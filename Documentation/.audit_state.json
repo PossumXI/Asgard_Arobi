@@ -1,0 +1,432 @@
+{
+    "Websites\\src\\components\\ui\\LoadingScreen.tsx":  {
+                                                             "Size":  3067,
+                                                             "Hash":  "BE35AA026D7C85D28C5CDD7E18DAC538",
+                                                             "LastModified":  "2026-01-21T01:49:33.1022173Z"
+                                                         },
+    "Bible.md":  {
+                     "Size":  29132,
+                     "Hash":  "C64120951AFD7C505E2D915F756C0C44",
+                     "LastModified":  "2026-01-21T02:52:12.7778156Z"
+                 },
+    "Websites\\src\\App.tsx":  {
+                                   "Size":  1845,
+                                   "Hash":  "4716B7EB06FFE59CC30AF8A591B41AA4",
+                                   "LastModified":  "2026-01-21T01:48:10.1103725Z"
+                               },
+    "pkg\\bundle\\serialization.go":  {
+                                          "Size":  8008,
+                                          "Hash":  "D8A7D87FEA4CE1E0D4BB4A0B00599BD6",
+                                          "LastModified":  "2026-01-21T03:17:44.5912692Z"
+                                      },
+    "Hubs\\README.md":  {
+                            "Size":  798,
+                            "Hash":  "E13F3C0FE53188BB3F4DF7EDAECC4E4E",
+                            "LastModified":  "2026-01-21T02:36:27.0116173Z"
+                        },
+    "Hubs\\package.json":  {
+                               "Size":  1572,
+                               "Hash":  "AC94EF196B5FCCF2B15F1695C684EDCA",
+                               "LastModified":  "2026-01-21T01:54:59.0749182Z"
+                           },
+    "Websites\\tailwind.config.js":  {
+                                         "Size":  4349,
+                                         "Hash":  "E660F5F3F882F82BE09305B6789D669A",
+                                         "LastModified":  "2026-01-21T01:47:40.6131163Z"
+                                     },
+    "Hubs\\src\\hooks\\useStreams.ts":  {
+                                            "Size":  8744,
+                                            "Hash":  "93195FAFF3A0572C426D3CEC2450F855",
+                                            "LastModified":  "2026-01-21T02:48:25.5357233Z"
+                                        },
+    "Data\\migrations\\postgres\\000001_initial_schema.up.sql":  {
+                                                                     "Size":  7642,
+                                                                     "Hash":  "966F19CB4F947806314F4A00FDB13171",
+                                                                     "LastModified":  "2026-01-21T01:44:10.2775742Z"
+                                                                 },
+    "Websites\\src\\pages\\Landing.tsx":  {
+                                              "Size":  15168,
+                                              "Hash":  "463917BD5FE05E11D15BA79793390DCB",
+                                              "LastModified":  "2026-01-21T01:51:02.3025976Z"
+                                          },
+    "Websites\\src\\pages\\Features.tsx":  {
+                                               "Size":  15539,
+                                               "Hash":  "27C57A21ABE81D80B63A79068BB56675",
+                                               "LastModified":  "2026-01-21T02:36:27.0126153Z"
+                                           },
+    "Data\\docker-compose.yml":  {
+                                     "Size":  1849,
+                                     "Hash":  "0C55F7CBB492D8096B8E4FBC370627AA",
+                                     "LastModified":  "2026-01-21T02:51:32.7261649Z"
+                                 },
+    "Websites\\package.json":  {
+                                   "Size":  1796,
+                                   "Hash":  "355376BCCEF4E09854FD39F46CFD7B04",
+                                   "LastModified":  "2026-01-21T01:47:20.7735407Z"
+                               },
+    "Websites\\src\\components\\layout\\Layout.tsx":  {
+                                                          "Size":  476,
+                                                          "Hash":  "1FB1CD39FED103145CE05F38E35CD94B",
+                                                          "LastModified":  "2026-01-21T01:49:37.9834421Z"
+                                                      },
+    "Data\\migrations\\mongo\\001_create_collections.js":  {
+                                                               "Size":  1718,
+                                                               "Hash":  "19E0867EB67817A785C33ABDBC106901",
+                                                               "LastModified":  "2026-01-21T01:44:10.2831003Z"
+                                                           },
+    "internal\\platform\\db\\config.go":  {
+                                              "Size":  2075,
+                                              "Hash":  "73734CA3C867DA75FD23537ACBDC47C0",
+                                              "LastModified":  "2026-01-21T01:48:28.8304710Z"
+                                          },
+    "Documentation\\Audit_Activity.md":  {
+                                             "Size":  1023,
+                                             "Hash":  "D6F537B5FC40F32D9258A2EDE1D1FFF5",
+                                             "LastModified":  "2026-01-21T03:24:34.4753524Z"
+                                         },
+    "Websites\\src\\lib\\realtime.ts":  {
+                                            "Size":  6669,
+                                            "Hash":  "8DD0127774FEB04151234512CAB8620A",
+                                            "LastModified":  "2026-01-21T02:46:31.1755997Z"
+                                        },
+    "pkg\\bundle\\bundle.go":  {
+                                   "Size":  6475,
+                                   "Hash":  "D0DB0F1AC4238842CA9372BD0796C041",
+                                   "LastModified":  "2026-01-21T03:17:21.5846313Z"
+                               },
+    "Documentation\\Credentials_Registry.md":  {
+                                                   "Size":  6983,
+                                                   "Hash":  "D973E73F5041FC4E706FE50FC2DF3985",
+                                                   "LastModified":  "2026-01-21T03:10:48.6848897Z"
+                                               },
+    "Hubs\\src\\components\\VideoPlayer.tsx":  {
+                                                   "Size":  6985,
+                                                   "Hash":  "CA663DEB445D71821CA94302FCF52075",
+                                                   "LastModified":  "2026-01-21T01:56:27.1114424Z"
+                                               },
+    "Documentation\\README.md":  {
+                                     "Size":  432,
+                                     "Hash":  "3711086B809F6050156D9260A9B544A7",
+                                     "LastModified":  "2026-01-21T01:44:10.2765676Z"
+                                 },
+    "internal\\platform\\dtn\\router.go":  {
+                                               "Size":  8065,
+                                               "Hash":  "B5525BB4FB090B6CFF0525917AD85F46",
+                                               "LastModified":  "2026-01-21T03:19:13.4832979Z"
+                                           },
+    "internal\\platform\\dtn\\storage.go":  {
+                                                "Size":  8125,
+                                                "Hash":  "1F37A09A077EB6C0A45DC3CD35EA3C09",
+                                                "LastModified":  "2026-01-21T03:18:09.3283513Z"
+                                            },
+    "Hubs\\src\\components\\LoadingScreen.tsx":  {
+                                                     "Size":  1789,
+                                                     "Hash":  "EADAD7436FF0C3228DCFD5CC78CE15AC",
+                                                     "LastModified":  "2026-01-21T01:55:53.8596854Z"
+                                                 },
+    "Websites\\src\\lib\\utils.ts":  {
+                                         "Size":  2528,
+                                         "Hash":  "63FCD8BFC4BCD125617D92CF93254D50",
+                                         "LastModified":  "2026-01-21T01:48:25.4476579Z"
+                                     },
+    "Data\\init_databases.ps1":  {
+                                     "Size":  3018,
+                                     "Hash":  "7286776D62530241CFB72288CB0AC9CE",
+                                     "LastModified":  "2026-01-21T02:55:40.6657810Z"
+                                 },
+    "manifest.md":  {
+                        "Size":  142093,
+                        "Hash":  "662A0E4ED48144497DFE4B029CB79828",
+                        "LastModified":  "2026-01-21T02:52:07.7797421Z"
+                    },
+    "Websites\\src\\components\\ui\\Card.tsx":  {
+                                                    "Size":  2116,
+                                                    "Hash":  "C809DBE1ECC44F0F029E40F34361B3A0",
+                                                    "LastModified":  "2026-01-21T01:49:11.8748115Z"
+                                                },
+    "Hunoid\\README.md":  {
+                              "Size":  945,
+                              "Hash":  "3D9F62DECF945BA467D9E6152503A562",
+                              "LastModified":  "2026-01-21T02:36:27.0086143Z"
+                          },
+    "Websites\\src\\pages\\auth\\SignUp.tsx":  {
+                                                   "Size":  10664,
+                                                   "Hash":  "D1A6849D0B47168FA908FF5511692B13",
+                                                   "LastModified":  "2026-01-21T02:36:27.0116173Z"
+                                               },
+    "Websites\\src\\stores\\appStore.ts":  {
+                                               "Size":  4957,
+                                               "Hash":  "EC993B38A791357FA097A31F42049B1C",
+                                               "LastModified":  "2026-01-21T02:47:25.4920046Z"
+                                           },
+    "Hubs\\src\\App.tsx":  {
+                               "Size":  1053,
+                               "Hash":  "A92635363DD7C0E04092D103130C0C6E",
+                               "LastModified":  "2026-01-21T01:55:26.0163484Z"
+                           },
+    "Hubs\\src\\pages\\MilitaryHub.tsx":  {
+                                              "Size":  4081,
+                                              "Hash":  "49CE3C907394A52063256E3132C1A73A",
+                                              "LastModified":  "2026-01-21T01:57:22.1835522Z"
+                                          },
+    "Giru\\README.md":  {
+                            "Size":  1046,
+                            "Hash":  "AFF47446B9D7B4438CCC83624548A2C7",
+                            "LastModified":  "2026-01-21T02:36:26.9684231Z"
+                        },
+    "Hubs\\src\\components\\Layout.tsx":  {
+                                              "Size":  5398,
+                                              "Hash":  "52DA047293C2CF324FFADB2996624464",
+                                              "LastModified":  "2026-01-21T01:55:48.5274996Z"
+                                          },
+    "Hubs\\src\\pages\\HubsHome.tsx":  {
+                                           "Size":  6722,
+                                           "Hash":  "5636B3A8B74CAB5B6BE80BD422187EFF",
+                                           "LastModified":  "2026-01-21T01:56:57.9900590Z"
+                                       },
+    "Websites\\src\\lib\\types.ts":  {
+                                         "Size":  10315,
+                                         "Hash":  "E7319F854834F3E1AB60083F48F45EA5",
+                                         "LastModified":  "2026-01-21T02:46:13.1689954Z"
+                                     },
+    "internal\\platform\\db\\models.go":  {
+                                              "Size":  5570,
+                                              "Hash":  "507B99E13BB8ECD1E89A32EB34E28495",
+                                              "LastModified":  "2026-01-21T01:48:54.5985014Z"
+                                          },
+    "Websites\\src\\main.tsx":  {
+                                    "Size":  682,
+                                    "Hash":  "2836D85F49CBE8E4F44888AC7372B5C2",
+                                    "LastModified":  "2026-01-21T01:47:49.8159746Z"
+                                },
+    "Hubs\\src\\components\\StreamCard.tsx":  {
+                                                  "Size":  4321,
+                                                  "Hash":  "06304BB618D0CA752F3A16C0AAEDB15F",
+                                                  "LastModified":  "2026-01-21T01:56:07.0130325Z"
+                                              },
+    "Websites\\tsconfig.node.json":  {
+                                         "Size":  223,
+                                         "Hash":  "281E378713152CCCC7860C818DB55849",
+                                         "LastModified":  "2026-01-21T01:47:23.7593494Z"
+                                     },
+    "Websites\\src\\pages\\Pricing.tsx":  {
+                                              "Size":  15877,
+                                              "Hash":  "4029121A40EB6016AC8CD97A0A7D1864",
+                                              "LastModified":  "2026-01-21T02:36:27.0116173Z"
+                                          },
+    "Websites\\src\\components\\ui\\Input.tsx":  {
+                                                     "Size":  1568,
+                                                     "Hash":  "21281EE795BA776D5ACFC31BD82CCE77",
+                                                     "LastModified":  "2026-01-21T01:49:06.8405497Z"
+                                                 },
+    "Websites\\tsconfig.json":  {
+                                    "Size":  654,
+                                    "Hash":  "17D470A943AEAD8D33499E11621A9C51",
+                                    "LastModified":  "2026-01-21T01:47:22.7999953Z"
+                                },
+    "Silenus\\README.md":  {
+                               "Size":  907,
+                               "Hash":  "F20FCD952F44A1BD137736F33825DD3D",
+                               "LastModified":  "2026-01-21T02:36:26.9995556Z"
+                           },
+    "Hubs\\src\\pages\\StreamView.tsx":  {
+                                             "Size":  7969,
+                                             "Hash":  "1EE1186C338528D2CD79ED2F47A8104B",
+                                             "LastModified":  "2026-01-21T01:58:15.6164263Z"
+                                         },
+    "README.md":  {
+                      "Size":  782,
+                      "Hash":  "CEBC232DE6319EC8A95ABD286F554500",
+                      "LastModified":  "2026-01-21T01:44:10.2765676Z"
+                  },
+    "Hubs\\tsconfig.json":  {
+                                "Size":  654,
+                                "Hash":  "17D470A943AEAD8D33499E11621A9C51",
+                                "LastModified":  "2026-01-21T01:55:01.1341773Z"
+                            },
+    "Websites\\src\\hooks\\useApi.ts":  {
+                                            "Size":  9194,
+                                            "Hash":  "6B858C1F548BC084F2A4027F1B864D71",
+                                            "LastModified":  "2026-01-21T02:48:11.8755050Z"
+                                        },
+    "Hubs\\vite.config.ts":  {
+                                 "Size":  497,
+                                 "Hash":  "3613F1C705B1AAAA8B2CADE9E25CF64D",
+                                 "LastModified":  "2026-01-21T01:55:04.1649801Z"
+                             },
+    "Websites\\src\\components\\ui\\Toaster.tsx":  {
+                                                       "Size":  4406,
+                                                       "Hash":  "878EBE886E0187EF27BFF0853D875910",
+                                                       "LastModified":  "2026-01-21T01:49:24.3544698Z"
+                                                   },
+    "Nysus\\README.md":  {
+                             "Size":  889,
+                             "Hash":  "53C4938FB4A4F449DE9823FDE23EEA73",
+                             "LastModified":  "2026-01-21T02:36:27.0126153Z"
+                         },
+    "cmd\\db_migrate\\main.go":  {
+                                     "Size":  2478,
+                                     "Hash":  "DBA5D07BE1A46B377B4269591561AB20",
+                                     "LastModified":  "2026-01-21T01:49:01.1715828Z"
+                                 },
+    "internal\\platform\\db\\mongodb.go":  {
+                                               "Size":  1308,
+                                               "Hash":  "66EBD4F0F3B40D21A099647BC651D80D",
+                                               "LastModified":  "2026-01-21T01:48:41.5430133Z"
+                                           },
+    "Hubs\\src\\pages\\InterstellarHub.tsx":  {
+                                                  "Size":  6312,
+                                                  "Hash":  "813C8C19558461A9C141828E9F98546E",
+                                                  "LastModified":  "2026-01-21T01:57:55.4163559Z"
+                                              },
+    "Websites\\src\\pages\\gov\\GovPortal.tsx":  {
+                                                     "Size":  12633,
+                                                     "Hash":  "7CD79DB8AEC65346E6ABA144C093E76A",
+                                                     "LastModified":  "2026-01-21T02:36:27.0116173Z"
+                                                 },
+    "Websites\\src\\pages\\auth\\SignIn.tsx":  {
+                                                   "Size":  8442,
+                                                   "Hash":  "76BDD315CA9017C4D5EF7FAE6319DD24",
+                                                   "LastModified":  "2026-01-21T02:36:27.0126153Z"
+                                               },
+    "Hubs\\src\\main.tsx":  {
+                                "Size":  541,
+                                "Hash":  "896187F747F2177C0AC4CCCAF1E2C58E",
+                                "LastModified":  "2026-01-21T01:55:16.4552150Z"
+                            },
+    "Websites\\vite.config.ts":  {
+                                     "Size":  473,
+                                     "Hash":  "F31D4058F255DA5F72CA1A122FA9CB86",
+                                     "LastModified":  "2026-01-21T01:47:25.6106767Z"
+                                 },
+    "internal\\platform\\dtn\\node.go":  {
+                                             "Size":  9822,
+                                             "Hash":  "E115A9A63DE57D679CA27A3BEB704335",
+                                             "LastModified":  "2026-01-21T03:18:46.5442227Z"
+                                         },
+    "Websites\\src\\lib\\api.ts":  {
+                                       "Size":  5972,
+                                       "Hash":  "1C18B2B9BF632E61C20E1969A9DF1EEF",
+                                       "LastModified":  "2026-01-21T01:48:38.3475789Z"
+                                   },
+    "Websites\\src\\pages\\About.tsx":  {
+                                            "Size":  14293,
+                                            "Hash":  "89A5AFFE60B9F567EB201B8A4247CA68",
+                                            "LastModified":  "2026-01-21T02:36:26.9754240Z"
+                                        },
+    "internal\\platform\\db\\postgres.go":  {
+                                                "Size":  1043,
+                                                "Hash":  "CFA7FB5E8CAA77EDEB690428BFCA2FC7",
+                                                "LastModified":  "2026-01-21T01:48:37.7524542Z"
+                                            },
+    "Websites\\src\\pages\\dashboard\\Dashboard.tsx":  {
+                                                           "Size":  14222,
+                                                           "Hash":  "5F4DF429054F96FF2544CEF477889F1C",
+                                                           "LastModified":  "2026-01-21T02:36:27.0136157Z"
+                                                       },
+    "Hubs\\tailwind.config.js":  {
+                                     "Size":  673,
+                                     "Hash":  "588CF89FD97978676B60F23051116D64",
+                                     "LastModified":  "2026-01-21T01:55:07.5396556Z"
+                                 },
+    "Hubs\\src\\stores\\hubStore.ts":  {
+                                           "Size":  5606,
+                                           "Hash":  "6C01339777F15DE4A4722513CB86E117",
+                                           "LastModified":  "2026-01-21T02:47:39.9523948Z"
+                                       },
+    "Hubs\\src\\pages\\CivilianHub.tsx":  {
+                                              "Size":  6975,
+                                              "Hash":  "1F50668D8F749A2E8A18A744C55AC414",
+                                              "LastModified":  "2026-01-21T01:57:11.0507338Z"
+                                          },
+    "Hubs\\postcss.config.js":  {
+                                    "Size":  87,
+                                    "Hash":  "33FAD9C02CB0EC6D6030369EF6347D57",
+                                    "LastModified":  "2026-01-21T01:55:08.8766383Z"
+                                },
+    "Websites\\src\\components\\ui\\Button.tsx":  {
+                                                      "Size":  2780,
+                                                      "Hash":  "6E2A4C5A1F07043F46E6145ED357C026",
+                                                      "LastModified":  "2026-01-21T01:49:02.2108921Z"
+                                                  },
+    "Documentation\\Build_Log.md":  {
+                                        "Size":  15750,
+                                        "Hash":  "9BDBC71ABC6F7B1E560D7AE74DEA124A",
+                                        "LastModified":  "2026-01-21T03:20:32.9602881Z"
+                                    },
+    "Control_net\\README.md":  {
+                                   "Size":  857,
+                                   "Hash":  "7CE65D2A6E340DB62E91A36FC4898E38",
+                                   "LastModified":  "2026-01-21T02:36:27.0116173Z"
+                               },
+    "Agent_Guide.md":  {
+                           "Size":  170828,
+                           "Hash":  "9523812DC8BD3E5517FAA138822DC032",
+                           "LastModified":  "2026-01-21T02:52:04.3075480Z"
+                       },
+    "cmd\\satnet_router\\main.go":  {
+                                        "Size":  4420,
+                                        "Hash":  "53AEF848ACD1EA967A2E407E1D8E068F",
+                                        "LastModified":  "2026-01-21T03:19:34.6863255Z"
+                                    },
+    "Websites\\postcss.config.js":  {
+                                        "Size":  87,
+                                        "Hash":  "33FAD9C02CB0EC6D6030369EF6347D57",
+                                        "LastModified":  "2026-01-21T01:47:41.3735029Z"
+                                    },
+    "Websites\\src\\providers\\AuthProvider.tsx":  {
+                                                       "Size":  2751,
+                                                       "Hash":  "2AB13E60E223D77C5CA41E4FFA8F46AA",
+                                                       "LastModified":  "2026-01-21T01:48:51.3484991Z"
+                                                   },
+    "Websites\\src\\pages\\NotFound.tsx":  {
+                                               "Size":  4640,
+                                               "Hash":  "67B092E108B8C23D62CC707CE1300492",
+                                               "LastModified":  "2026-01-21T02:36:26.9759348Z"
+                                           },
+    "Data\\migrations\\postgres\\000001_initial_schema.down.sql":  {
+                                                                       "Size":  843,
+                                                                       "Hash":  "EBDA45A3974BC24B43EF3CF5B3CB699B",
+                                                                       "LastModified":  "2026-01-21T01:44:10.2831003Z"
+                                                                   },
+    "Websites\\src\\components\\layout\\Footer.tsx":  {
+                                                          "Size":  6487,
+                                                          "Hash":  "2D9300A3E11238BFCAF08DF65DB3E6FA",
+                                                          "LastModified":  "2026-01-21T01:50:14.9493154Z"
+                                                      },
+    "Websites\\src\\components\\layout\\Header.tsx":  {
+                                                          "Size":  9231,
+                                                          "Hash":  "D781975810CFA6C2C11CC9B8076F978F",
+                                                          "LastModified":  "2026-01-21T01:49:59.8060444Z"
+                                                      },
+    "Hubs\\tsconfig.node.json":  {
+                                     "Size":  223,
+                                     "Hash":  "281E378713152CCCC7860C818DB55849",
+                                     "LastModified":  "2026-01-21T01:55:02.2566325Z"
+                                 },
+    "Websites\\src\\providers\\ThemeProvider.tsx":  {
+                                                        "Size":  2375,
+                                                        "Hash":  "CAA644698D00F32DB37BC9E02BF8B51B",
+                                                        "LastModified":  "2026-01-21T01:48:44.7456257Z"
+                                                    },
+    "Hubs\\src\\lib\\api.ts":  {
+                                   "Size":  11170,
+                                   "Hash":  "7D3277878C2AD97420E1CFD4DD149DE8",
+                                   "LastModified":  "2026-01-21T02:47:01.7462999Z"
+                               },
+    "Documentation\\audit_trigger.ps1":  {
+                                             "Size":  9284,
+                                             "Hash":  "DD23CD74457F079F9BC652984C7E8067",
+                                             "LastModified":  "2026-01-21T03:21:06.8456202Z"
+                                         },
+    "Hubs\\src\\lib\\utils.ts":  {
+                                     "Size":  906,
+                                     "Hash":  "507BF26D94EC27DE44A648B4B163A67D",
+                                     "LastModified":  "2026-01-21T01:55:29.4086294Z"
+                                 },
+    "Sat_Net\\README.md":  {
+                               "Size":  910,
+                               "Hash":  "2CD92929475C035EADD0F0DA4EEDAD9E",
+                               "LastModified":  "2026-01-21T02:36:27.0126153Z"
+                           }
+}
