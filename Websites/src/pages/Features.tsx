@@ -23,8 +23,11 @@ import { cn } from '@/lib/utils';
 
 const fadeInUp = {
   initial: { opacity: 0, y: 30 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.6 }
+  animate: { 
+    opacity: 1, 
+    y: 0,
+    transition: { duration: 0.6 }
+  }
 };
 
 const staggerContainer = {
@@ -91,6 +94,7 @@ const coreCapabilities = [
       'Ethical offensive capabilities',
     ],
     color: 'red',
+    image: '/giru.png',
   },
   {
     id: 'satnet',
@@ -244,12 +248,22 @@ export default function Features() {
                           'p-8 flex flex-col justify-center',
                           colors.bg
                         )}>
-                          <div className={cn(
-                            'w-16 h-16 rounded-2xl flex items-center justify-center mb-4',
-                            'bg-white dark:bg-asgard-900'
-                          )}>
-                            <capability.icon className={cn('w-8 h-8', colors.text)} />
-                          </div>
+                          {'image' in capability && capability.image ? (
+                            <div className="w-24 h-24 mb-4">
+                              <img 
+                                src={capability.image} 
+                                alt={capability.title}
+                                className="w-full h-full object-contain"
+                              />
+                            </div>
+                          ) : (
+                            <div className={cn(
+                              'w-16 h-16 rounded-2xl flex items-center justify-center mb-4',
+                              'bg-white dark:bg-asgard-900'
+                            )}>
+                              <capability.icon className={cn('w-8 h-8', colors.text)} />
+                            </div>
+                          )}
                           <h3 className="text-headline text-asgard-900 dark:text-white">
                             {capability.title}
                           </h3>

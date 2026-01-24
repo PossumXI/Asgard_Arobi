@@ -17,10 +17,10 @@ func Apply(handler http.Handler) http.Handler {
 	handler = middleware.RealIP(handler)
 
 	// Structured logging
-	handler = middleware.Logger(handler)
+	handler = Logger(handler)
 
 	// Panic recovery
-	handler = middleware.Recoverer(handler)
+	handler = Recoverer(handler)
 
 	// Request timeout
 	handler = middleware.Timeout(30 * time.Second)(handler)

@@ -1,0 +1,41 @@
+{
+  "timestamp": "2026-01-23T21:38:56.4444308-05:00",
+  "systemVersion": "1.0.0",
+  "totalTests": 4,
+  "passedTests": 3,
+  "overallAccuracy": 89.08009506577696,
+  "results": [
+    {
+      "testName": "Short Range UAV",
+      "duration": 166503700,
+      "accuracy": 79.46114523409682,
+      "errorMargin": 20.53885476590318,
+      "passed": false,
+      "details": "Expected: 7071.07m, Actual: 8523.39m, Deviation: 20.54%, Waypoints: 52, Stealth: 0.00"
+    },
+    {
+      "testName": "Medium Range Missile",
+      "duration": 130320200,
+      "accuracy": 89.85958182947742,
+      "errorMargin": 10.140418170522574,
+      "passed": true,
+      "details": "Expected: 58523.72m, Actual: 64458.27m, Deviation: 10.14%, Waypoints: 52, Stealth: 0.00"
+    },
+    {
+      "testName": "Ground Robot Navigation",
+      "duration": 120454000,
+      "accuracy": 99.22170244048029,
+      "errorMargin": 0.778297559519708,
+      "passed": true,
+      "details": "Expected: 1131.37m, Actual: 1140.18m, Deviation: 0.78%, Waypoints: 5, Stealth: 0.26"
+    },
+    {
+      "testName": "Orbital Spacecraft",
+      "duration": 110728600,
+      "accuracy": 87.77795075905333,
+      "errorMargin": 12.222049240946669,
+      "passed": true,
+      "details": "Expected: 111803.40m, Actual: 125468.07m, Deviation: 12.22%, Waypoints: 52, Stealth: 0.00"
+    }
+  ]
+}

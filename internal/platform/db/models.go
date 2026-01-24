@@ -12,12 +12,26 @@ type User struct {
 	ID               uuid.UUID      `db:"id"`
 	Email            string         `db:"email"`
 	PasswordHash     string         `db:"password_hash"`
+	EmailVerified    bool           `db:"email_verified"`
+	EmailVerifiedAt  sql.NullTime   `db:"email_verified_at"`
 	FullName         sql.NullString `db:"full_name"`
 	SubscriptionTier string         `db:"subscription_tier"`
 	IsGovernment     bool           `db:"is_government"`
 	CreatedAt        time.Time      `db:"created_at"`
 	UpdatedAt        time.Time      `db:"updated_at"`
 	LastLogin        sql.NullTime   `db:"last_login"`
+}
+
+// NotificationSettings represents user notification preferences.
+type NotificationSettings struct {
+	UserID            uuid.UUID `db:"user_id"`
+	EmailAlerts       bool      `db:"email_alerts"`
+	PushNotifications bool      `db:"push_notifications"`
+	WeeklyDigest      bool      `db:"weekly_digest"`
+	SecurityAlerts    bool      `db:"security_alerts"`
+	MissionUpdates    bool      `db:"mission_updates"`
+	SystemStatus      bool      `db:"system_status"`
+	UpdatedAt         time.Time `db:"updated_at"`
 }
 
 // Satellite represents an orbital vehicle (Silenus)

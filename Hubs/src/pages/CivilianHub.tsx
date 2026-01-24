@@ -1,99 +1,9 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Globe, Filter, Grid, List, Search, MapPin } from 'lucide-react';
-import StreamCard, { Stream } from '@/components/StreamCard';
+import { Globe, Grid, List, Search, MapPin, Loader2 } from 'lucide-react';
+import StreamCard from '@/components/StreamCard';
 import { cn } from '@/lib/utils';
-
-const civilianStreams: Stream[] = [
-  {
-    id: 'pacific-monitor-1',
-    title: 'Pacific Shipping Lane Monitor',
-    source: 'Silenus-47',
-    location: 'Pacific Ocean',
-    type: 'civilian',
-    status: 'live',
-    viewers: 12453,
-    latency: 234,
-    description: 'Real-time monitoring of major shipping routes',
-  },
-  {
-    id: 'hunoid-aid-1',
-    title: 'Medical Supply Delivery',
-    source: 'Hunoid-102',
-    location: 'Vietnam',
-    type: 'civilian',
-    status: 'live',
-    viewers: 8721,
-    latency: 156,
-    description: 'Emergency medical supplies to rural clinic',
-  },
-  {
-    id: 'amazon-watch',
-    title: 'Amazon Forest Monitoring',
-    source: 'Silenus-56',
-    location: 'Brazil',
-    type: 'civilian',
-    status: 'live',
-    viewers: 6743,
-    latency: 267,
-    description: 'Deforestation and fire detection',
-  },
-  {
-    id: 'atlantic-patrol',
-    title: 'Atlantic Maritime Safety',
-    source: 'Silenus-23',
-    location: 'Atlantic Ocean',
-    type: 'civilian',
-    status: 'live',
-    viewers: 3421,
-    latency: 189,
-    description: 'Search and rescue coordination',
-  },
-  {
-    id: 'earthquake-response',
-    title: 'Earthquake Response Team',
-    source: 'Hunoid Squadron',
-    location: 'Indonesia',
-    type: 'civilian',
-    status: 'live',
-    viewers: 15632,
-    latency: 201,
-    description: 'Search and rescue operations',
-  },
-  {
-    id: 'arctic-survey',
-    title: 'Arctic Climate Survey',
-    source: 'Silenus-12',
-    location: 'Arctic Circle',
-    type: 'civilian',
-    status: 'live',
-    viewers: 2156,
-    latency: 312,
-    description: 'Ice coverage and wildlife monitoring',
-  },
-  {
-    id: 'flood-relief',
-    title: 'Flood Relief Operations',
-    source: 'Hunoid-78',
-    location: 'Bangladesh',
-    type: 'civilian',
-    status: 'live',
-    viewers: 9234,
-    latency: 178,
-    description: 'Evacuation and supply distribution',
-  },
-  {
-    id: 'wildlife-protection',
-    title: 'Wildlife Migration Tracking',
-    source: 'Silenus-34',
-    location: 'Africa',
-    type: 'civilian',
-    status: 'live',
-    viewers: 4521,
-    latency: 289,
-    description: 'Anti-poaching surveillance',
-  },
-];
+import { useStreams, useStreamUpdates } from '@/hooks/useStreams';
 
 const regions = ['All Regions', 'Asia Pacific', 'Americas', 'Europe', 'Africa', 'Arctic'];
 
@@ -101,11 +11,22 @@ export default function CivilianHub() {
   const [layout, setLayout] = useState<'grid' | 'list'>('grid');
   const [selectedRegion, setSelectedRegion] = useState('All Regions');
   const [searchQuery, setSearchQuery] = useState('');
+  const { data, isLoading, error } = useStreams({ type: 'civilian' });
 
-  const filteredStreams = civilianStreams.filter((stream) => {
-    const matchesSearch = stream.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         stream.location.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesSearch;
+  useStreamUpdates();
+
+  const streams = data?.streams ?? [];
+
+  const filteredStreams = streams.filter((stream) => {
+    const matchesSearch =
+      stream.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      stream.location.toLowerCase().includes(searchQuery.toLowerCase());
+
+    if (selectedRegion === 'All Regions') {
+      return matchesSearch;
+    }
+
+    return matchesSearch && stream.location.toLowerCase().includes(selectedRegion.toLowerCase());
   });
 
   return (
@@ -188,16 +109,30 @@ export default function CivilianHub() {
           ? 'grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'
           : 'space-y-3'
       )}>
-        {filteredStreams.map((stream, index) => (
-          <motion.div
-            key={stream.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.05 }}
-          >
-            <StreamCard stream={stream} layout={layout} />
-          </motion.div>
-        ))}
+        {isLoading ? (
+          <div className="col-span-full flex items-center justify-center py-12">
+            <Loader2 className="w-6 h-6 animate-spin text-hub-accent" />
+          </div>
+        ) : error ? (
+          <div className="col-span-full text-center text-red-400">
+            Failed to load civilian streams.
+          </div>
+        ) : filteredStreams.length > 0 ? (
+          filteredStreams.map((stream, index) => (
+            <motion.div
+              key={stream.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05 }}
+            >
+              <StreamCard stream={stream} layout={layout} />
+            </motion.div>
+          ))
+        ) : (
+          <div className="col-span-full text-center text-gray-500">
+            No civilian streams available.
+          </div>
+        )}
       </div>
 
       {filteredStreams.length === 0 && (

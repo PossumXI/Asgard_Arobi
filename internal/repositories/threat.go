@@ -72,21 +72,11 @@ func (r *ThreatRepository) GetByID(id string) (*db.Threat, error) {
 		return nil, fmt.Errorf("failed to query threat: %w", err)
 	}
 
-	if sourceIP.Valid {
-		threat.SourceIP = &sourceIP.String
-	}
-	if targetComponent.Valid {
-		threat.TargetComponent = &targetComponent.String
-	}
-	if attackVector.Valid {
-		threat.AttackVector = &attackVector.String
-	}
-	if mitigationAction.Valid {
-		threat.MitigationAction = &mitigationAction.String
-	}
-	if resolvedAt.Valid {
-		threat.ResolvedAt = &resolvedAt.Time
-	}
+	threat.SourceIP = sourceIP
+	threat.TargetComponent = targetComponent
+	threat.AttackVector = attackVector
+	threat.MitigationAction = mitigationAction
+	threat.ResolvedAt = resolvedAt
 
 	return threat, nil
 }

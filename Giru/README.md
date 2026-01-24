@@ -1,5 +1,13 @@
 # Giru 2.0 - AI Defense System
 
+<p align="center">
+  <img src="../Assets/giru.png" alt="Giru - AI Defense System" width="200"/>
+</p>
+
+<p align="center">
+  <em>Giru - The Guardian Intelligence of ASGARD</em>
+</p>
+
 ## Overview
 Giru is the immune system of ASGARD, providing continuous red-teaming, threat detection, and autonomous defense.
 

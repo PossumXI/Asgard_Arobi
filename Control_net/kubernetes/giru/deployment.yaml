@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: giru
+  namespace: asgard
+  labels:
+    app: giru
+    component: security
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: giru
+  template:
+    metadata:
+      labels:
+        app: giru
+        component: security
+    spec:
+      containers:
+      - name: giru
+        image: asgard/giru:latest
+        imagePullPolicy: IfNotPresent
+        args:
+        - -interface
+        - "eth0"
+        securityContext:
+          capabilities:
+            add:
+            - NET_ADMIN
+            - NET_RAW
+          privileged: false
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - "ps aux | grep giru | grep -v grep"
+          initialDelaySeconds: 30
+          periodSeconds: 10

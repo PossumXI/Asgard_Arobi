@@ -1,0 +1,112 @@
+# ASGARD .gitignore
+
+# Environment files with secrets - NEVER COMMIT
+.env
+.env.local
+.env.*.local
+*.env
+
+# Keep example file
+!.env.example
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.settings/
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Go binaries and build artifacts
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+/bin/
+!/bin/.gitkeep
+
+# Go test and coverage
+*.test
+*.out
+coverage.html
+coverage.txt
+
+# Go vendor (if not vendoring)
+# vendor/
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# Logs
+logs/
+*.log
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Docker volumes (local data)
+postgres_data/
+mongo_data/
+redis_data/
+nats_data/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Credentials and secrets
+*.pem
+*.key
+*.crt
+*.p12
+credentials.json
+service-account.json
+secrets.yaml
+!Control_net/kubernetes/secrets.yaml.example
+
+# Terraform state (if used)
+*.tfstate
+*.tfstate.*
+.terraform/
+
+# Python (if any scripts)
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+venv/
+ENV/
+
+# Test artifacts
+test-results/
+playwright-report/
+
+# Local development
+.local/
+*.local.yaml
+*.local.json
+# Large files (exceed GitHub 100MB limit)
+third_party/tflite/libtensorflow.zip
+third_party/tflite/*.zip
+*.zip

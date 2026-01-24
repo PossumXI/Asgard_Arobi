@@ -3,10 +3,12 @@ package handlers
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
+	"os"
 
 	"github.com/asgard/pandora/internal/services"
-	"github.com/go-chi/chi/v5"
+	"github.com/stripe/stripe-go/v78/webhook"
 )
 
 // SubscriptionHandler handles subscription endpoints.
@@ -103,4 +105,39 @@ func (h *SubscriptionHandler) ReactivateSubscription(w http.ResponseWriter, r *h
 	}
 
 	jsonResponse(w, http.StatusOK, map[string]string{"message": "Subscription reactivated"})
+}
+
+// HandleWebhook handles POST /api/webhooks/stripe
+func (h *SubscriptionHandler) HandleWebhook(w http.ResponseWriter, r *http.Request) {
+	const maxBodyBytes = int64(65536)
+	r.Body = http.MaxBytesReader(w, r.Body, maxBodyBytes)
+
+	payload, err := io.ReadAll(r.Body)
+	if err != nil {
+		jsonError(w, http.StatusBadRequest, "Error reading request body", "invalid_body")
+		return
+	}
+
+	// Get the webhook secret from environment
+	webhookSecret := os.Getenv("STRIPE_WEBHOOK_SECRET")
+	if webhookSecret == "" {
+		jsonError(w, http.StatusInternalServerError, "Webhook secret not configured", "config_error")
+		return
+	}
+
+	// Verify the webhook signature
+	sigHeader := r.Header.Get("Stripe-Signature")
+	event, err := webhook.ConstructEvent(payload, sigHeader, webhookSecret)
+	if err != nil {
+		jsonError(w, http.StatusBadRequest, "Invalid webhook signature", "invalid_signature")
+		return
+	}
+
+	// Route to the appropriate handler based on event type
+	if err := h.subscriptionService.HandleStripeWebhook(event); err != nil {
+		jsonError(w, http.StatusInternalServerError, err.Error(), "webhook_error")
+		return
+	}
+
+	jsonResponse(w, http.StatusOK, map[string]string{"received": "true"})
 }

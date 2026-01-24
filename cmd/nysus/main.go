@@ -5,17 +5,21 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
-	"github.com/asgard/pandora/Nysus/internal/api"
-	"github.com/asgard/pandora/Nysus/internal/events"
+	"github.com/asgard/pandora/internal/controlplane"
+	"github.com/asgard/pandora/internal/nysus/api"
+	"github.com/asgard/pandora/internal/nysus/events"
 	"github.com/asgard/pandora/internal/platform/db"
+	"github.com/asgard/pandora/internal/platform/observability"
 	"github.com/google/uuid"
 )
 
@@ -23,13 +27,24 @@ func main() {
 	// Parse command line flags
 	addr := flag.String("addr", ":8080", "HTTP server address")
 	dbHost := flag.String("db-host", "localhost", "PostgreSQL host")
-	dbPort := flag.String("db-port", "5432", "PostgreSQL port")
+	dbPort := flag.String("db-port", "55432", "PostgreSQL port")
 	mongoHost := flag.String("mongo-host", "localhost", "MongoDB host")
 	mongoPort := flag.String("mongo-port", "27017", "MongoDB port")
 	flag.Parse()
 
 	log.Println("=== ASGARD Nysus - Central Nervous System ===")
 	log.Printf("HTTP Server: %s", *addr)
+
+	shutdownTracing, err := observability.InitTracing(context.Background(), "nysus")
+	if err != nil {
+		log.Printf("Tracing disabled: %v", err)
+	} else {
+		defer func() {
+			if err := shutdownTracing(context.Background()); err != nil {
+				log.Printf("Tracing shutdown error: %v", err)
+			}
+		}()
+	}
 
 	// Override config from flags
 	os.Setenv("POSTGRES_HOST", *dbHost)
@@ -43,14 +58,20 @@ func main() {
 		log.Fatalf("Failed to load database config: %v", err)
 	}
 
+	allowNoDB := strings.EqualFold(os.Getenv("ASGARD_ALLOW_NO_DB"), "true") || os.Getenv("ASGARD_ALLOW_NO_DB") == "1"
+
 	// Connect to PostgreSQL
 	log.Println("Connecting to PostgreSQL...")
 	pgDB, err := db.NewPostgresDB(dbCfg)
 	if err != nil {
-		log.Printf("Warning: PostgreSQL connection failed: %v", err)
-		log.Println("Continuing without database - API will return sample data")
-		pgDB = nil
-	} else {
+		if allowNoDB {
+			log.Printf("Warning: PostgreSQL connection failed: %v (continuing without database)", err)
+			pgDB = nil
+		} else {
+			log.Fatalf("PostgreSQL connection failed: %v", err)
+		}
+	}
+	if pgDB != nil {
 		log.Println("PostgreSQL connected successfully")
 		defer pgDB.Close()
 	}
@@ -71,14 +92,32 @@ func main() {
 	eventBus.Start()
 	defer eventBus.Stop()
 
-	// Subscribe to events for logging
+	// Start unified control plane
+	cpCfg := controlplane.DefaultConfig()
+	if natsURL := os.Getenv("NATS_URL"); natsURL != "" {
+		cpCfg.NATSUrl = natsURL
+	}
+	controlPlane, err := controlplane.NewUnifiedControlPlane(cpCfg)
+	if err != nil {
+		log.Printf("Control plane init failed: %v", err)
+	} else {
+		if err := controlPlane.Start(); err != nil {
+			log.Printf("Control plane start failed: %v", err)
+		} else {
+			defer controlPlane.Stop()
+		}
+	}
+
+	// Subscribe to events for logging and control plane bridging
 	eventBus.Subscribe(events.EventTypeAlert, func(ctx context.Context, event events.Event) error {
 		log.Printf("[Event] Alert: %v", event.Payload)
+		publishToControlPlane(controlPlane, event)
 		return nil
 	})
 
 	eventBus.Subscribe(events.EventTypeThreat, func(ctx context.Context, event events.Event) error {
 		log.Printf("[Event] Threat: %v", event.Payload)
+		publishToControlPlane(controlPlane, event)
 		return nil
 	})
 
@@ -92,22 +131,13 @@ func main() {
 		IdleTimeout:  60 * time.Second,
 	}
 
-	// Handle nil DB connections gracefully
-	var pgDBPtr *db.PostgresDB = pgDB
-	var mongoDBPtr *db.MongoDB = mongoDB
+	// Handle nil DB connections gracefully - API server handles nil DBs
+	server := api.NewServer(serverCfg, pgDB, mongoDB, eventBus)
 
-	// Create a mock DB wrapper if needed
-	if pgDB == nil {
-		pgDBPtr = createMockPostgres()
+	// Start database-driven event publishing if DB is available
+	if pgDB != nil {
+		go startEventPublisher(context.Background(), eventBus, pgDB)
 	}
-	if mongoDB == nil {
-		mongoDBPtr = createMockMongo()
-	}
-
-	server := api.NewServer(serverCfg, pgDBPtr, mongoDBPtr, eventBus)
-
-	// Start event simulation for demo purposes
-	go simulateEvents(eventBus)
 
 	// Start server in goroutine
 	go func() {
@@ -124,7 +154,8 @@ func main() {
 	log.Println("  - Dashboard:  GET  /api/dashboard/stats")
 	log.Println("  - Entities:   GET  /api/alerts, /api/missions, /api/satellites, /api/hunoids")
 	log.Println("  - Streams:    GET  /api/streams, /api/streams/stats")
-	log.Println("  - WebSocket:  WS   /ws/realtime")
+	log.Println("  - WebSocket:  WS   /ws, /ws/events, /ws/realtime")
+	log.Println("  - Signaling:  WS   /ws/signaling (WebRTC SFU)")
 
 	// Wait for shutdown signal
 	sigChan := make(chan os.Signal, 1)
@@ -144,62 +175,228 @@ func main() {
 	log.Println("Nysus stopped")
 }
 
-// simulateEvents generates periodic events for demonstration.
-func simulateEvents(eventBus *events.EventBus) {
-	ticker := time.NewTicker(30 * time.Second)
-	defer ticker.Stop()
+// publishToControlPlane bridges nysus events to the unified control plane.
+// It converts internal events to cross-domain events for system-wide coordination.
+func publishToControlPlane(cp *controlplane.UnifiedControlPlane, event events.Event) {
+	if cp == nil {
+		return
+	}
 
-	alertTypes := []string{"fire", "tsunami", "troop_movement", "maritime_distress"}
+	// Map nysus event type to control plane event type and domain
+	var eventType controlplane.CrossDomainEventType
+	var domain controlplane.EventDomain
+	var severity controlplane.Severity
 
-	for range ticker.C {
-		// Simulate random alerts
+	switch event.Type {
+	case events.EventTypeAlert, events.EventTypeAlertUpdated:
+		eventType = controlplane.EventControlAlert
+		domain = controlplane.DomainAutonomy
+	case events.EventTypeThreat:
+		eventType = controlplane.EventSecurityThreat
+		domain = controlplane.DomainSecurity
+	case events.EventTypeThreatMitigated:
+		eventType = controlplane.EventSecurityMitigated
+		domain = controlplane.DomainSecurity
+	default:
+		eventType = controlplane.EventAutonomyStatus
+		domain = controlplane.DomainAutonomy
+	}
+
+	// Map priority to severity (priority 0-10, higher is more urgent)
+	switch {
+	case event.Priority >= 9:
+		severity = controlplane.SeverityCritical
+	case event.Priority >= 7:
+		severity = controlplane.SeverityHigh
+	case event.Priority >= 5:
+		severity = controlplane.SeverityMedium
+	case event.Priority >= 3:
+		severity = controlplane.SeverityLow
+	default:
+		severity = controlplane.SeverityInfo
+	}
+
+	// Create cross-domain event
+	cpEvent := controlplane.NewCrossDomainEvent(
+		eventType,
+		domain,
+		event.Source,
+		severity,
+		string(event.Type),
+	)
+	cpEvent.ID = event.ID
+	cpEvent.Timestamp = event.Timestamp
+
+	// Convert payload to map
+	if event.Payload != nil {
+		payloadBytes, err := json.Marshal(event.Payload)
+		if err == nil {
+			var payloadMap map[string]interface{}
+			if json.Unmarshal(payloadBytes, &payloadMap) == nil {
+				cpEvent.Payload = payloadMap
+			}
+		}
+	}
+
+	// Publish to control plane (fire and forget, log errors)
+	if err := cp.PublishEvent(cpEvent); err != nil {
+		log.Printf("[Nysus] Failed to publish event to control plane: %v", err)
+	}
+}
+
+// startEventPublisher subscribes to database changes and publishes events to the event bus.
+// This replaces the simulated events with real database-driven events.
+func startEventPublisher(ctx context.Context, eventBus *events.EventBus, pgDB *db.PostgresDB) {
+	if pgDB == nil {
+		log.Println("Warning: No database connection, event publishing disabled")
+		return
+	}
+
+	// Subscribe to PostgreSQL notifications for real-time events
+	go func() {
+		ticker := time.NewTicker(5 * time.Second)
+		defer ticker.Stop()
+
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-ticker.C:
+				// Check for new alerts in the last 5 seconds
+				publishNewAlerts(eventBus, pgDB)
+				
+				// Check for telemetry updates
+				publishTelemetryUpdates(eventBus, pgDB)
+			}
+		}
+	}()
+}
+
+func publishNewAlerts(eventBus *events.EventBus, pgDB *db.PostgresDB) {
+	if pgDB == nil {
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	rows, err := pgDB.QueryContext(ctx, `
+		SELECT id, satellite_id, alert_type, confidence_score, latitude, longitude, created_at
+		FROM alerts
+		WHERE created_at > NOW() - INTERVAL '10 seconds'
+		  AND status = 'new'
+	`)
+	if err != nil {
+		return
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var id, satID, alertType string
+		var confidence, lat, lon float64
+		var createdAt time.Time
+
+		if err := rows.Scan(&id, &satID, &alertType, &confidence, &lat, &lon, &createdAt); err != nil {
+			continue
+		}
+
 		alertEvent := events.Event{
-			ID:        uuid.New(),
+			ID:        uuid.MustParse(id),
 			Type:      events.EventTypeAlert,
-			Source:    "sat-" + uuid.New().String()[:8],
-			Timestamp: time.Now().UTC(),
+			Source:    satID,
+			Timestamp: createdAt,
 			Payload: events.AlertEvent{
-				SatelliteID: "sat-" + uuid.New().String()[:8],
-				AlertType:   alertTypes[time.Now().UnixNano()%int64(len(alertTypes))],
-				Confidence:  0.75 + float64(time.Now().UnixNano()%25)/100,
+				SatelliteID: satID,
+				AlertType:   alertType,
+				Confidence:  confidence,
 				Location: events.GeoLocation{
-					Latitude:  35.0 + float64(time.Now().UnixNano()%1000)/100,
-					Longitude: -120.0 + float64(time.Now().UnixNano()%500)/100,
+					Latitude:  lat,
+					Longitude: lon,
 				},
 			},
 			Priority: 7,
 		}
 		eventBus.Publish(alertEvent)
-
-		// Simulate telemetry
-		telemetryEvent := events.Event{
-			ID:        uuid.New(),
-			Type:      events.EventTypeSatelliteTelemetry,
-			Source:    "sat-001",
-			Timestamp: time.Now().UTC(),
-			Payload: events.TelemetryEvent{
-				ComponentID:   "sat-001",
-				ComponentType: "satellite",
-				Metrics: map[string]float64{
-					"battery":     85.5 + float64(time.Now().UnixNano()%100)/10,
-					"temperature": 25.0 + float64(time.Now().UnixNano()%50)/10,
-					"altitude":    400.0 + float64(time.Now().UnixNano()%100)/10,
-				},
-				Status: "operational",
-			},
-		}
-		eventBus.Publish(telemetryEvent)
 	}
 }
 
-// createMockPostgres creates a mock PostgresDB for testing without a database.
-func createMockPostgres() *db.PostgresDB {
-	// Return nil - the API handlers will use sample data
-	return nil
-}
+func publishTelemetryUpdates(eventBus *events.EventBus, pgDB *db.PostgresDB) {
+	if pgDB == nil {
+		return
+	}
 
-// createMockMongo creates a mock MongoDB for testing without a database.
-func createMockMongo() *db.MongoDB {
-	// Return nil - the API handlers will use sample data
-	return nil
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	// Publish satellite telemetry
+	satRows, err := pgDB.QueryContext(ctx, `
+		SELECT id, name, current_battery_percent, status, last_telemetry
+		FROM satellites
+		WHERE last_telemetry > NOW() - INTERVAL '30 seconds'
+		  AND status = 'operational'
+	`)
+	if err == nil {
+		defer satRows.Close()
+		for satRows.Next() {
+			var id, name, status string
+			var battery float64
+			var lastTelemetry time.Time
+
+			if err := satRows.Scan(&id, &name, &battery, &status, &lastTelemetry); err != nil {
+				continue
+			}
+
+			telemetryEvent := events.Event{
+				ID:        uuid.New(),
+				Type:      events.EventTypeSatelliteTelemetry,
+				Source:    id,
+				Timestamp: lastTelemetry,
+				Payload: events.TelemetryEvent{
+					ComponentID:   id,
+					ComponentType: "satellite",
+					Metrics: map[string]float64{
+						"battery": battery,
+					},
+					Status: status,
+				},
+			}
+			eventBus.Publish(telemetryEvent)
+		}
+	}
+
+	// Publish hunoid telemetry
+	hunRows, err := pgDB.QueryContext(ctx, `
+		SELECT id, serial_number, battery_percent, status, last_telemetry
+		FROM hunoids
+		WHERE last_telemetry > NOW() - INTERVAL '30 seconds'
+		  AND status IN ('active', 'idle')
+	`)
+	if err == nil {
+		defer hunRows.Close()
+		for hunRows.Next() {
+			var id, serial, status string
+			var battery float64
+			var lastTelemetry time.Time
+
+			if err := hunRows.Scan(&id, &serial, &battery, &status, &lastTelemetry); err != nil {
+				continue
+			}
+
+			telemetryEvent := events.Event{
+				ID:        uuid.New(),
+				Type:      events.EventTypeHunoidTelemetry,
+				Source:    id,
+				Timestamp: lastTelemetry,
+				Payload: events.TelemetryEvent{
+					ComponentID:   id,
+					ComponentType: "hunoid",
+					Metrics: map[string]float64{
+						"battery": battery,
+					},
+					Status: status,
+				},
+			}
+			eventBus.Publish(telemetryEvent)
+		}
+	}
 }

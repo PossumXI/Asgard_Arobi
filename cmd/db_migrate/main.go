@@ -60,7 +60,14 @@ func main() {
 	}
 
 	log.Println("Verifying MongoDB collections...")
-	collections := []string{"satellite_telemetry", "hunoid_telemetry", "network_flows", "security_events"}
+	collections := []string{
+		"satellite_telemetry",
+		"hunoid_telemetry",
+		"network_flows",
+		"security_events",
+		"vla_inferences",
+		"router_training_episodes",
+	}
 	dbCollections, err := mongoDB.Database().ListCollectionNames(ctx, map[string]interface{}{})
 	if err != nil {
 		log.Fatalf("Failed to list collections: %v", err)

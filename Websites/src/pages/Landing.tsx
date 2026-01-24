@@ -20,8 +20,11 @@ import { cn } from '@/lib/utils';
 
 const fadeInUp = {
   initial: { opacity: 0, y: 30 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.6 }
+  animate: { 
+    opacity: 1, 
+    y: 0,
+    transition: { duration: 0.6 }
+  }
 };
 
 const staggerContainer = {
@@ -53,6 +56,7 @@ const features = [
     description: 'Giru continuously red-teams infrastructure, neutralizing threats before impact.',
     color: 'text-purple-500',
     bgColor: 'bg-purple-500/10',
+    image: '/giru.png',
   },
   {
     icon: Globe,
@@ -250,9 +254,19 @@ export default function Landing() {
               >
                 <Card className="h-full hover-lift">
                   <CardContent className="p-6">
-                    <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center mb-4', feature.bgColor)}>
-                      <feature.icon className={cn('w-6 h-6', feature.color)} />
-                    </div>
+                    {'image' in feature && feature.image ? (
+                      <div className="w-16 h-16 mb-4">
+                        <img 
+                          src={feature.image} 
+                          alt={feature.title}
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
+                    ) : (
+                      <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center mb-4', feature.bgColor)}>
+                        <feature.icon className={cn('w-6 h-6', feature.color)} />
+                      </div>
+                    )}
                     <h3 className="text-title text-asgard-900 dark:text-white mb-2">
                       {feature.title}
                     </h3>

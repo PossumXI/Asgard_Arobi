@@ -4,7 +4,7 @@
  */
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
-const WS_BASE_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:8080/ws';
+const WS_BASE_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:8080/ws/events';
 
 // ============================================================================
 // Types
@@ -14,7 +14,7 @@ export interface Stream {
   id: string;
   title: string;
   source: string;
-  sourceType: 'satellite' | 'hunoid' | 'ground_station';
+  sourceType: 'satellite' | 'hunoid' | 'ground_station' | 'external_hls';
   sourceId: string;
   location: string;
   geoLocation?: { latitude: number; longitude: number };
@@ -24,6 +24,7 @@ export interface Stream {
   latency: number;
   thumbnail?: string;
   description?: string;
+  playbackUrl?: string;
   resolution: string;
   bitrate: number;
   startedAt: string;
@@ -57,6 +58,15 @@ export interface TelemetryData {
   status: string;
   location?: { latitude: number; longitude: number };
   metrics: Record<string, number>;
+}
+
+export interface ChatMessage {
+  id: string;
+  streamId: string;
+  userId: string;
+  username: string;
+  message: string;
+  timestamp: string;
 }
 
 // ============================================================================
@@ -138,6 +148,18 @@ class HubsApiClient {
   async searchStreams(query: string): Promise<Stream[]> {
     return this.request(`/streams/search?q=${encodeURIComponent(query)}`);
   }
+
+  // Chat endpoints (optional - enabled when backend supports it)
+  async getStreamChat(streamId: string, limit: number = 50): Promise<ChatMessage[]> {
+    return this.request(`/streams/${streamId}/chat?limit=${limit}`);
+  }
+
+  async sendStreamChat(streamId: string, message: string): Promise<ChatMessage> {
+    return this.request(`/streams/${streamId}/chat`, {
+      method: 'POST',
+      body: JSON.stringify({ message }),
+    });
+  }
 }
 
 export const hubsApi = new HubsApiClient(API_BASE_URL);
@@ -146,18 +168,30 @@ export const hubsApi = new HubsApiClient(API_BASE_URL);
 // WebRTC Streaming Client
 // ============================================================================
 
+export type WebRTCClientMode = 'subscriber' | 'publisher';
+
+interface WebRTCClientOptions {
+  mode?: WebRTCClientMode;
+  localStream?: MediaStream | null;
+}
+
 export class WebRTCStreamClient {
   private peerConnection: RTCPeerConnection | null = null;
   private dataChannel: RTCDataChannel | null = null;
   private ws: WebSocket | null = null;
   private streamId: string;
   private sessionId: string;
+  private mode: WebRTCClientMode;
+  private localStream: MediaStream | null;
   private onTrackCallback: ((stream: MediaStream) => void) | null = null;
-  private onStatsCallback: ((stats: RTCStatsReport) => void) | null = null;
+  // Stats callback for future use (currently unused)
+  private _onStatsCallback: ((stats: RTCStatsReport) => void) | null = null;
 
-  constructor(session: StreamSession) {
+  constructor(session: StreamSession, options: WebRTCClientOptions = {}) {
     this.streamId = session.streamId;
     this.sessionId = session.sessionId;
+    this.mode = options.mode ?? 'subscriber';
+    this.localStream = options.localStream ?? null;
     
     this.peerConnection = new RTCPeerConnection({
       iceServers: session.iceServers,
@@ -170,6 +204,12 @@ export class WebRTCStreamClient {
   private setupPeerConnection(): void {
     if (!this.peerConnection) return;
 
+    if (this.mode === 'publisher' && this.localStream) {
+      this.localStream.getTracks().forEach((track) => {
+        this.peerConnection?.addTrack(track, this.localStream as MediaStream);
+      });
+    }
+
     this.peerConnection.ontrack = (event) => {
       console.log('[WebRTC] Track received:', event.track.kind);
       if (this.onTrackCallback && event.streams[0]) {
@@ -181,6 +221,7 @@ export class WebRTCStreamClient {
       if (event.candidate && this.ws) {
         this.ws.send(JSON.stringify({
           type: 'ice-candidate',
+          sessionId: this.sessionId,
           candidate: event.candidate,
         }));
       }
@@ -208,7 +249,11 @@ export class WebRTCStreamClient {
         type: 'join',
         streamId: this.streamId,
         sessionId: this.sessionId,
+        role: this.mode,
       }));
+      if (this.mode === 'publisher') {
+        this.createAndSendOffer();
+      }
     };
 
     this.ws.onmessage = async (event) => {
@@ -229,12 +274,19 @@ export class WebRTCStreamClient {
     if (!this.peerConnection) return;
 
     switch (message.type) {
+      case 'ready':
+        if (this.mode === 'publisher') {
+          await this.createAndSendOffer();
+        }
+        break;
+
       case 'offer':
         await this.peerConnection.setRemoteDescription(message.sdp as RTCSessionDescriptionInit);
         const answer = await this.peerConnection.createAnswer();
         await this.peerConnection.setLocalDescription(answer);
         this.ws?.send(JSON.stringify({
           type: 'answer',
+          sessionId: this.sessionId,
           sdp: answer,
         }));
         break;
@@ -249,12 +301,23 @@ export class WebRTCStreamClient {
     }
   }
 
+  private async createAndSendOffer(): Promise<void> {
+    if (!this.peerConnection || !this.ws) return;
+    const offer = await this.peerConnection.createOffer();
+    await this.peerConnection.setLocalDescription(offer);
+    this.ws.send(JSON.stringify({
+      type: 'offer',
+      sessionId: this.sessionId,
+      sdp: offer,
+    }));
+  }
+
   onTrack(callback: (stream: MediaStream) => void): void {
     this.onTrackCallback = callback;
   }
 
   onStats(callback: (stats: RTCStatsReport) => void): void {
-    this.onStatsCallback = callback;
+    this._onStatsCallback = callback;
   }
 
   async getStats(): Promise<RTCStatsReport | null> {
@@ -296,7 +359,12 @@ export class HubsRealtimeClient {
 
   connect(token?: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      const url = new URL(`${this.baseUrl}/realtime`);
+      if (this.ws && (this.ws.readyState === WebSocket.OPEN || this.ws.readyState === WebSocket.CONNECTING)) {
+        resolve();
+        return;
+      }
+
+      const url = new URL(this.baseUrl);
       if (token) {
         url.searchParams.set('token', token);
       }
@@ -310,12 +378,22 @@ export class HubsRealtimeClient {
       };
 
       this.ws.onmessage = (event) => {
-        try {
-          const message = JSON.parse(event.data);
-          this.dispatchEvent(message.type, message.payload);
-        } catch (error) {
-          console.error('[Realtime] Parse error:', error);
-        }
+        const raw = event.data as string;
+        const frames = raw.includes('\n') ? raw.split('\n') : [raw];
+
+        frames.forEach((frame) => {
+          if (!frame.trim()) return;
+          try {
+            const message = JSON.parse(frame);
+            if (message.type === 'event' && message.eventType) {
+              this.dispatchEvent(message.eventType, message.event ?? message.payload ?? message);
+              return;
+            }
+            this.dispatchEvent(message.type, message.payload ?? message);
+          } catch (error) {
+            console.error('[Realtime] Parse error:', error);
+          }
+        });
       };
 
       this.ws.onerror = (error) => {

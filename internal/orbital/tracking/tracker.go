@@ -34,17 +34,21 @@ const (
 
 // Tracker processes detections and generates alerts
 type Tracker struct {
-	mu          sync.Mutex
-	criteria    vision.AlertCriteria
-	alertChan   chan<- Alert
-	recentAlerts map[string]time.Time // Deduplication
+	mu               sync.Mutex
+	criteria         vision.AlertCriteria
+	alertChan        chan<- Alert
+	recentAlerts     map[string]time.Time // Deduplication
+	locationProvider func(context.Context) (string, error)
+	clipProvider     func(context.Context) ([]byte, error)
 }
 
-func NewTracker(criteria vision.AlertCriteria, alertChan chan<- Alert) *Tracker {
+func NewTracker(criteria vision.AlertCriteria, alertChan chan<- Alert, locationProvider func(context.Context) (string, error), clipProvider func(context.Context) ([]byte, error)) *Tracker {
 	return &Tracker{
-		criteria:     criteria,
-		alertChan:    alertChan,
-		recentAlerts: make(map[string]time.Time),
+		criteria:         criteria,
+		alertChan:        alertChan,
+		recentAlerts:     make(map[string]time.Time),
+		locationProvider: locationProvider,
+		clipProvider:     clipProvider,
 	}
 }
 
@@ -55,7 +59,7 @@ func (t *Tracker) ProcessDetections(ctx context.Context, detections []vision.Det
 
 	for _, det := range detections {
 		if t.criteria.ShouldAlert(det) {
-			if err := t.generateAlert(det); err != nil {
+			if err := t.generateAlert(ctx, det); err != nil {
 				log.Printf("Failed to generate alert: %v", err)
 				continue
 			}
@@ -68,7 +72,7 @@ func (t *Tracker) ProcessDetections(ctx context.Context, detections []vision.Det
 	return nil
 }
 
-func (t *Tracker) generateAlert(det vision.Detection) error {
+func (t *Tracker) generateAlert(ctx context.Context, det vision.Detection) error {
 	// Deduplication: don't alert for same class within 5 minutes
 	if lastTime, exists := t.recentAlerts[det.Class]; exists {
 		if time.Since(lastTime) < 5*time.Minute {
@@ -76,12 +80,26 @@ func (t *Tracker) generateAlert(det vision.Detection) error {
 		}
 	}
 
+	if t.locationProvider == nil || t.clipProvider == nil {
+		return fmt.Errorf("alert providers not configured")
+	}
+
+	location, err := t.locationProvider(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to resolve alert location: %w", err)
+	}
+
+	clip, err := t.clipProvider(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to build alert clip: %w", err)
+	}
+
 	alert := Alert{
 		ID:         uuid.New(),
 		Type:       det.Class,
 		Confidence: det.Confidence,
-		Location:   "orbital_position_placeholder",
-		VideoClip:  []byte{}, // Would contain actual video segment
+		Location:   location,
+		VideoClip:  clip,
 		Timestamp:  time.Now().UTC(),
 		Status:     AlertStatusNew,
 	}

@@ -54,6 +54,19 @@ docker restart asgard_nats
 curl http://localhost:8222/healthz
 ```
 
+### NATS Protocol Confusion (RESOLVED 2026-01-21)
+**Symptom**: Log shows `Client parser ERROR` with HTTP GET requests on port 4222.
+
+**Cause**: HTTP requests accidentally sent to NATS client port instead of HTTP monitoring port.
+
+**Resolution Applied**: Bound NATS client and cluster ports to localhost only:
+```yaml
+ports:
+  - "127.0.0.1:4222:4222"  # Client - localhost only
+  - "8222:8222"            # HTTP monitoring - open
+  - "127.0.0.1:6222:6222"  # Cluster - localhost only
+```
+
 ### Redis Security Warning (RESOLVED 2026-01-21)
 **Symptom**: Log shows "Possible SECURITY ATTACK detected. Cross Protocol Scripting"
 
@@ -123,3 +136,71 @@ redis:
 No critical errors or warnings detected in this monitoring interval.
 
 [2026-01-20 23:56:39] [SUCCESS] SUMMARY: All containers healthy, no issues detected
+
+---
+
+## Status Report: 2026-01-24 02:19:00 (Audit & Fixes)
+
+### Issues Found & Fixed
+
+#### RESOLVED - PostgreSQL Column Name Errors (2026-01-24)
+**Symptom**: Repeated errors in PostgreSQL logs:
+```
+ERROR: column "last_telemetry_at" does not exist at character 54
+HINT: Perhaps you meant to reference the column "satellites.last_telemetry".
+STATEMENT: SELECT id, name, current_battery_percent, status, last_telemetry_at
+FROM satellites WHERE last_telemetry_at > NOW() - INTERVAL '30 seconds'
+```
+
+**Cause**: Some queries or processes were using `last_telemetry_at` column name, but the actual column in the database is `last_telemetry`.
+
+**Resolution Applied**: 
+1. Created migration `000010_fix_column_compatibility.up.sql`
+2. Added `last_telemetry_at` columns to `satellites` and `hunoids` tables
+3. Created triggers to automatically sync `last_telemetry_at` with `last_telemetry`
+4. Backfilled existing data
+5. Added indexes for performance
+
+**Migration Details**:
+- Added compatibility columns: `satellites.last_telemetry_at`, `hunoids.last_telemetry_at`
+- Created sync triggers: `trigger_sync_satellite_telemetry_at`, `trigger_sync_hunoid_telemetry_at`
+- Both columns stay in sync automatically via triggers
+
+#### RESOLVED - create_alert Unterminated String (2026-01-24)
+**Symptom**: 
+```
+ERROR: unterminated quoted string at or near "'{\" at character 79
+STATEMENT: SELECT create_alert(NULL, 'test_alert', 0.95, 40.7128, -74.0060, 100.0, NULL, '{\
+```
+
+**Cause**: Manual test call to `create_alert` function with improperly formatted JSON string parameter.
+
+**Resolution**: This was a one-time manual test error, not a code issue. The `create_alert` function accepts JSONB parameters correctly. When calling manually, ensure JSON strings are properly escaped and terminated.
+
+**Best Practice**: Use parameterized queries or JSONB literals:
+```sql
+-- Correct usage
+SELECT create_alert(
+    NULL::UUID, 
+    'test_alert', 
+    0.95, 
+    40.7128, 
+    -74.0060, 
+    100.0, 
+    NULL, 
+    '{}'::JSONB
+);
+```
+
+### Container Health
+
+| Container | Status | Health | Notes |
+|-----------|--------|--------|-------|
+| asgard_postgres | running | healthy | Migration 000010 applied successfully |
+| asgard_mongodb | running | healthy | No issues detected |
+| asgard_nats | running | healthy | No issues detected |
+| asgard_redis | running | healthy | No issues detected |
+
+### Status: All Clear
+
+All identified errors have been resolved. Database compatibility columns added and synced.

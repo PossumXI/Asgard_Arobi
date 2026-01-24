@@ -66,21 +66,11 @@ func (r *SubscriptionRepository) GetByUserID(userID string) (*db.Subscription, e
 		return nil, fmt.Errorf("failed to query subscription: %w", err)
 	}
 
-	if stripeSubID.Valid {
-		sub.StripeSubscriptionID = &stripeSubID.String
-	}
-	if stripeCustID.Valid {
-		sub.StripeCustomerID = &stripeCustID.String
-	}
-	if tier.Valid {
-		sub.Tier = &tier.String
-	}
-	if periodStart.Valid {
-		sub.CurrentPeriodStart = &periodStart.Time
-	}
-	if periodEnd.Valid {
-		sub.CurrentPeriodEnd = &periodEnd.Time
-	}
+	sub.StripeSubscriptionID = stripeSubID
+	sub.StripeCustomerID = stripeCustID
+	sub.Tier = tier
+	sub.CurrentPeriodStart = periodStart
+	sub.CurrentPeriodEnd = periodEnd
 
 	return sub, nil
 }
@@ -94,34 +84,15 @@ func (r *SubscriptionRepository) Create(sub *db.Subscription) error {
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 	`
 
-	var stripeSubID, stripeCustID, tier interface{}
-	var periodStart, periodEnd interface{}
-
-	if sub.StripeSubscriptionID != nil {
-		stripeSubID = *sub.StripeSubscriptionID
-	}
-	if sub.StripeCustomerID != nil {
-		stripeCustID = *sub.StripeCustomerID
-	}
-	if sub.Tier != nil {
-		tier = *sub.Tier
-	}
-	if sub.CurrentPeriodStart != nil {
-		periodStart = *sub.CurrentPeriodStart
-	}
-	if sub.CurrentPeriodEnd != nil {
-		periodEnd = *sub.CurrentPeriodEnd
-	}
-
 	_, err := r.db.Exec(query,
 		sub.ID,
 		sub.UserID,
-		stripeSubID,
-		stripeCustID,
-		tier,
+		sub.StripeSubscriptionID,
+		sub.StripeCustomerID,
+		sub.Tier,
 		sub.Status,
-		periodStart,
-		periodEnd,
+		sub.CurrentPeriodStart,
+		sub.CurrentPeriodEnd,
 		sub.CreatedAt,
 		sub.UpdatedAt,
 	)
@@ -142,34 +113,15 @@ func (r *SubscriptionRepository) Update(sub *db.Subscription) error {
 		WHERE id = $1 AND user_id = $2
 	`
 
-	var stripeSubID, stripeCustID, tier interface{}
-	var periodStart, periodEnd interface{}
-
-	if sub.StripeSubscriptionID != nil {
-		stripeSubID = *sub.StripeSubscriptionID
-	}
-	if sub.StripeCustomerID != nil {
-		stripeCustID = *sub.StripeCustomerID
-	}
-	if sub.Tier != nil {
-		tier = *sub.Tier
-	}
-	if sub.CurrentPeriodStart != nil {
-		periodStart = *sub.CurrentPeriodStart
-	}
-	if sub.CurrentPeriodEnd != nil {
-		periodEnd = *sub.CurrentPeriodEnd
-	}
-
 	_, err := r.db.Exec(query,
 		sub.ID,
 		sub.UserID,
-		stripeSubID,
-		stripeCustID,
-		tier,
+		sub.StripeSubscriptionID,
+		sub.StripeCustomerID,
+		sub.Tier,
 		sub.Status,
-		periodStart,
-		periodEnd,
+		sub.CurrentPeriodStart,
+		sub.CurrentPeriodEnd,
 		sub.UpdatedAt,
 	)
 	if err != nil {
@@ -177,4 +129,97 @@ func (r *SubscriptionRepository) Update(sub *db.Subscription) error {
 	}
 
 	return nil
+}
+
+// GetByStripeSubscriptionID retrieves a subscription by Stripe subscription ID.
+func (r *SubscriptionRepository) GetByStripeSubscriptionID(stripeSubID string) (*db.Subscription, error) {
+	query := `
+		SELECT id, user_id, stripe_subscription_id, stripe_customer_id,
+		       tier, status, current_period_start, current_period_end,
+		       created_at, updated_at
+		FROM subscriptions
+		WHERE stripe_subscription_id = $1
+		LIMIT 1
+	`
+
+	sub := &db.Subscription{}
+	var stripeSubscriptionID sql.NullString
+	var stripeCustID sql.NullString
+	var tier sql.NullString
+	var periodStart sql.NullTime
+	var periodEnd sql.NullTime
+
+	err := r.db.QueryRow(query, stripeSubID).Scan(
+		&sub.ID,
+		&sub.UserID,
+		&stripeSubscriptionID,
+		&stripeCustID,
+		&tier,
+		&sub.Status,
+		&periodStart,
+		&periodEnd,
+		&sub.CreatedAt,
+		&sub.UpdatedAt,
+	)
+	if err == sql.ErrNoRows {
+		return nil, fmt.Errorf("subscription not found for stripe_subscription_id: %s", stripeSubID)
+	}
+	if err != nil {
+		return nil, fmt.Errorf("failed to query subscription: %w", err)
+	}
+
+	sub.StripeSubscriptionID = stripeSubscriptionID
+	sub.StripeCustomerID = stripeCustID
+	sub.Tier = tier
+	sub.CurrentPeriodStart = periodStart
+	sub.CurrentPeriodEnd = periodEnd
+
+	return sub, nil
+}
+
+// GetByStripeCustomerID retrieves a subscription by Stripe customer ID.
+func (r *SubscriptionRepository) GetByStripeCustomerID(stripeCustomerID string) (*db.Subscription, error) {
+	query := `
+		SELECT id, user_id, stripe_subscription_id, stripe_customer_id,
+		       tier, status, current_period_start, current_period_end,
+		       created_at, updated_at
+		FROM subscriptions
+		WHERE stripe_customer_id = $1
+		ORDER BY created_at DESC
+		LIMIT 1
+	`
+
+	sub := &db.Subscription{}
+	var stripeSubscriptionID sql.NullString
+	var stripeCustID sql.NullString
+	var tier sql.NullString
+	var periodStart sql.NullTime
+	var periodEnd sql.NullTime
+
+	err := r.db.QueryRow(query, stripeCustomerID).Scan(
+		&sub.ID,
+		&sub.UserID,
+		&stripeSubscriptionID,
+		&stripeCustID,
+		&tier,
+		&sub.Status,
+		&periodStart,
+		&periodEnd,
+		&sub.CreatedAt,
+		&sub.UpdatedAt,
+	)
+	if err == sql.ErrNoRows {
+		return nil, fmt.Errorf("subscription not found for stripe_customer_id: %s", stripeCustomerID)
+	}
+	if err != nil {
+		return nil, fmt.Errorf("failed to query subscription: %w", err)
+	}
+
+	sub.StripeSubscriptionID = stripeSubscriptionID
+	sub.StripeCustomerID = stripeCustID
+	sub.Tier = tier
+	sub.CurrentPeriodStart = periodStart
+	sub.CurrentPeriodEnd = periodEnd
+
+	return sub, nil
 }

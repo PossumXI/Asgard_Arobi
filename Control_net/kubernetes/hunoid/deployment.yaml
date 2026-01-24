@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hunoid
+  namespace: asgard
+  labels:
+    app: hunoid
+    component: robotics
+spec:
+  replicas: 10
+  selector:
+    matchLabels:
+      app: hunoid
+  template:
+    metadata:
+      labels:
+        app: hunoid
+        component: robotics
+    spec:
+      containers:
+      - name: hunoid
+        image: asgard/hunoid:latest
+        imagePullPolicy: IfNotPresent
+        args:
+        - -id
+        - "hunoid-$(POD_NAME)"
+        - -serial
+        - "HND-2026-$(POD_NAME)"
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: VLA_MODEL_PATH
+          value: "/models/openvla.onnx"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+        volumeMounts:
+        - name: models
+          mountPath: /models
+          readOnly: true
+      volumes:
+      - name: models
+        configMap:
+          name: hunoid-models

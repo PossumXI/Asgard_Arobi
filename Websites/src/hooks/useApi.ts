@@ -6,9 +6,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api, authApi, userApi, subscriptionApi } from '@/lib/api';
 import type {
-  User,
-  Subscription,
-  SubscriptionPlan,
   DashboardStats,
   Alert,
   Mission,
@@ -17,8 +14,14 @@ import type {
   NotificationSettings,
   SignUpRequest,
   SignInRequest,
-  AuthResponse,
 } from '@/lib/types';
+import type { User } from '@/lib/api';
+
+// Auth response from our API
+interface ApiAuthResponse {
+  user: User;
+  token: string;
+}
 import { useAuthStore } from '@/stores/appStore';
 
 // ============================================================================
@@ -47,7 +50,7 @@ export function useSignIn() {
 
   return useMutation({
     mutationFn: (data: SignInRequest) => authApi.signIn(data.email, data.password),
-    onSuccess: (response: AuthResponse) => {
+    onSuccess: (response: ApiAuthResponse) => {
       api.setToken(response.token);
       setAuth(response.user, response.token);
       queryClient.invalidateQueries({ queryKey: queryKeys.user });
@@ -61,7 +64,7 @@ export function useSignUp() {
 
   return useMutation({
     mutationFn: (data: SignUpRequest) => authApi.signUp(data),
-    onSuccess: (response: AuthResponse) => {
+    onSuccess: (response: ApiAuthResponse) => {
       api.setToken(response.token);
       setAuth(response.user, response.token);
       queryClient.invalidateQueries({ queryKey: queryKeys.user });

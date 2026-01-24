@@ -6,13 +6,14 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
 	"log"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
+	"github.com/asgard/pandora/internal/platform/db"
 	"github.com/asgard/pandora/internal/platform/dtn"
 )
 
@@ -24,6 +25,8 @@ func main() {
 	bufferSize := flag.Int("buffer", 1000, "Bundle buffer size")
 	energyAware := flag.Bool("energy-aware", false, "Enable energy-aware routing for satellites")
 	initialBattery := flag.Float64("battery", 100.0, "Initial battery percentage (0-100)")
+	rlModel := flag.String("rl-model", "models/rl_router.json", "Path to RL routing model")
+	useRL := flag.Bool("rl", false, "Enable RL-based routing policy")
 	flag.Parse()
 
 	if *nodeID == "" || *nodeEID == "" {
@@ -36,13 +39,22 @@ func main() {
 	log.Printf("Node EID: %s", *nodeEID)
 	log.Printf("Listen Address: %s", *listenAddr)
 	log.Printf("Energy Aware: %v", *energyAware)
+	log.Printf("RL Routing: %v", *useRL)
 
 	// Create storage
-	storage := dtn.NewInMemoryStorage(10000)
+	storage, cleanup := buildStorage()
+	defer cleanup()
 
 	// Create router
 	var router dtn.Router
-	if *energyAware {
+	if *useRL {
+		rlRouter, err := dtn.NewRLRoutingAgent(*nodeEID, *rlModel)
+		if err != nil {
+			log.Fatalf("Failed to load RL model: %v", err)
+		}
+		rlRouter.UpdateEnergy(*nodeID, *initialBattery)
+		router = rlRouter
+	} else if *energyAware {
 		energyRouter := dtn.NewEnergyAwareRouter(*nodeEID)
 		energyRouter.UpdateEnergy(*nodeID, *initialBattery)
 		router = energyRouter
@@ -58,8 +70,13 @@ func main() {
 		PurgeInterval:  5 * time.Minute,
 	}
 
-	// Create and start node
-	node := dtn.NewNode(*nodeID, *nodeEID, storage, router, config)
+	// Initialize transport
+	transportConfig := dtn.DefaultTCPTransportConfig()
+	transportConfig.ListenAddress = *listenAddr
+	transport := dtn.NewTCPTransport(*nodeID, transportConfig)
+
+	// Create and start node with transport
+	node := dtn.NewNodeWithTransport(*nodeID, *nodeEID, storage, router, transport, config)
 
 	if err := node.Start(); err != nil {
 		log.Fatalf("Failed to start node: %v", err)
@@ -67,8 +84,13 @@ func main() {
 
 	log.Printf("Sat_Net router started successfully")
 
-	// Register some test neighbors for demonstration
-	registerTestNeighbors(node, *nodeEID)
+	// Register neighbors from configuration
+	neighbors := parseNeighborConfig(os.Getenv("DTN_NEIGHBORS"))
+	if len(neighbors) == 0 {
+		log.Println("No neighbors configured (DTN_NEIGHBORS is empty)")
+	} else {
+		registerNeighbors(context.Background(), node, transport, neighbors)
+	}
 
 	// Start telemetry reporter
 	go reportTelemetry(node)
@@ -85,45 +107,91 @@ func main() {
 	log.Println("Sat_Net router stopped")
 }
 
-// registerTestNeighbors adds simulated neighbors for demonstration.
-func registerTestNeighbors(node *dtn.Node, selfEID string) {
-	// Simulated ground stations and satellites
-	neighbors := []struct {
-		id          string
-		eid         string
-		linkQuality float64
-		latency     time.Duration
-		bandwidth   int64
-	}{
-		{"ground_earth_1", "dtn://earth/ground001", 0.95, 50 * time.Millisecond, 10000000},
-		{"ground_earth_2", "dtn://earth/ground002", 0.90, 75 * time.Millisecond, 8000000},
-		{"sat_leo_001", "dtn://leo/sat001", 0.85, 20 * time.Millisecond, 5000000},
-		{"sat_leo_002", "dtn://leo/sat002", 0.80, 25 * time.Millisecond, 5000000},
-		{"relay_mars_1", "dtn://mars/relay001", 0.60, 14 * time.Minute, 100000}, // Mars relay ~14 min light delay
-		{"relay_lunar_1", "dtn://lunar/relay001", 0.75, 1300 * time.Millisecond, 2000000}, // Moon ~1.3 sec delay
-	}
+type neighborConfig struct {
+	id       string
+	eid      string
+	address  string
+	quality  float64
+	latency  time.Duration
+	bandwidth int64
+}
 
-	// Filter out self
-	for _, n := range neighbors {
-		if n.eid == selfEID {
+func parseNeighborConfig(raw string) []neighborConfig {
+	entries := strings.Split(strings.TrimSpace(raw), ";")
+	var neighbors []neighborConfig
+
+	for _, entry := range entries {
+		entry = strings.TrimSpace(entry)
+		if entry == "" {
 			continue
 		}
 
+		parts := strings.Split(entry, "@")
+		if len(parts) < 3 {
+			continue
+		}
+
+		neighbors = append(neighbors, neighborConfig{
+			id:       parts[0],
+			eid:      parts[1],
+			address:  parts[2],
+			quality:  0.9,
+			latency:  50 * time.Millisecond,
+			bandwidth: 5_000_000,
+		})
+	}
+
+	return neighbors
+}
+
+func buildStorage() (dtn.BundleStorage, func()) {
+	backend := strings.ToLower(strings.TrimSpace(os.Getenv("DTN_STORAGE_BACKEND")))
+	if backend == "" {
+		backend = "memory"
+	}
+	switch backend {
+	case "postgres":
+		cfg, err := db.LoadConfig()
+		if err != nil {
+			log.Fatalf("Failed to load DB config: %v", err)
+		}
+		pgDB, err := db.NewPostgresDB(cfg)
+		if err != nil {
+			log.Fatalf("Failed to connect to Postgres: %v", err)
+		}
+		storage, err := dtn.NewPostgresBundleStorage(pgDB)
+		if err != nil {
+			log.Fatalf("Failed to initialize Postgres storage: %v", err)
+		}
+		log.Printf("Using Postgres-backed DTN storage")
+		return storage, func() { _ = pgDB.Close() }
+	default:
+		log.Printf("Using in-memory DTN storage")
+		return dtn.NewInMemoryStorage(10000), func() {}
+	}
+}
+
+func registerNeighbors(ctx context.Context, node *dtn.Node, transport *dtn.TCPTransport, neighbors []neighborConfig) {
+	for _, n := range neighbors {
 		neighbor := &dtn.Neighbor{
 			ID:           n.id,
 			EID:          n.eid,
-			LinkQuality:  n.linkQuality,
+			LinkQuality:  n.quality,
 			LastContact:  time.Now().UTC(),
 			IsActive:     true,
 			Latency:      n.latency,
 			Bandwidth:    n.bandwidth,
 			ContactStart: time.Now().UTC(),
-			ContactEnd:   time.Now().Add(24 * time.Hour), // Simulated 24hr contact window
+			ContactEnd:   time.Now().Add(24 * time.Hour),
 		}
 
 		node.RegisterNeighbor(neighbor)
-		log.Printf("Registered neighbor: %s (%s) - quality=%.2f, latency=%v",
-			neighbor.ID, neighbor.EID, neighbor.LinkQuality, neighbor.Latency)
+		if err := transport.Connect(ctx, neighbor.ID, n.address); err != nil {
+			log.Printf("Failed to connect to neighbor %s at %s: %v", neighbor.ID, n.address, err)
+			continue
+		}
+
+		log.Printf("Registered neighbor: %s (%s) at %s", neighbor.ID, neighbor.EID, n.address)
 	}
 }
 

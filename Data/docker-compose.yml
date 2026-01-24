@@ -1,3 +1,18 @@
+# ASGARD Data Services
+# SECURITY: Passwords are read from environment variables
+# Create a .env file in Data/ directory or set env vars before running
+#
+# Required environment variables:
+#   POSTGRES_PASSWORD - PostgreSQL password
+#   MONGO_PASSWORD - MongoDB root password
+#   REDIS_PASSWORD - Redis password
+#
+# Example:
+#   export POSTGRES_PASSWORD=your_secure_postgres_password
+#   export MONGO_PASSWORD=your_secure_mongo_password
+#   export REDIS_PASSWORD=your_secure_redis_password
+#   docker compose up -d
+
 services:
   postgres:
     image: postgis/postgis:15-3.3
@@ -5,9 +20,9 @@ services:
     environment:
       POSTGRES_DB: asgard
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: asgard_secure_2026
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD environment variable is required}
     ports:
-      - "5432:5432"
+      - "127.0.0.1:55432:5432"  # Bind to localhost only
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./migrations/postgres:/docker-entrypoint-initdb.d
@@ -16,15 +31,16 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
   mongodb:
     image: mongo:7
     container_name: asgard_mongodb
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: asgard_mongo_2026
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:?MONGO_PASSWORD environment variable is required}
     ports:
-      - "27017:27017"
+      - "127.0.0.1:27017:27017"  # Bind to localhost only
     volumes:
       - mongo_data:/data/db
       - ./migrations/mongo:/docker-entrypoint-initdb.d
@@ -33,20 +49,22 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
   nats:
     image: nats:latest
     container_name: asgard_nats
     ports:
-      - "4222:4222" # Client connections
-      - "8222:8222" # HTTP monitoring
-      - "6222:6222" # Cluster routing
+      - "127.0.0.1:4222:4222" # Client connections - localhost only
+      - "127.0.0.1:8222:8222" # HTTP monitoring - localhost only
+      - "127.0.0.1:6222:6222" # Cluster routing - localhost only
     command:
       - "--jetstream"
       - "--store_dir=/data"
       - "--http_port=8222"
     volumes:
       - nats_data:/data
+    restart: unless-stopped
     # Note: NATS image is minimal (no shell), healthcheck disabled
     # Monitor health via http://localhost:8222/healthz externally
 
@@ -54,15 +72,20 @@ services:
     image: redis:7-alpine
     container_name: asgard_redis
     ports:
-      - "127.0.0.1:6379:6379"  # Bind to localhost only - prevents external access
+      - "127.0.0.1:6379:6379"  # Bind to localhost only
     volumes:
       - redis_data:/data
-    command: redis-server --appendonly yes --requirepass asgard_redis_2026 --protected-mode yes
+    command: >
+      redis-server
+      --appendonly yes
+      --requirepass ${REDIS_PASSWORD:?REDIS_PASSWORD environment variable is required}
+      --protected-mode yes
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "asgard_redis_2026", "ping"]
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
 volumes:
   postgres_data:

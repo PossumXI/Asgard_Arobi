@@ -3,6 +3,7 @@ package services
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/asgard/pandora/internal/platform/db"
 	"github.com/asgard/pandora/internal/repositories"
@@ -61,14 +62,63 @@ func (s *DashboardService) GetStats() (map[string]interface{}, error) {
 		return nil, fmt.Errorf("failed to get threat count: %w", err)
 	}
 
+	// Calculate system health based on operational status
+	systemHealth := s.calculateSystemHealth(activeSatellites, activeHunoids, pendingAlerts, threatsToday)
+
 	return map[string]interface{}{
 		"activeSatellites": activeSatellites,
 		"activeHunoids":    activeHunoids,
 		"pendingAlerts":     pendingAlerts,
 		"activeMissions":    activeMissions,
 		"threatsToday":      threatsToday,
-		"systemHealth":      95, // Placeholder
+		"systemHealth":      systemHealth,
 	}, nil
+}
+
+// calculateSystemHealth computes system health percentage based on operational metrics.
+func (s *DashboardService) calculateSystemHealth(satellites, hunoids, alerts, threats int) float64 {
+	// Base health starts at 100%
+	health := 100.0
+
+	// Deduct points for low satellite count (expect at least 1 operational)
+	if satellites == 0 {
+		health -= 30.0 // Critical: no satellites operational
+	} else if satellites < 5 {
+		health -= float64(5-satellites) * 2.0 // Minor deduction for low count
+	}
+
+	// Deduct points for low hunoid count (expect at least 1 operational)
+	if hunoids == 0 {
+		health -= 20.0 // Significant: no hunoids operational
+	} else if hunoids < 3 {
+		health -= float64(3-hunoids) * 3.0
+	}
+
+	// Deduct points for high alert backlog (alerts > 50 is concerning)
+	if alerts > 50 {
+		health -= 15.0
+	} else if alerts > 20 {
+		health -= float64(alerts-20) * 0.3
+	}
+
+	// Deduct points for threats (each threat reduces health)
+	if threats > 10 {
+		health -= 20.0 // Critical threat level
+	} else if threats > 5 {
+		health -= float64(threats-5) * 2.0
+	} else if threats > 0 {
+		health -= float64(threats) * 1.0
+	}
+
+	// Ensure health stays within bounds
+	if health < 0 {
+		health = 0
+	}
+	if health > 100 {
+		health = 100
+	}
+
+	return health
 }
 
 // GetAlerts retrieves all alerts.
@@ -141,4 +191,84 @@ func (s *DashboardService) GetHunoid(id string) (*db.Hunoid, error) {
 		return nil, fmt.Errorf("failed to get hunoid: %w", err)
 	}
 	return hunoid, nil
+}
+
+// GetHunoidLocation retrieves a hunoid's current location if available.
+func (s *DashboardService) GetHunoidLocation(id string) (*repositories.GeoLocation, error) {
+	location, err := s.hunoidRepo.GetLocation(id)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get hunoid location: %w", err)
+	}
+	return location, nil
+}
+
+// TelemetrySnapshot represents telemetry fields for API responses.
+type TelemetrySnapshot struct {
+	BatteryPercent float64
+	Status         string
+	LastTelemetry  *time.Time
+	Location       *repositories.GeoLocation
+}
+
+// GetSatelliteTelemetry returns telemetry from the satellites_api view.
+func (s *DashboardService) GetSatelliteTelemetry(id string) (*TelemetrySnapshot, error) {
+	telemetry, err := s.satelliteRepo.GetTelemetry(id)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get satellite telemetry: %w", err)
+	}
+
+	var lastTelemetry *time.Time
+	if telemetry.LastTelemetry.Valid {
+		timestamp := telemetry.LastTelemetry.Time.UTC()
+		lastTelemetry = &timestamp
+	}
+
+	battery := 0.0
+	if telemetry.BatteryPercent.Valid {
+		battery = telemetry.BatteryPercent.Float64
+	}
+
+	return &TelemetrySnapshot{
+		BatteryPercent: battery,
+		Status:         telemetry.Status,
+		LastTelemetry:  lastTelemetry,
+		Location:       nil,
+	}, nil
+}
+
+// GetHunoidTelemetry returns telemetry from the hunoids_api view.
+func (s *DashboardService) GetHunoidTelemetry(id string) (*TelemetrySnapshot, error) {
+	telemetry, err := s.hunoidRepo.GetTelemetry(id)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get hunoid telemetry: %w", err)
+	}
+
+	var lastTelemetry *time.Time
+	if telemetry.LastTelemetry.Valid {
+		timestamp := telemetry.LastTelemetry.Time.UTC()
+		lastTelemetry = &timestamp
+	}
+
+	battery := 0.0
+	if telemetry.BatteryPercent.Valid {
+		battery = telemetry.BatteryPercent.Float64
+	}
+
+	var location *repositories.GeoLocation
+	if telemetry.Latitude.Valid && telemetry.Longitude.Valid {
+		location = &repositories.GeoLocation{
+			Latitude:  telemetry.Latitude.Float64,
+			Longitude: telemetry.Longitude.Float64,
+		}
+		if telemetry.Altitude.Valid {
+			location.Altitude = telemetry.Altitude.Float64
+		}
+	}
+
+	return &TelemetrySnapshot{
+		BatteryPercent: battery,
+		Status:         telemetry.Status,
+		LastTelemetry:  lastTelemetry,
+		Location:       location,
+	}, nil
 }

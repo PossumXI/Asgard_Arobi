@@ -1,101 +1,17 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Globe, Shield, Rocket, TrendingUp, Activity } from 'lucide-react';
-import StreamCard, { Stream } from '@/components/StreamCard';
+import { Globe, Shield, Rocket, TrendingUp, Activity, Loader2 } from 'lucide-react';
+import StreamCard from '@/components/StreamCard';
 import { cn } from '@/lib/utils';
+import { hubsApi, Stream, StreamStats } from '@/lib/api';
 
-// Sample stream data - in production this would come from the API
-const featuredStreams: Stream[] = [
-  {
-    id: 'silenus-47',
-    title: 'Silenus-47 Pacific Monitoring',
-    source: 'Silenus Constellation',
-    location: 'Pacific Ocean',
-    type: 'civilian',
-    status: 'live',
-    viewers: 12453,
-    latency: 234,
-    description: 'Real-time monitoring of Pacific shipping lanes and weather patterns',
-  },
-  {
-    id: 'hunoid-102',
-    title: 'Hunoid-102 Aid Delivery',
-    source: 'Hunoid Ground Unit',
-    location: 'Southeast Asia',
-    type: 'civilian',
-    status: 'live',
-    viewers: 8721,
-    latency: 156,
-    description: 'Medical supply delivery to remote village',
-  },
-  {
-    id: 'mars-relay',
-    title: 'Mars Base Alpha Construction',
-    source: 'Interstellar Hub',
-    location: 'Mars',
-    type: 'interstellar',
-    status: 'delayed',
-    viewers: 45892,
-    latency: 720000,
-    description: 'Reconstructed reality feed from Mars operations',
-  },
-];
-
-const recentStreams: Stream[] = [
-  {
-    id: 'atlantic-patrol',
-    title: 'Atlantic Maritime Patrol',
-    source: 'Silenus-23',
-    location: 'Atlantic Ocean',
-    type: 'civilian',
-    status: 'live',
-    viewers: 3421,
-    latency: 189,
-  },
-  {
-    id: 'disaster-relief',
-    title: 'Earthquake Response Team',
-    source: 'Hunoid Units',
-    location: 'Indonesia',
-    type: 'civilian',
-    status: 'live',
-    viewers: 15632,
-    latency: 201,
-  },
-  {
-    id: 'forest-monitor',
-    title: 'Amazon Deforestation Monitor',
-    source: 'Silenus-56',
-    location: 'Brazil',
-    type: 'civilian',
-    status: 'live',
-    viewers: 6743,
-    latency: 267,
-  },
-  {
-    id: 'arctic-survey',
-    title: 'Arctic Ice Survey',
-    source: 'Silenus-12',
-    location: 'Arctic',
-    type: 'civilian',
-    status: 'live',
-    viewers: 2156,
-    latency: 312,
-  },
-];
-
-const stats = [
-  { label: 'Active Streams', value: '247', icon: Activity, trend: '+12' },
-  { label: 'Global Viewers', value: '1.2M', icon: Globe, trend: '+5.3%' },
-  { label: 'Satellites Online', value: '152', icon: TrendingUp, trend: '+3' },
-];
-
+// Hub category configuration
 const hubCategories = [
   { 
     id: 'civilian', 
     label: 'Civilian Hub', 
     icon: Globe, 
     color: 'bg-civilian/10 text-civilian border-civilian/20',
-    streams: 156,
     description: 'Public humanitarian operations'
   },
   { 
@@ -103,7 +19,6 @@ const hubCategories = [
     label: 'Military Hub', 
     icon: Shield, 
     color: 'bg-military/10 text-military border-military/20',
-    streams: 67,
     description: 'Authorized tactical feeds'
   },
   { 
@@ -111,12 +26,84 @@ const hubCategories = [
     label: 'Interstellar Hub', 
     icon: Rocket, 
     color: 'bg-interstellar/10 text-interstellar border-interstellar/20',
-    streams: 24,
     description: 'Beyond Earth operations'
   },
 ];
 
 export default function HubsHome() {
+  const [featuredStreams, setFeaturedStreams] = useState<Stream[]>([]);
+  const [recentStreams, setRecentStreams] = useState<Stream[]>([]);
+  const [stats, setStats] = useState<StreamStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Fetch all data in parallel
+        const [featured, recent, streamStats] = await Promise.all([
+          hubsApi.getFeaturedStreams(),
+          hubsApi.getRecentStreams(8),
+          hubsApi.getStreamStats(),
+        ]);
+
+        setFeaturedStreams(featured);
+        setRecentStreams(recent);
+        setStats(streamStats);
+      } catch (err) {
+        console.error('Failed to fetch hub data:', err);
+        setError('Failed to load stream data. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+    
+    // Refresh data every 30 seconds
+    const interval = setInterval(fetchData, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const formatViewers = (count: number): string => {
+    if (count >= 1000000) return (count / 1000000).toFixed(1) + 'M';
+    if (count >= 1000) return (count / 1000).toFixed(1) + 'K';
+    return count.toString();
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-hub-accent" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <p className="text-red-400 mb-4">{error}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-hub-accent text-white rounded hover:bg-hub-accent/80"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const statCards = [
+    { label: 'Active Streams', value: stats?.liveStreams || 0, icon: Activity },
+    { label: 'Global Viewers', value: formatViewers(stats?.totalViewers || 0), icon: Globe },
+    { label: 'Total Streams', value: stats?.totalStreams || 0, icon: TrendingUp },
+  ];
+
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -129,7 +116,7 @@ export default function HubsHome() {
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4">
-        {stats.map((stat, index) => (
+        {statCards.map((stat, index) => (
           <motion.div
             key={stat.label}
             initial={{ opacity: 0, y: 20 }}
@@ -141,9 +128,6 @@ export default function HubsHome() {
               <div className="p-2 rounded-lg bg-hub-accent/10">
                 <stat.icon className="w-5 h-5 text-hub-accent" />
               </div>
-              <span className="text-xs font-medium text-green-400 bg-green-400/10 px-2 py-0.5 rounded">
-                {stat.trend}
-              </span>
             </div>
             <div className="text-2xl font-bold text-white mb-1">{stat.value}</div>
             <div className="text-sm text-gray-500">{stat.label}</div>
@@ -175,7 +159,9 @@ export default function HubsHome() {
                 <p className="text-sm text-gray-500">{hub.description}</p>
               </div>
               <div className="text-right">
-                <div className="text-lg font-bold text-white">{hub.streams}</div>
+                <div className="text-lg font-bold text-white">
+                  {stats?.byCategory?.[hub.id as keyof typeof stats.byCategory] || 0}
+                </div>
                 <div className="text-xs text-gray-500">streams</div>
               </div>
             </motion.a>
@@ -187,14 +173,20 @@ export default function HubsHome() {
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-white">Featured Streams</h2>
-          <a href="#" className="text-sm text-hub-accent hover:underline">
+          <a href="/streams" className="text-sm text-hub-accent hover:underline">
             View all
           </a>
         </div>
         <div className="grid md:grid-cols-3 gap-4">
-          {featuredStreams.map((stream) => (
-            <StreamCard key={stream.id} stream={stream} />
-          ))}
+          {featuredStreams.length > 0 ? (
+            featuredStreams.map((stream) => (
+              <StreamCard key={stream.id} stream={stream} />
+            ))
+          ) : (
+            <p className="text-gray-500 col-span-3 text-center py-8">
+              No featured streams available
+            </p>
+          )}
         </div>
       </div>
 
@@ -202,14 +194,20 @@ export default function HubsHome() {
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-white">Recently Active</h2>
-          <a href="#" className="text-sm text-hub-accent hover:underline">
+          <a href="/streams" className="text-sm text-hub-accent hover:underline">
             View all
           </a>
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {recentStreams.map((stream) => (
-            <StreamCard key={stream.id} stream={stream} />
-          ))}
+          {recentStreams.length > 0 ? (
+            recentStreams.map((stream) => (
+              <StreamCard key={stream.id} stream={stream} />
+            ))
+          ) : (
+            <p className="text-gray-500 col-span-4 text-center py-8">
+              No recent streams available
+            </p>
+          )}
         </div>
       </div>
     </div>

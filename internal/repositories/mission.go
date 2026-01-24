@@ -63,19 +63,10 @@ func (r *MissionRepository) GetAll() ([]*db.Mission, error) {
 			return nil, fmt.Errorf("failed to scan mission: %w", err)
 		}
 
-		if description.Valid {
-			mission.Description = &description.String
-		}
-		if createdBy.Valid {
-			mission.CreatedBy = &createdBy.String
-		}
-		if startedAt.Valid {
-			mission.StartedAt = &startedAt.Time
-		}
-		if completedAt.Valid {
-			mission.CompletedAt = &completedAt.Time
-		}
-
+		mission.Description = description
+		mission.CreatedBy = createdBy
+		mission.StartedAt = startedAt
+		mission.CompletedAt = completedAt
 		mission.AssignedHunoidIDs = []string(hunoidIDs)
 		mission.TargetLocation = targetLocation
 
@@ -128,19 +119,10 @@ func (r *MissionRepository) GetByID(id string) (*db.Mission, error) {
 		return nil, fmt.Errorf("failed to query mission: %w", err)
 	}
 
-	if description.Valid {
-		mission.Description = &description.String
-	}
-	if createdBy.Valid {
-		mission.CreatedBy = &createdBy.String
-	}
-	if startedAt.Valid {
-		mission.StartedAt = &startedAt.Time
-	}
-	if completedAt.Valid {
-		mission.CompletedAt = &completedAt.Time
-	}
-
+	mission.Description = description
+	mission.CreatedBy = createdBy
+	mission.StartedAt = startedAt
+	mission.CompletedAt = completedAt
 	mission.AssignedHunoidIDs = []string(hunoidIDs)
 	mission.TargetLocation = targetLocation
 

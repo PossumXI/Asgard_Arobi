@@ -21,6 +21,41 @@ import { cn } from '@/lib/utils';
 
 function GovLanding() {
   const [showLogin, setShowLogin] = useState(false);
+  const [email, setEmail] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const { signInWithFido2, registerFido2, user, isAuthenticated } = useAuth();
+
+  const handleFido2SignIn = async () => {
+    if (!email.trim()) {
+      setStatusMessage('Email is required for FIDO2 sign-in.');
+      return;
+    }
+    setIsSubmitting(true);
+    setStatusMessage(null);
+    try {
+      await signInWithFido2(email.trim());
+      setStatusMessage('Authentication successful.');
+      setShowLogin(false);
+    } catch (err) {
+      setStatusMessage((err as Error).message ?? 'FIDO2 authentication failed.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleFido2Register = async () => {
+    setIsSubmitting(true);
+    setStatusMessage(null);
+    try {
+      await registerFido2();
+      setStatusMessage('Security key registered successfully.');
+    } catch (err) {
+      setStatusMessage((err as Error).message ?? 'FIDO2 registration failed.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="min-h-screen">
@@ -106,11 +141,24 @@ function GovLanding() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                <Input
+                  label="Government Email"
+                  placeholder="you@gov.example"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+
                 <div className="p-4 rounded-xl bg-asgard-50 dark:bg-asgard-800 text-center">
-                  <div className="animate-pulse text-asgard-500 dark:text-asgard-400">
-                    Waiting for security key...
+                  <div className="text-asgard-500 dark:text-asgard-400">
+                    Insert your hardware key and touch to continue.
                   </div>
                 </div>
+
+                {statusMessage && (
+                  <div className="text-center text-sm text-asgard-500 dark:text-asgard-400">
+                    {statusMessage}
+                  </div>
+                )}
                 
                 <div className="text-center text-sm text-asgard-500 dark:text-asgard-400">
                   Supported: YubiKey, CAC/PIV, FIDO2 keys
@@ -124,14 +172,38 @@ function GovLanding() {
                   >
                     Cancel
                   </Button>
-                  <Button className="flex-1">
-                    Retry
+                  <Button className="flex-1" onClick={handleFido2SignIn} disabled={isSubmitting}>
+                    {isSubmitting ? 'Authenticating...' : 'Authenticate'}
                   </Button>
                 </div>
               </CardContent>
             </Card>
           </motion.div>
         </div>
+      )}
+
+      {isAuthenticated && (
+        <section className="container-wide pb-16">
+          <Card>
+            <CardHeader>
+              <CardTitle>Security Key Enrollment</CardTitle>
+              <CardDescription>
+                Register a FIDO2 hardware key for {user?.email}.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {statusMessage && (
+                <div className="text-sm text-asgard-500 dark:text-asgard-400">
+                  {statusMessage}
+                </div>
+              )}
+              <Button onClick={handleFido2Register} disabled={isSubmitting}>
+                <Fingerprint className="w-4 h-4 mr-2" />
+                {isSubmitting ? 'Registering...' : 'Register Security Key'}
+              </Button>
+            </CardContent>
+          </Card>
+        </section>
       )}
 
       {/* Features */}

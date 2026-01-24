@@ -1,0 +1,27 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - alerts.yml
+
+scrape_configs:
+  - job_name: nysus
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["localhost:8080"]
+
+  - job_name: giru
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["localhost:9091"]
+
+  - job_name: hunoid
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["localhost:9092"]
+
+  - job_name: silenus
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["localhost:9093"]

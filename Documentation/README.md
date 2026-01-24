@@ -12,7 +12,13 @@ generated specifications belong here.
 | `Build_Log.md` | Build events and deployment history |
 | `Credentials_Registry.md` | All service credentials and connection strings |
 | `Docker_Logs.md` | Docker container status and error tracking |
+| `Docker_Audit_Report_2026-01-21.md` | Full Docker infrastructure audit report |
 | `Audit_Activity.md` | File change audit log |
+| `Phases_7_15.md` | Build continuation phases 7-15 |
+| `Hunoid_Mission_System.md` | Mission planning, ethics, intervention, audit runtime |
+| `Hunoid_Demo_Scenarios.md` | Demo-ready Hunoid scenarios |
+| `Runbooks.md` | Operational incident response playbooks |
+| `Release_Procedure.md` | Staged release and rollback procedure |
 
 ## Automation Scripts
 

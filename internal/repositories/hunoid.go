@@ -62,23 +62,10 @@ func (r *HunoidRepository) GetAll() ([]*db.Hunoid, error) {
 			return nil, fmt.Errorf("failed to scan hunoid: %w", err)
 		}
 
-		if missionID.Valid {
-			missionUUID, err := uuid.Parse(missionID.String)
-			if err == nil {
-				missionIDStr := missionUUID.String()
-				hunoid.CurrentMissionID = &missionIDStr
-			}
-		}
-		if battery.Valid {
-			hunoid.BatteryPercent = &battery.Float64
-		}
-		if vlaModel.Valid {
-			hunoid.VLAModelVersion = &vlaModel.String
-		}
-		if lastTelemetry.Valid {
-			hunoid.LastTelemetry = &lastTelemetry.Time
-		}
-
+		hunoid.CurrentMissionID = missionID
+		hunoid.BatteryPercent = battery
+		hunoid.VLAModelVersion = vlaModel
+		hunoid.LastTelemetry = lastTelemetry
 		hunoid.CurrentLocation = location
 		hunoid.HardwareConfig = hardwareConfig
 
@@ -131,23 +118,10 @@ func (r *HunoidRepository) GetByID(id string) (*db.Hunoid, error) {
 		return nil, fmt.Errorf("failed to query hunoid: %w", err)
 	}
 
-	if missionID.Valid {
-		missionUUID, err := uuid.Parse(missionID.String)
-		if err == nil {
-			missionIDStr := missionUUID.String()
-			hunoid.CurrentMissionID = &missionIDStr
-		}
-	}
-	if battery.Valid {
-		hunoid.BatteryPercent = &battery.Float64
-	}
-	if vlaModel.Valid {
-		hunoid.VLAModelVersion = &vlaModel.String
-	}
-	if lastTelemetry.Valid {
-		hunoid.LastTelemetry = &lastTelemetry.Time
-	}
-
+	hunoid.CurrentMissionID = missionID
+	hunoid.BatteryPercent = battery
+	hunoid.VLAModelVersion = vlaModel
+	hunoid.LastTelemetry = lastTelemetry
 	hunoid.CurrentLocation = location
 	hunoid.HardwareConfig = hardwareConfig
 
@@ -163,4 +137,89 @@ func (r *HunoidRepository) GetActiveCount() (int, error) {
 		return 0, fmt.Errorf("failed to count hunoids: %w", err)
 	}
 	return count, nil
+}
+
+// GetLocation returns the hunoid's current location if available.
+func (r *HunoidRepository) GetLocation(id string) (*GeoLocation, error) {
+	if r.db == nil {
+		return nil, fmt.Errorf("postgres database not configured")
+	}
+
+	hunoidID, err := uuid.Parse(id)
+	if err != nil {
+		return nil, fmt.Errorf("invalid hunoid ID: %w", err)
+	}
+
+	var lat sql.NullFloat64
+	var lon sql.NullFloat64
+	var alt sql.NullFloat64
+	err = r.db.QueryRow(`
+		SELECT latitude, longitude, altitude
+		FROM hunoids_api
+		WHERE id = $1
+	`, hunoidID).Scan(&lat, &lon, &alt)
+	if err == sql.ErrNoRows {
+		return nil, fmt.Errorf("hunoid not found")
+	}
+	if err != nil {
+		return nil, fmt.Errorf("failed to query hunoid location: %w", err)
+	}
+
+	if !lat.Valid || !lon.Valid {
+		return nil, nil
+	}
+
+	location := &GeoLocation{
+		Latitude:  lat.Float64,
+		Longitude: lon.Float64,
+	}
+	if alt.Valid {
+		location.Altitude = alt.Float64
+	}
+
+	return location, nil
+}
+
+// HunoidTelemetry represents hunoid telemetry fields from the API view.
+type HunoidTelemetry struct {
+	BatteryPercent sql.NullFloat64
+	Status         string
+	LastTelemetry  sql.NullTime
+	Latitude       sql.NullFloat64
+	Longitude      sql.NullFloat64
+	Altitude       sql.NullFloat64
+}
+
+// GetTelemetry returns telemetry fields for a hunoid.
+func (r *HunoidRepository) GetTelemetry(id string) (*HunoidTelemetry, error) {
+	if r.db == nil {
+		return nil, fmt.Errorf("postgres database not configured")
+	}
+
+	hunoidID, err := uuid.Parse(id)
+	if err != nil {
+		return nil, fmt.Errorf("invalid hunoid ID: %w", err)
+	}
+
+	var telemetry HunoidTelemetry
+	err = r.db.QueryRow(`
+		SELECT battery_percent, status, last_telemetry, latitude, longitude, altitude
+		FROM hunoids_api
+		WHERE id = $1
+	`, hunoidID).Scan(
+		&telemetry.BatteryPercent,
+		&telemetry.Status,
+		&telemetry.LastTelemetry,
+		&telemetry.Latitude,
+		&telemetry.Longitude,
+		&telemetry.Altitude,
+	)
+	if err == sql.ErrNoRows {
+		return nil, fmt.Errorf("hunoid not found")
+	}
+	if err != nil {
+		return nil, fmt.Errorf("failed to query hunoid telemetry: %w", err)
+	}
+
+	return &telemetry, nil
 }

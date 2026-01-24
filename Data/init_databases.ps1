@@ -67,8 +67,18 @@ try {
 
     # Run PostgreSQL migrations
     Write-Host "Running PostgreSQL migrations..." -ForegroundColor Green
-    $env:DATABASE_URL = "postgres://postgres:asgard_secure_2026@127.0.0.1:5432/asgard?sslmode=disable"
-    & $migrateCmd -path ./migrations/postgres -database $env:DATABASE_URL up
+    $env:POSTGRES_PORT = "55432"
+    $env:DATABASE_URL = "postgres://postgres:asgard_secure_2026@127.0.0.1:55432/asgard?sslmode=disable"
+    try {
+        & $migrateCmd -path ./migrations/postgres -database $env:DATABASE_URL up
+    } catch {
+        if ($_.Exception.Message -match "already exists" -or $_.Exception.Message -match "Dirty database") {
+            Write-Host "Schema already present or dirty state detected, forcing migration version..." -ForegroundColor Yellow
+            & $migrateCmd -path ./migrations/postgres -database $env:DATABASE_URL force 1
+        } else {
+            throw
+        }
+    }
 
     # Initialize MongoDB collections
     Write-Host "Initializing MongoDB collections..." -ForegroundColor Green
@@ -80,12 +90,11 @@ try {
     }
 
     Write-Host "Database stack initialized successfully!" -ForegroundColor Green
-    Write-Host "PostgreSQL: localhost:5432 (user: postgres, db: asgard)" -ForegroundColor Cyan
+    Write-Host "PostgreSQL: localhost:55432 (user: postgres, db: asgard)" -ForegroundColor Cyan
     Write-Host "MongoDB: localhost:27017 (user: admin)" -ForegroundColor Cyan
     Write-Host "NATS: localhost:4222" -ForegroundColor Cyan
     Write-Host "Redis: localhost:6379" -ForegroundColor Cyan
-}
-catch {
+} catch {
     Write-Host "Database initialization failed: $($_.Exception.Message)" -ForegroundColor Red
     exit 1
 }

@@ -1,14 +1,25 @@
 follow APPLE and Preplexity Design principles and make this a step forward in design, simlicity, a vision. always ready documents and follow all instruction. never add fake or holusinated code of functions or placeholders or stubs. PANDORA (ASGARD) ABSOLUTE EXECUTION MANIFEST
 
-PROJECT STATUS SNAPSHOT (2026-01-20)
+PROJECT STATUS SNAPSHOT (2026-01-21)
 Workspace: C:\Users\hp\Desktop\Asgard
 Directories present: Silenus, Hunoid, Nysus, Sat_Net, Control_net, Data, Hubs, Giru, Documentation, Websites
-Core docs: Agent_Guide.md, Bible.md, manifist.md, README.md
+Core docs: Agent_Guide.md, Bible.md, manifest.md, README.md
 Build log: Documentation\Build_Log.md
 Data foundation: Data\migrations\postgres, Data\migrations\mongo, Data\docker-compose.yml, Data\init_databases.ps1
 DB access layer: internal\platform\db, cmd\db_migrate
 Go deps: installed and module tidied
-Next execution focus: Ensure Docker Desktop is running, install migrate/mongosh, rerun Data\init_databases.ps1, then build/run cmd\db_migrate
+Local DB: Postgres bound to 55432 (host 5432 occupied), MongoDB collections created in asgard db
+Verification: cmd\db_migrate passed with POSTGRES_PORT=55432 (all Mongo collections validated)
+Sat_Net RL: models\rl_router.json + scripts\train_rl_router.py + RLRoutingAgent wired into satnet_router
+Sat_Net verification: cmd\satnet_verify passed (reroute after neighbor outage)
+Silenus: cmd\silenus builds successfully to bin\silenus.exe
+Silenus pipeline: frame buffer + alert clips + Sat_Net forwarding + GPS tagging
+Silenus runtime: startup verified (mock vision + DTN node init)
+Vision backend: SimpleVisionProcessor live + TFLite backend built with tflite-dist runtime
+TFLite model: models\coco_ssd_mobilenet_v1_1.0_quant\detect.tflite
+Silenus TFLite build: bin\silenus_tflite.exe (CGO + MinGW GCC)
+Alert forwarding: telemetry bundles forwarded to satnet_gateway during TFLite run
+Next execution focus: Longer TFLite run to validate alert bundle emission
 CRITICAL FOUNDATIONAL PRINCIPLES FOR AI AGENTS
 YOU ARE BUILDING A PRODUCTION-READY PLANETARY-SCALE AUTONOMOUS SYSTEM
 Every line of code, every configuration file, every database schema, every API endpoint must be:
@@ -4548,4 +4559,167 @@ func (r *EnergyAwareRouter) Route(bundle Bundle, neighborsNode) Node {
     Stop() error
     Status() (HealthStatus, error)
 }
-Verification: Deploy a test pod and verify Nysus can restart it remotely.Phase 3: The Orbital Segment (Silenus & Sat_Net)Objective: Enable the eyes and the interstellar network.Develop Sat_Net (DTN):Implement Bundle Protocol v7 in internal/platform/dtn.Train the RL Routing Agent using a Python simulation, then export the model (ONNX) to Go.Implement the EnergyAwareRouter logic.Verification: Simulate a node failure (eclipse mode) and verify the RL agent re-routes traffic.Build Silenus Firmware:Write the TinyGo HAL for the camera sensors in internal/orbital/hal.Implement the "AI Track & Assess" loop using wazero to run the object detection model.Verification: Cross-compile cmd/silenus for ARM64 (Raspberry Pi/Jetson) and RISC-V targets.Phase 4: The Body (Hunoid)Objective: Awaken the physical avatar.Robotics Middleware:Set up the ROS2 Go bridge (rclgo).Implement the Ethical Pre-Processor middleware.VLA Integration:Create the Python service for OpenVLA inference.Build the gRPC bridge between Hunoid (Go) and VLA (Python).Verification: Send a text command "Lift Box" and verify the VLA returns valid joint trajectories.Phase 5: The Shield (Giru 2.0)Objective: Arm the immune system.Deploy Sentinel:Implement the traffic analyzer using gopacket.Connect the Metasploit RPC client.31Train Gaga Chat:Define the linguistic steganography rules in pkg/gagachat.Implement the rolling-code encryption.Verification: Run a Red Team simulation where the Red Agent attempts to hack Websites and Giru blocks it automatically.Phase 6: The Interface (Hubs & Websites)Objective: Connect humanity to the system.Frontend Development:Scaffold the React apps in Websites/.Implement the Subscription flow with Stripe.Hub Streaming:Deploy the WebRTC signaling server in Hubs/.Connect it to the Sat_Net egress point.Verification: Stream a video file from Silenus (simulated) through Sat_Net to the Hub browser with simulated latency.12. Detailed Technical Specifications: Deep Dive12.1. Silenus: Flight Software SpecificsThe choice of TinyGo is pivotal. Unlike standard Go, TinyGo uses LLVM to produce compact binaries (often <100KB) suitable for the embedded controllers on satellites.Memory Management: Satellite OBCs have limited RAM. We disable the standard Go Garbage Collector (GC) for critical loops or use TinyGo's specialized conservative GC to prevent "Stop-the-World" pauses that could cause the satellite to miss a control deadline (e.g., firing a thruster).Thermal Throttling: The software includes a thermal PID controller. If the CPU temperature exceeds 85°C (common in direct sunlight), the software automatically downclocks the processor and pauses non-essential AI inference tasks.12.2. Sat_Net: The Bundle Protocol & Convergence LayersWe define the Bundle Protocol architecture in internal/platform/dtn.Convergence Layers (CL):TCPCL: For ground-testing and reliable links.LTP (Licklider Transmission Protocol): For long-delay space links. We implement a Go version of LTP to handle high bit-error rates over RF links.Bundle Security Protocol (BPSec): Every bundle is signed and encrypted. This prevents spoofing—a critical requirement for a military-grade system. Giru manages the keys for BPSec.12.3. Hunoid: Interstellar Autarky ModeWhen the Hunoid is on Mars, the light-speed delay (up to 24 minutes) makes teleoperation impossible. The robot must be Autarkic (Self-Sufficient).Local VLA: The robot carries a quantized version of the VLA model. It can perform tasks like "Build Greenhouse" without contacting Earth.Journaling: Instead of streaming video, the robot records a "Journal" of events (Action: Moved Rock, Result: Success, Time: 12:00). This text-based log is incredibly bandwidth-efficient.Reconstruction: On Earth, the Hubs read this journal and use a game engine (Unreal/Unity via WebAssembly) to simulate and visualize what the robot did, providing a high-fidelity "replay" for the user.12.4. Giru: The "Parallel Engine" & Shadow SimulationThe Parallel Engine is a masterpiece of defensive engineering.Mechanism: Control_net spins up dynamic containers that mimic the production environment (Honeypots).Routing: Giru probabilistically clones incoming traffic. One copy goes to the real server, one to the Shadow Engine.Analysis: If the request causes a crash or unauthorized file access in the Shadow Engine, Giru immediately blocks the sender IP on the real firewall. This allows "Zero-False-Positive" blocking.13. Insight & Conclusion: The Ghost in the MachineThis architecture is not a collection of parts but a holistic system. By applying First Principles, we have derived that:Latency dictates the use of DTN and Edge AI.Safety dictates the use of Go (memory safety) and Ethical Guardrails.Security dictates the use of Active Defense (Giru) and Steganography (Gaga Chat).Second-Order Effects:By implementing DTN for space, we inadvertently create a robust terrestrial network that can survive massive infrastructure collapse (e.g., natural disasters), fulfilling the "Aid humanity" goal even on Earth.The "Gaga Chat" language, initially for security, evolves into a unique dialect for AI-to-AI communication, potentially increasing the efficiency of Nysus inference by bypassing human-language tokenization overhead.Third-Order Effects:The "Interstellar" requirement pushes the Hunoid to be fully autonomous. This autonomy makes it incredibly effective for terrestrial disaster relief where local infrastructure is destroyed, as it doesn't rely on the cloud.The system is designed to be Antifragile. It does not just withstand stress; it improves from it. The Red Agent constantly finding flaws makes the Blue Agent stronger. The latency of space makes the Edge AI smarter. This is the essence of PANDORA (ASGARD).Verification of Territory:Silenus -> Orbit (Edge AI).Hunoid -> Ground/Space (Robotics).Nysus -> Core (Orchestrator).Sat_Net -> Mesh (Transport).Giru -> Immune System (Security).Proceed with Bias for Action. Reject temporary patches. Build for the interstellar scale today.End of Report
+Verification: Deploy a test pod and verify Nysus can restart it remotely.Phase 3: The Orbital Segment (Silenus & Sat_Net)Objective: Enable the eyes and the interstellar network.Develop Sat_Net (DTN):Implement Bundle Protocol v7 in internal/platform/dtn.Train the RL Routing Agent using a Python simulation, then export the model (ONNX) to Go.Implement the EnergyAwareRouter logic.Verification: Simulate a node failure (eclipse mode) and verify the RL agent re-routes traffic.Build Silenus Firmware:Write the TinyGo HAL for the camera sensors in internal/orbital/hal.Implement the "AI Track & Assess" loop using wazero to run the object detection model.Verification: Cross-compile cmd/silenus for ARM64 (Raspberry Pi/Jetson) and RISC-V targets.Phase 4: The Body (Hunoid)Objective: Awaken the physical avatar.Robotics Middleware:Set up the ROS2 Go bridge (rclgo).Implement the Ethical Pre-Processor middleware.VLA Integration:Create the Python service for OpenVLA inference.Build the gRPC bridge between Hunoid (Go) and VLA (Python).Verification: Send a text command "Lift Box" and verify the VLA returns valid joint trajectories.Phase 5: The Shield (Giru 2.0)Objective: Arm the immune system.Deploy Sentinel:Implement the traffic analyzer using gopacket.Connect the Metasploit RPC client.31Train Gaga Chat:Define the linguistic steganography rules in pkg/gagachat.Implement the rolling-code encryption.Verification: Run a Red Team simulation where the Red Agent attempts to hack Websites and Giru blocks it automatically.Phase 6: The Interface (Hubs & Websites)Objective: Connect humanity to the system.Frontend Development:Scaffold the React apps in Websites/.Implement the Subscription flow with Stripe.Hub Streaming:Deploy the WebRTC signaling server in Hubs/.Connect it to the Sat_Net egress point.Verification: Stream a video file from Silenus (simulated) through Sat_Net to the Hub browser with simulated latency.
+
+**Phase 7: The Guidance System (PERCILA)**
+
+Objective: Build the most advanced AI-controlled guidance system for all payload types.
+
+**7.1. PERCILA Core Architecture**
+
+PERCILA (Precision Engagement & Routing Control with Integrated Learning Architecture) is the guidance brain that navigates all ASGARD payloads.
+
+**Create PERCILA Directory Structure:**
+```powershell
+New-Item -ItemType Directory -Path "C:\Users\hp\Desktop\Asgard\Percila\internal\guidance" -Force
+New-Item -ItemType Directory -Path "C:\Users\hp\Desktop\Asgard\Percila\internal\navigation" -Force
+New-Item -ItemType Directory -Path "C:\Users\hp\Desktop\Asgard\Percila\internal\stealth" -Force
+New-Item -ItemType Directory -Path "C:\Users\hp\Desktop\Asgard\Percila\internal\prediction" -Force
+New-Item -ItemType Directory -Path "C:\Users\hp\Desktop\Asgard\Percila\internal\payload" -Force
+New-Item -ItemType Directory -Path "C:\Users\hp\Desktop\Asgard\Percila\internal\integration" -Force
+New-Item -ItemType Directory -Path "C:\Users\hp\Desktop\Asgard\Percila\cmd\percila" -Force
+```
+
+**7.2. Core Components:**
+
+1. **Navigation System** (`Percila/internal/navigation/navigator.go`):
+   - Waypoint management with terrain avoidance
+   - Threat zone routing
+   - Multiple navigation modes: direct, terrain, stealth, evasive, ballistic, orbital
+   - 20 Hz steering command generation
+
+2. **Prediction Engine** (`Percila/internal/prediction/predictor.go`):
+   - 9-state Kalman filter for trajectory prediction
+   - Proportional navigation intercept calculation
+   - Fuel consumption forecasting
+   - Contact window prediction for Sat_Net
+
+3. **Stealth Optimizer** (`Percila/internal/stealth/optimizer.go`):
+   - Radar Cross Section (RCS) calculation
+   - Thermal signature modeling (Stefan-Boltzmann)
+   - Terrain masking analysis
+   - SAM threat evaluation
+
+4. **Payload Controller** (`Percila/internal/payload/controller.go`):
+   - Multi-payload management: Hunoid, UAV, Rocket, Missile, Spacecraft, Drone
+   - Command processing: navigate_to, hold, arm, abort, engage_stealth
+   - Telemetry collection at 10 Hz
+
+5. **ASGARD Integration** (`Percila/internal/integration/asgard.go`):
+   - Silenus: Terrain maps, satellite positions, alert feeds
+   - Hunoid: Robot control and state monitoring
+   - Sat_Net: DTN command/telemetry relay
+   - Giru: Threat intelligence for route planning
+   - Nysus: Mission orchestration
+
+**7.3. Build and Test PERCILA:**
+```powershell
+# Build PERCILA executable
+cd C:\Users\hp\Desktop\Asgard
+go build -o bin/percila.exe ./Percila/cmd/percila/main.go
+
+# Run PERCILA
+.\bin\percila.exe -http-port 8089 -stealth=true -prediction=true
+
+# Test API
+curl http://localhost:8089/api/v1/status
+```
+
+**7.4. Payload Capabilities:**
+
+| Payload Type | Max Speed | Max Altitude | Stealth | Use Case |
+|-------------|-----------|--------------|---------|----------|
+| Hunoid | 3 m/s | Ground | No | Humanitarian aid |
+| UAV | 80 m/s | 10 km | Yes | Reconnaissance |
+| Rocket | 3,000 m/s | 400 km (LEO) | No | Orbital insertion |
+| Missile | 1,000 m/s (Mach 3) | 30 km | Yes | Precision strike |
+| Spacecraft | 10,000 m/s | 1M+ km | No | Orbital operations |
+| Drone | 20 m/s | 500 m | No | Local surveillance |
+| Interstellar | 50,000 m/s | Unlimited | No | Deep space |
+
+**7.5. Stealth Optimization:**
+
+PERCILA calculates optimal stealth trajectories using:
+- **RCS Minimization**: Aspect angle optimization relative to radar sources
+- **Thermal Reduction**: Speed/altitude management to reduce IR signature
+- **Terrain Masking**: Nap-of-earth flying using Silenus terrain data
+- **Threat Avoidance**: Dynamic routing around SAM engagement envelopes
+
+**7.6. API Endpoints:**
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/v1/missions` | GET/POST | Mission management |
+| `/api/v1/missions/{id}` | GET | Get mission details |
+| `/api/v1/payloads` | GET/POST | Payload registration |
+| `/api/v1/payloads/{id}` | GET/PUT | Payload state |
+| `/api/v1/trajectories/{id}` | GET | Trajectory details |
+| `/api/v1/status` | GET | System status |
+| `/health` | GET | Health check |
+| `/metrics` | GET | Prometheus metrics |
+
+**7.7. Live Feed System (v2.0)**
+
+PERCILA v2.0 introduces real-time live feeds for payload delivery monitoring:
+
+| Endpoint | Method | Description | Headers |
+|----------|--------|-------------|---------|
+| `/api/v1/feeds` | GET | List live feeds | X-Clearance |
+| `/api/v1/feeds` | POST | Create feed | X-Clearance |
+| `/api/v1/feeds/{id}` | GET | Get feed | X-Clearance |
+| `/api/v1/feeds/{id}` | DELETE | End feed | X-Clearance |
+| `/api/v1/telemetry/{payloadId}` | GET | Live telemetry | X-Clearance |
+
+**Stream Types:**
+- `telemetry` - Position, velocity, status updates
+- `video` - Live camera feed (4K/1080p/720p)
+- `thermal` - Thermal imaging
+- `radar` - Radar overlay
+- `map` - 3D visualization
+- `alert` - Critical notifications
+
+**7.8. Access Control & Tiered Clearances**
+
+| Level | Name | Color | Access |
+|-------|------|-------|--------|
+| 0 | PUBLIC | #22c55e | Public humanitarian missions |
+| 1 | CIVILIAN | #3b82f6 | Civilian search & rescue |
+| 2 | MILITARY | #f59e0b | Military tactical ops |
+| 3 | GOVERNMENT | #8b5cf6 | Classified missions |
+| 4 | SECRET | #ef4444 | Top secret ops |
+| 5 | ULTRA | #ec4899 | Highest classification |
+
+**Access Control Endpoints:**
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/v1/auth/login` | POST | User login |
+| `/api/v1/auth/validate` | GET | Validate session |
+| `/api/v1/users` | GET | List users |
+| `/api/v1/terminals` | GET | List terminals |
+| `/api/v1/clearance/levels` | GET | Get clearance info |
+
+**7.9. Mission Hub Interface**
+
+The Mission Hub is a React-based interface at `Hubs/src/pages/MissionHub/`:
+
+- **MissionHub.tsx** - Main hub component with tiered access
+- **MissionHub.css** - Dark theme styling
+
+**Features:**
+- Login with clearance level selection
+- Live mission dashboard (filtered by clearance)
+- Real-time telemetry display with HUD overlay
+- Video feed viewer with controls
+- Access terminal selection
+- Audit logging
+
+**Access Route:** `http://localhost:5173/missions`
+
+**Verification:**
+1. Create a mission with stealth requirements
+2. Verify trajectory includes terrain masking waypoints
+3. Confirm threat zones are avoided
+4. Test payload state updates via Sat_Net telemetry
+
+12. Detailed Technical Specifications: Deep Dive12.1. Silenus: Flight Software SpecificsThe choice of TinyGo is pivotal. Unlike standard Go, TinyGo uses LLVM to produce compact binaries (often <100KB) suitable for the embedded controllers on satellites.Memory Management: Satellite OBCs have limited RAM. We disable the standard Go Garbage Collector (GC) for critical loops or use TinyGo's specialized conservative GC to prevent "Stop-the-World" pauses that could cause the satellite to miss a control deadline (e.g., firing a thruster).Thermal Throttling: The software includes a thermal PID controller. If the CPU temperature exceeds 85°C (common in direct sunlight), the software automatically downclocks the processor and pauses non-essential AI inference tasks.12.2. Sat_Net: The Bundle Protocol & Convergence LayersWe define the Bundle Protocol architecture in internal/platform/dtn.Convergence Layers (CL):TCPCL: For ground-testing and reliable links.LTP (Licklider Transmission Protocol): For long-delay space links. We implement a Go version of LTP to handle high bit-error rates over RF links.Bundle Security Protocol (BPSec): Every bundle is signed and encrypted. This prevents spoofing—a critical requirement for a military-grade system. Giru manages the keys for BPSec.12.3. Hunoid: Interstellar Autarky ModeWhen the Hunoid is on Mars, the light-speed delay (up to 24 minutes) makes teleoperation impossible. The robot must be Autarkic (Self-Sufficient).Local VLA: The robot carries a quantized version of the VLA model. It can perform tasks like "Build Greenhouse" without contacting Earth.Journaling: Instead of streaming video, the robot records a "Journal" of events (Action: Moved Rock, Result: Success, Time: 12:00). This text-based log is incredibly bandwidth-efficient.Reconstruction: On Earth, the Hubs read this journal and use a game engine (Unreal/Unity via WebAssembly) to simulate and visualize what the robot did, providing a high-fidelity "replay" for the user.12.4. Giru: The "Parallel Engine" & Shadow SimulationThe Parallel Engine is a masterpiece of defensive engineering.Mechanism: Control_net spins up dynamic containers that mimic the production environment (Honeypots).Routing: Giru probabilistically clones incoming traffic. One copy goes to the real server, one to the Shadow Engine.Analysis: If the request causes a crash or unauthorized file access in the Shadow Engine, Giru immediately blocks the sender IP on the real firewall. This allows "Zero-False-Positive" blocking.13. Insight & Conclusion: The Ghost in the MachineThis architecture is not a collection of parts but a holistic system. By applying First Principles, we have derived that:Latency dictates the use of DTN and Edge AI.Safety dictates the use of Go (memory safety) and Ethical Guardrails.Security dictates the use of Active Defense (Giru) and Steganography (Gaga Chat).Second-Order Effects:By implementing DTN for space, we inadvertently create a robust terrestrial network that can survive massive infrastructure collapse (e.g., natural disasters), fulfilling the "Aid humanity" goal even on Earth.The "Gaga Chat" language, initially for security, evolves into a unique dialect for AI-to-AI communication, potentially increasing the efficiency of Nysus inference by bypassing human-language tokenization overhead.Third-Order Effects:The "Interstellar" requirement pushes the Hunoid to be fully autonomous. This autonomy makes it incredibly effective for terrestrial disaster relief where local infrastructure is destroyed, as it doesn't rely on the cloud.The system is designed to be Antifragile. It does not just withstand stress; it improves from it. The Red Agent constantly finding flaws makes the Blue Agent stronger. The latency of space makes the Edge AI smarter. This is the essence of PANDORA (ASGARD).Verification of Territory:Silenus -> Orbit (Edge AI).Hunoid -> Ground/Space (Robotics).Nysus -> Core (Orchestrator).Sat_Net -> Mesh (Transport).Giru -> Immune System (Security).Proceed with Bias for Action. Reject temporary patches. Build for the interstellar scale today.End of Report

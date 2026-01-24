@@ -48,6 +48,12 @@ type MotionController interface {
 	IsMoving() bool
 }
 
+// HunoidController extends MotionController with battery telemetry.
+type HunoidController interface {
+	MotionController
+	GetBatteryPercent() float64
+}
+
 // PerceptionSystem handles sensors
 type PerceptionSystem interface {
 	GetCameraImage(cameraID string) ([]byte, error)

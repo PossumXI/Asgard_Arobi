@@ -2,11 +2,11 @@
 package handlers
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
 
 	"github.com/asgard/pandora/internal/services"
+	"github.com/asgard/pandora/internal/utils"
 )
 
 // AuthHandler handles authentication endpoints.
@@ -27,13 +27,30 @@ func (h *AuthHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		handleError(w, utils.ErrBadRequest)
+		return
+	}
+
+	if !validateEmail(req.Email) {
+		handleError(w, utils.NewAPIError("INVALID_EMAIL", "Invalid email address", http.StatusBadRequest))
+		return
+	}
+
+	if !validatePassword(req.Password) {
+		handleError(w, utils.NewAPIError("INVALID_PASSWORD", "Password must be at least 8 characters", http.StatusBadRequest))
 		return
 	}
 
 	user, token, err := h.authService.SignIn(req.Email, req.Password)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusUnauthorized)
+		switch err {
+		case services.ErrEmailNotVerified:
+			handleError(w, utils.NewAPIError("EMAIL_NOT_VERIFIED", "Email verification required for government access", http.StatusForbidden))
+		case services.ErrFido2Required:
+			handleError(w, utils.NewAPIError("FIDO2_REQUIRED", "FIDO2 authentication required for government access", http.StatusForbidden))
+		default:
+			handleError(w, utils.WrapAPIError(err, "INVALID_CREDENTIALS", "Invalid email or password", http.StatusUnauthorized))
+		}
 		return
 	}
 
@@ -72,25 +89,40 @@ func (h *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 
 // SignOut handles POST /api/auth/signout
 func (h *AuthHandler) SignOut(w http.ResponseWriter, r *http.Request) {
-	// In production, invalidate token in Redis/database
+	token := extractToken(r)
+	if token != "" {
+		claims, err := h.authService.ValidateToken(token)
+		if err == nil {
+			if err := h.authService.RevokeToken(claims.TokenID, claims.UserID); err != nil {
+				http.Error(w, "Failed to revoke token", http.StatusInternalServerError)
+				return
+			}
+		}
+	}
 	jsonResponse(w, http.StatusOK, map[string]string{"message": "Signed out successfully"})
 }
 
 // RefreshToken handles POST /api/auth/refresh
 func (h *AuthHandler) RefreshToken(w http.ResponseWriter, r *http.Request) {
-	userID := getUserIDFromContext(r)
-	if userID == "" {
+	token := extractToken(r)
+	if token == "" {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
 
-	token, err := h.authService.RefreshToken(userID)
+	claims, err := h.authService.ValidateToken(token)
+	if err != nil {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	newToken, err := h.authService.RefreshToken(claims)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
-	jsonResponse(w, http.StatusOK, map[string]string{"token": token})
+	jsonResponse(w, http.StatusOK, map[string]string{"token": newToken})
 }
 
 // RequestPasswordReset handles POST /api/auth/password-reset/request
@@ -176,13 +208,7 @@ func (h *AuthHandler) CompleteFido2Registration(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	var credential map[string]interface{}
-	if err := json.NewDecoder(r.Body).Decode(&credential); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
-		return
-	}
-
-	if err := h.authService.CompleteFido2Registration(userID, credential); err != nil {
+	if err := h.authService.CompleteFido2Registration(userID, r); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -196,12 +222,18 @@ func (h *AuthHandler) StartFido2Auth(w http.ResponseWriter, r *http.Request) {
 		Email string `json:"email"`
 	}
 
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+	_ = json.NewDecoder(r.Body).Decode(&req)
+
+	email := req.Email
+	if email == "" {
+		email = r.URL.Query().Get("email")
+	}
+	if email == "" {
+		http.Error(w, "Email is required", http.StatusBadRequest)
 		return
 	}
 
-	options, err := h.authService.StartFido2Auth(req.Email)
+	options, err := h.authService.StartFido2Auth(email)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -217,12 +249,18 @@ func (h *AuthHandler) CompleteFido2Auth(w http.ResponseWriter, r *http.Request) 
 		Credential map[string]interface{} `json:"credential"`
 	}
 
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+	_ = json.NewDecoder(r.Body).Decode(&req)
+
+	email := req.Email
+	if email == "" {
+		email = r.URL.Query().Get("email")
+	}
+	if email == "" {
+		http.Error(w, "Email is required", http.StatusBadRequest)
 		return
 	}
 
-	user, token, err := h.authService.CompleteFido2Auth(req.Email, req.Credential)
+	user, token, err := h.authService.CompleteFido2Auth(email, r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
@@ -243,13 +281,13 @@ func (h *AuthHandler) RequireAuth(next http.Handler) http.Handler {
 			return
 		}
 
-		userID, err := h.authService.ValidateToken(token)
+		claims, err := h.authService.ValidateToken(token)
 		if err != nil {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
 
-		ctx := contextWithUserID(r.Context(), userID)
+		ctx := contextWithAuthClaims(r.Context(), claims)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
@@ -259,8 +297,8 @@ func (h *AuthHandler) OptionalAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token := extractToken(r)
 		if token != "" {
-			if userID, err := h.authService.ValidateToken(token); err == nil {
-				ctx := contextWithUserID(r.Context(), userID)
+			if claims, err := h.authService.ValidateToken(token); err == nil {
+				ctx := contextWithAuthClaims(r.Context(), claims)
 				r = r.WithContext(ctx)
 			}
 		}
@@ -279,22 +317,4 @@ func extractToken(r *http.Request) string {
 
 	// Check query parameter
 	return r.URL.Query().Get("token")
-}
-
-func getUserIDFromContext(r *http.Request) string {
-	userID := r.Context().Value("user_id")
-	if userID == nil {
-		return ""
-	}
-	return userID.(string)
-}
-
-func contextWithUserID(ctx context.Context, userID string) context.Context {
-	return context.WithValue(ctx, "user_id", userID)
-}
-
-func jsonResponse(w http.ResponseWriter, status int, data interface{}) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(status)
-	json.NewEncoder(w).Encode(data)
 }

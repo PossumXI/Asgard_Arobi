@@ -200,7 +200,7 @@ export function useRealtime(): RealtimeConnection {
 }
 
 // React hook for subscribing to events
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 
 export function useRealtimeEvent<T = unknown>(
   eventType: RealtimeEventType | '*'

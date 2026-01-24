@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/asgard/pandora/pkg/bundle"
-	"github.com/google/uuid"
 )
 
 // Node represents a DTN network node (satellite, ground station, Hunoid, etc.).
@@ -17,6 +16,7 @@ type Node struct {
 	EID         string // Endpoint Identifier (e.g., "dtn://earth/nysus")
 	storage     BundleStorage
 	router      Router
+	transport   TransportAdapter
 	neighbors   map[string]*Neighbor
 	neighborsMu sync.RWMutex
 	ingressChan chan *bundle.Bundle
@@ -32,6 +32,7 @@ type Node struct {
 type Neighbor struct {
 	ID           string
 	EID          string
+	Address      string
 	LinkQuality  float64   // 0.0 to 1.0
 	LastContact  time.Time
 	IsActive     bool
@@ -86,6 +87,7 @@ func NewNode(id, eid string, storage BundleStorage, router Router, config NodeCo
 		EID:         eid,
 		storage:     storage,
 		router:      router,
+		transport:   nil, // Transport is optional, set via SetTransport
 		neighbors:   make(map[string]*Neighbor),
 		ingressChan: make(chan *bundle.Bundle, config.BufferSize),
 		egressChan:  make(chan *bundle.Bundle, config.BufferSize),
@@ -95,9 +97,32 @@ func NewNode(id, eid string, storage BundleStorage, router Router, config NodeCo
 	}
 }
 
+// NewNodeWithTransport creates a new DTN node with a transport adapter.
+func NewNodeWithTransport(id, eid string, storage BundleStorage, router Router, transport TransportAdapter, config NodeConfig) *Node {
+	node := NewNode(id, eid, storage, router, config)
+	node.transport = transport
+	return node
+}
+
+// SetTransport sets the transport adapter for the node.
+func (n *Node) SetTransport(transport TransportAdapter) {
+	n.transport = transport
+}
+
 // Start begins node operations.
 func (n *Node) Start() error {
 	log.Printf("[DTN Node %s] Starting at EID: %s", n.ID, n.EID)
+
+	// Start transport if configured
+	if n.transport != nil {
+		if err := n.transport.Start(n.ctx); err != nil {
+			return fmt.Errorf("failed to start transport: %w", err)
+		}
+
+		// Start transport receiver goroutine
+		n.wg.Add(1)
+		go n.processTransportReceive()
+	}
 
 	// Start ingress processor
 	n.wg.Add(1)
@@ -118,6 +143,14 @@ func (n *Node) Start() error {
 func (n *Node) Stop() error {
 	log.Printf("[DTN Node %s] Shutting down", n.ID)
 	n.cancel()
+
+	// Stop transport if configured
+	if n.transport != nil {
+		if err := n.transport.Stop(); err != nil {
+			log.Printf("[DTN Node %s] Error stopping transport: %v", n.ID, err)
+		}
+	}
+
 	n.wg.Wait()
 	close(n.ingressChan)
 	close(n.egressChan)
@@ -193,6 +226,7 @@ func (n *Node) GetNeighbors() map[string]*Neighbor {
 		result[k] = &Neighbor{
 			ID:           v.ID,
 			EID:          v.EID,
+			Address:      v.Address,
 			LinkQuality:  v.LinkQuality,
 			LastContact:  v.LastContact,
 			IsActive:     v.IsActive,
@@ -310,17 +344,34 @@ func (n *Node) forwardBundle(b *bundle.Bundle) {
 		return
 	}
 
-	// Simulate transmission
-	log.Printf("[DTN Node %s] Forwarding bundle %s to %s (EID: %s)",
-		n.ID, b.ID.String()[:8], nextHop, neighbor.EID)
+	if n.transport == nil {
+		log.Printf("[DTN Node %s] Transport not configured; cannot send bundle %s to %s",
+			n.ID, b.ID.String()[:8], nextHop)
+		n.storage.UpdateStatus(n.ctx, b.ID, StatusFailed)
+		return
+	}
 
-	// Update metrics
+	if !n.transport.IsConnected(nextHop) {
+		log.Printf("[DTN Node %s] Transport not connected to %s (EID: %s)", n.ID, nextHop, neighbor.EID)
+		n.storage.UpdateStatus(n.ctx, b.ID, StatusFailed)
+		return
+	}
+
+	if err := n.transport.Send(n.ctx, nextHop, b); err != nil {
+		log.Printf("[DTN Node %s] Failed to send bundle %s to %s: %v",
+			n.ID, b.ID.String()[:8], nextHop, err)
+		n.storage.UpdateStatus(n.ctx, b.ID, StatusFailed)
+		return
+	}
+
+	log.Printf("[DTN Node %s] Successfully sent bundle %s to %s via transport",
+		n.ID, b.ID.String()[:8], nextHop)
+
 	n.recordMetric(func(m *NodeMetrics) {
 		m.BundlesSent++
 		m.BytesSent += int64(b.Size())
 	})
 
-	// Mark as in transit
 	n.storage.UpdateStatus(n.ctx, b.ID, StatusInTransit)
 }
 
@@ -347,6 +398,42 @@ func (n *Node) runMaintenance() {
 
 			// Check neighbor health
 			n.checkNeighborHealth()
+		}
+	}
+}
+
+// processTransportReceive handles incoming bundles from the transport layer.
+func (n *Node) processTransportReceive() {
+	defer n.wg.Done()
+
+	if n.transport == nil {
+		return
+	}
+
+	receiveChan := n.transport.Receive()
+
+	for {
+		select {
+		case <-n.ctx.Done():
+			return
+		case b, ok := <-receiveChan:
+			if !ok {
+				// Channel closed, transport shut down
+				log.Printf("[DTN Node %s] Transport receive channel closed", n.ID)
+				return
+			}
+			if b == nil {
+				continue
+			}
+
+			log.Printf("[DTN Node %s] Received bundle %s from transport (src: %s, dst: %s)",
+				n.ID, b.ID.String()[:8], b.SourceEID, b.DestinationEID)
+
+			// Process the received bundle through normal ingress
+			if err := n.Receive(n.ctx, b); err != nil {
+				log.Printf("[DTN Node %s] Failed to process received bundle %s: %v",
+					n.ID, b.ID.String()[:8], err)
+			}
 		}
 	}
 }
@@ -379,4 +466,59 @@ func (n *Node) CreateBundle(destination string, payload []byte, priority uint8) 
 		return err
 	}
 	return n.Send(n.ctx, b)
+}
+
+// ConnectNeighbor establishes a transport connection to a neighbor.
+// This should be called after RegisterNeighbor to enable actual data transmission.
+func (n *Node) ConnectNeighbor(ctx context.Context, neighborID string, address string) error {
+	if n.transport == nil {
+		return fmt.Errorf("no transport configured")
+	}
+
+	if err := n.transport.Connect(ctx, neighborID, address); err != nil {
+		return fmt.Errorf("failed to connect to neighbor %s: %w", neighborID, err)
+	}
+
+	// Update neighbor's active status
+	n.neighborsMu.Lock()
+	if neighbor, exists := n.neighbors[neighborID]; exists {
+		neighbor.IsActive = true
+		neighbor.LastContact = time.Now().UTC()
+	}
+	n.neighborsMu.Unlock()
+
+	return nil
+}
+
+// DisconnectNeighbor closes the transport connection to a neighbor.
+func (n *Node) DisconnectNeighbor(neighborID string) error {
+	if n.transport == nil {
+		return fmt.Errorf("no transport configured")
+	}
+
+	if err := n.transport.Disconnect(neighborID); err != nil {
+		return fmt.Errorf("failed to disconnect from neighbor %s: %w", neighborID, err)
+	}
+
+	// Update neighbor's active status
+	n.neighborsMu.Lock()
+	if neighbor, exists := n.neighbors[neighborID]; exists {
+		neighbor.IsActive = false
+	}
+	n.neighborsMu.Unlock()
+
+	return nil
+}
+
+// IsNeighborConnected returns true if the transport is connected to a neighbor.
+func (n *Node) IsNeighborConnected(neighborID string) bool {
+	if n.transport == nil {
+		return false
+	}
+	return n.transport.IsConnected(neighborID)
+}
+
+// GetTransport returns the node's transport adapter.
+func (n *Node) GetTransport() TransportAdapter {
+	return n.transport
 }

@@ -1,9 +1,18 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Shield, Lock, AlertTriangle, Key } from 'lucide-react';
+import { Shield, Lock, AlertTriangle, Key, Crosshair, Target, Loader2 } from 'lucide-react';
+import StreamCard from '@/components/StreamCard';
+import { useStreams, useStreamUpdates } from '@/hooks/useStreams';
 
 export default function MilitaryHub() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { data, isLoading, error } = useStreams({ type: 'military' });
+  useStreamUpdates();
+
+  const streams = data?.streams ?? [];
+  const liveCount = streams.filter((stream) => stream.status === 'live').length;
+  const delayedCount = streams.filter((stream) => stream.status === 'delayed').length;
+  const offlineCount = streams.filter((stream) => stream.status === 'offline').length;
 
   if (!isAuthenticated) {
     return (
@@ -88,13 +97,68 @@ export default function MilitaryHub() {
         </div>
       </div>
 
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="hub-card p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <Crosshair className="w-5 h-5 text-military" />
+            <h2 className="text-lg font-bold text-white">Operational Feeds</h2>
+          </div>
+          
+          <div className="space-y-4">
+            {isLoading ? (
+              <div className="flex items-center justify-center py-6">
+                <Loader2 className="w-5 h-5 animate-spin text-military" />
+              </div>
+            ) : error ? (
+              <div className="text-sm text-red-400">
+                Failed to load military streams.
+              </div>
+            ) : streams.length > 0 ? (
+              streams.map((stream) => (
+                <StreamCard key={stream.id} stream={stream} layout="list" />
+              ))
+            ) : (
+              <div className="text-sm text-gray-500">
+                No authorized military feeds are available.
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="hub-card p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <Target className="w-5 h-5 text-military" />
+            <h2 className="text-lg font-bold text-white">Tactical Analysis</h2>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div className="p-4 rounded-xl bg-hub-surface border border-hub-border">
+              <p className="text-xs text-gray-500 uppercase mb-1">Live Feeds</p>
+              <p className="text-2xl font-bold text-white">{liveCount}</p>
+            </div>
+            <div className="p-4 rounded-xl bg-hub-surface border border-hub-border">
+              <p className="text-xs text-gray-500 uppercase mb-1">Delayed Feeds</p>
+              <p className="text-2xl font-bold text-white">{delayedCount}</p>
+            </div>
+            <div className="p-4 rounded-xl bg-hub-surface border border-hub-border">
+              <p className="text-xs text-gray-500 uppercase mb-1">Offline Feeds</p>
+              <p className="text-2xl font-bold text-white">{offlineCount}</p>
+            </div>
+            <div className="p-4 rounded-xl bg-hub-surface border border-hub-border">
+              <p className="text-xs text-gray-500 uppercase mb-1">Signal Quality</p>
+              <p className="text-2xl font-bold text-white">N/A</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="hub-card p-8 text-center">
         <Shield className="w-16 h-16 text-gray-700 mx-auto mb-4" />
         <p className="text-gray-500">
           Military streams are available to authorized personnel only.
         </p>
         <p className="text-sm text-gray-600 mt-2">
-          This is a demonstration environment.
+          Feeds appear when authorized sources are active.
         </p>
       </div>
     </div>

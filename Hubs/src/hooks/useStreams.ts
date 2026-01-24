@@ -4,8 +4,9 @@
  */
 
 import { useEffect, useRef, useCallback, useState } from 'react';
+import Hls from 'hls.js';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { hubsApi, hubsRealtime, WebRTCStreamClient, Stream, StreamSession } from '@/lib/api';
+import { hubsApi, hubsRealtime, WebRTCStreamClient, Stream, StreamSession, ChatMessage } from '@/lib/api';
 import { useStreamsStore, usePlayerStore } from '@/stores/hubStore';
 
 // ============================================================================
@@ -112,6 +113,8 @@ interface UseWebRTCStreamOptions {
   onConnected?: () => void;
   onDisconnected?: () => void;
   onError?: (error: Error) => void;
+  mode?: 'subscriber' | 'publisher';
+  localStream?: MediaStream | null;
 }
 
 export function useWebRTCStream(
@@ -129,7 +132,10 @@ export function useWebRTCStream(
     setError(null);
 
     try {
-      clientRef.current = new WebRTCStreamClient(session);
+      clientRef.current = new WebRTCStreamClient(session, {
+        mode: options.mode,
+        localStream: options.localStream ?? null,
+      });
       
       clientRef.current.onTrack((stream) => {
         setMediaStream(stream);
@@ -208,6 +214,10 @@ export function useStreamUpdates() {
   const updateStreamStatus = useStreamsStore((state) => state.updateStreamStatus);
 
   useEffect(() => {
+    hubsRealtime.connect().catch((error) => {
+      console.error('[Realtime] Connection failed:', error);
+    });
+
     const unsubViewers = hubsRealtime.subscribe('stream.viewers', (data) => {
       const { streamId, viewers } = data as { streamId: string; viewers: number };
       updateStreamViewers(streamId, viewers);
@@ -218,28 +228,162 @@ export function useStreamUpdates() {
       updateStreamStatus(streamId, status);
     });
 
+    const unsubUpdate = hubsRealtime.subscribe('stream_update', (data) => {
+      const payload = data as {
+        streamId?: string;
+        id?: string;
+        viewers?: number;
+        status?: Stream['status'];
+        stream?: { id?: string; viewers?: number; status?: Stream['status'] };
+      };
+      const streamId = payload.streamId || payload.id || payload.stream?.id;
+      if (!streamId) return;
+      if (typeof payload.viewers === 'number') {
+        updateStreamViewers(streamId, payload.viewers);
+      } else if (typeof payload.stream?.viewers === 'number') {
+        updateStreamViewers(streamId, payload.stream.viewers);
+      }
+      if (payload.status) {
+        updateStreamStatus(streamId, payload.status);
+      } else if (payload.stream?.status) {
+        updateStreamStatus(streamId, payload.stream.status);
+      }
+    });
+
     return () => {
       unsubViewers();
       unsubStatus();
+      unsubUpdate();
     };
   }, [updateStreamViewers, updateStreamStatus]);
+}
+
+// ============================================================================
+// Stream Chat Hook (optional backend support)
+// ============================================================================
+
+export function useStreamChat(streamId: string | null) {
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [isConnected, setIsConnected] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const chatEnabled = import.meta.env.VITE_CHAT_ENABLED === 'true';
+
+  useEffect(() => {
+    if (!chatEnabled || !streamId) {
+      setMessages([]);
+      setIsConnected(false);
+      setIsLoading(false);
+      setError(null);
+      return;
+    }
+
+    let unsubscribe: (() => void) | null = null;
+
+    const setup = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        await hubsRealtime.connect();
+        setIsConnected(true);
+      } catch (err) {
+        setError('Failed to connect to chat service');
+      }
+
+      try {
+        const history = await hubsApi.getStreamChat(streamId);
+        setMessages(history);
+      } catch (err) {
+        setError('Failed to load chat history');
+      } finally {
+        setIsLoading(false);
+      }
+
+      unsubscribe = hubsRealtime.subscribe('stream_chat', (data) => {
+        const payload = data as Partial<ChatMessage> & { streamId?: string; message?: string };
+        if (payload.streamId && payload.streamId !== streamId) {
+          return;
+        }
+        if (!payload.id || !payload.message) {
+          return;
+        }
+        setMessages((prev) => [...prev, payload as ChatMessage].slice(-200));
+      });
+    };
+
+    setup();
+
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
+  }, [chatEnabled, streamId]);
+
+  const sendMessage = useCallback(async (message: string) => {
+    if (!chatEnabled || !streamId) {
+      return;
+    }
+    await hubsApi.sendStreamChat(streamId, message);
+  }, [chatEnabled, streamId]);
+
+  return {
+    enabled: chatEnabled,
+    messages,
+    isConnected,
+    isLoading,
+    error,
+    sendMessage,
+  };
 }
 
 // ============================================================================
 // Video Element Hook
 // ============================================================================
 
-export function useVideoElement(mediaStream: MediaStream | null) {
+export function useVideoElement(mediaStream: MediaStream | null, playbackUrl?: string) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const hlsRef = useRef<Hls | null>(null);
   const isPlaying = usePlayerStore((state) => state.isPlaying);
   const isMuted = usePlayerStore((state) => state.isMuted);
   const volume = usePlayerStore((state) => state.volume);
 
   useEffect(() => {
-    if (videoRef.current && mediaStream) {
-      videoRef.current.srcObject = mediaStream;
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (mediaStream) {
+      if (hlsRef.current) {
+        hlsRef.current.destroy();
+        hlsRef.current = null;
+      }
+      video.src = '';
+      video.srcObject = mediaStream;
+      return;
     }
-  }, [mediaStream]);
+
+    if (playbackUrl) {
+      video.srcObject = null;
+      if (Hls.isSupported()) {
+        const hls = new Hls({ enableWorker: true });
+        hls.loadSource(playbackUrl);
+        hls.attachMedia(video);
+        hlsRef.current = hls;
+        return () => {
+          hls.destroy();
+          hlsRef.current = null;
+        };
+      }
+      video.src = playbackUrl;
+      return;
+    }
+
+    video.srcObject = null;
+    video.removeAttribute('src');
+    video.load();
+  }, [mediaStream, playbackUrl]);
 
   useEffect(() => {
     if (videoRef.current) {

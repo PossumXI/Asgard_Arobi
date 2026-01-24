@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: silenus
+  namespace: asgard
+  labels:
+    app: silenus
+    component: satellite
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: silenus
+  template:
+    metadata:
+      labels:
+        app: silenus
+        component: satellite
+    spec:
+      containers:
+      - name: silenus
+        image: asgard/silenus:latest
+        imagePullPolicy: IfNotPresent
+        args:
+        - -id
+        - "sat-$(POD_NAME)"
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: MODEL_PATH
+          value: "/models/yolov8n.onnx"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        volumeMounts:
+        - name: models
+          mountPath: /models
+          readOnly: true
+      volumes:
+      - name: models
+        configMap:
+          name: silenus-models

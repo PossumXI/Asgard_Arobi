@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Eye, EyeOff, ArrowRight, Mail, Lock } from 'lucide-react';
+import { Eye, EyeOff, ArrowRight, Fingerprint } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
@@ -21,23 +21,50 @@ type SignInFormData = z.infer<typeof signInSchema>;
 export default function SignIn() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn } = useAuth();
+  const [requiresFido2, setRequiresFido2] = useState(false);
+  const { signIn, signInWithFido2 } = useAuth();
   const { error: showError } = useToast();
 
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<SignInFormData>({
     resolver: zodResolver(signInSchema),
   });
+  const emailValue = watch('email');
 
   const onSubmit = async (data: SignInFormData) => {
     setIsLoading(true);
     try {
+      setRequiresFido2(false);
       await signIn(data.email, data.password);
     } catch (err) {
-      showError('Sign in failed', 'Please check your credentials and try again.');
+      const code = (err as { code?: string })?.code;
+      if (code === 'FIDO2_REQUIRED') {
+        setRequiresFido2(true);
+        showError('Security key required', 'Use your FIDO2 device to complete sign in.');
+      } else if (code === 'EMAIL_NOT_VERIFIED') {
+        showError('Email verification required', 'Check your inbox to verify your email address.');
+      } else {
+        showError('Sign in failed', 'Please check your credentials and try again.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleFido2 = async () => {
+    if (!emailValue) {
+      showError('Email required', 'Enter your email to continue with FIDO2.');
+      return;
+    }
+    setIsLoading(true);
+    try {
+      await signInWithFido2(emailValue);
+    } catch (err) {
+      showError('FIDO2 sign-in failed', (err as Error).message ?? 'Try again.');
     } finally {
       setIsLoading(false);
     }
@@ -138,6 +165,24 @@ export default function SignIn() {
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </form>
+
+            <div className="mt-4 space-y-3">
+              {requiresFido2 && (
+                <div className="rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-sm text-primary">
+                  Government access requires FIDO2 authentication.
+                </div>
+              )}
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                onClick={handleFido2}
+                disabled={!emailValue || isLoading}
+              >
+                <Fingerprint className="w-4 h-4 mr-2" />
+                Use Security Key
+              </Button>
+            </div>
 
             <div className="relative my-6">
               <div className="absolute inset-0 flex items-center">

@@ -2,27 +2,13 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   Play, 
-  Volume2, 
-  Maximize2, 
   Eye, 
   Clock, 
   MapPin,
   Signal
 } from 'lucide-react';
 import { cn, formatLatency } from '@/lib/utils';
-
-export interface Stream {
-  id: string;
-  title: string;
-  source: string;
-  location: string;
-  type: 'civilian' | 'military' | 'interstellar';
-  status: 'live' | 'delayed' | 'offline';
-  viewers: number;
-  latency: number;
-  thumbnail?: string;
-  description?: string;
-}
+import type { Stream } from '@/lib/api';
 
 interface StreamCardProps {
   stream: Stream;
@@ -35,10 +21,11 @@ const typeColors = {
   interstellar: 'border-interstellar/30 hover:border-interstellar/50',
 };
 
-const statusLabels = {
+const statusLabels: Record<Stream['status'], { label: string; class: string }> = {
   live: { label: 'LIVE', class: 'bg-green-500' },
   delayed: { label: 'DELAYED', class: 'bg-yellow-500' },
   offline: { label: 'OFFLINE', class: 'bg-red-500' },
+  buffering: { label: 'BUFFERING', class: 'bg-orange-500' },
 };
 
 export default function StreamCard({ stream, layout = 'grid' }: StreamCardProps) {

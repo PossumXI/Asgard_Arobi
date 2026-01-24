@@ -1,0 +1,41 @@
+{
+  "timestamp": "2026-01-23T21:32:37.8747314-05:00",
+  "systemVersion": "1.0.0",
+  "totalTests": 4,
+  "passedTests": 4,
+  "overallAccuracy": 50.00538772590343,
+  "results": [
+    {
+      "testName": "Far from radar",
+      "duration": 0,
+      "accuracy": 50.00065853001586,
+      "errorMargin": -0.04999934146998414,
+      "passed": true,
+      "details": "RCS: 1.0705 m², Detection Prob: 0.00, Expected Max: 0.10"
+    },
+    {
+      "testName": "Near radar - frontal aspect",
+      "duration": 0,
+      "accuracy": 50.01446194088862,
+      "errorMargin": -0.39988430447289103,
+      "passed": true,
+      "details": "RCS: 0.6873 m², Detection Prob: 0.00, Expected Max: 0.80"
+    },
+    {
+      "testName": "Near radar - side aspect",
+      "duration": 0,
+      "accuracy": 50.00642752928384,
+      "errorMargin": -0.4499421522364455,
+      "passed": true,
+      "details": "RCS: 0.6873 m², Detection Prob: 0.00, Expected Max: 0.90"
+    },
+    {
+      "testName": "Very high altitude",
+      "duration": 0,
+      "accuracy": 50.00000290342541,
+      "errorMargin": -0.24999998548287292,
+      "passed": true,
+      "details": "RCS: 0.0118 m², Detection Prob: 0.00, Expected Max: 0.50"
+    }
+  ]
+}

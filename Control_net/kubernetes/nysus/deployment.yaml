@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nysus
+  namespace: asgard
+  labels:
+    app: nysus
+    component: orchestration
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nysus
+  template:
+    metadata:
+      labels:
+        app: nysus
+        component: orchestration
+    spec:
+      containers:
+      - name: nysus
+        image: asgard/nysus:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        env:
+        - name: POSTGRES_HOST
+          valueFrom:
+            secretKeyRef:
+              name: asgard-secrets
+              key: postgres-host
+        - name: POSTGRES_PORT
+          value: "5432"
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: asgard-secrets
+              key: postgres-user
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: asgard-secrets
+              key: postgres-password
+        - name: MONGO_HOST
+          valueFrom:
+            secretKeyRef:
+              name: asgard-secrets
+              key: mongo-host
+        - name: MONGO_PORT
+          value: "27017"
+        - name: ASGARD_JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: asgard-secrets
+              key: asgard-jwt-secret
+        - name: ASGARD_WEBAUTHN_RP_ID
+          valueFrom:
+            secretKeyRef:
+              name: asgard-secrets
+              key: webauthn-rp-id
+        - name: ASGARD_WEBAUTHN_RP_ORIGIN
+          valueFrom:
+            secretKeyRef:
+              name: asgard-secrets
+              key: webauthn-rp-origin
+        - name: ASGARD_WEBAUTHN_RP_NAME
+          valueFrom:
+            secretKeyRef:
+              name: asgard-secrets
+              key: webauthn-rp-name
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 5

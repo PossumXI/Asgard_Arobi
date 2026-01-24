@@ -20,12 +20,15 @@
 
 ### 1.1 PostgreSQL (PostGIS)
 
+Note: Local Docker binding uses port 55432 due to a host PostgreSQL 18
+service occupying 5432.
+
 | Property | Value |
 |----------|-------|
 | **Container Name** | `asgard_postgres` |
 | **Image** | `postgis/postgis:15-3.3` |
 | **Host** | `localhost` |
-| **Port** | `5432` |
+| **Port** | `55432` |
 | **Database** | `asgard` |
 | **Username** | `postgres` |
 | **Password** | `asgard_secure_2026` |
@@ -33,18 +36,18 @@
 
 **Connection String:**
 ```
-postgres://postgres:asgard_secure_2026@localhost:5432/asgard?sslmode=disable
+postgres://postgres:asgard_secure_2026@localhost:55432/asgard?sslmode=disable
 ```
 
 **DSN Format (Go):**
 ```
-host=localhost port=5432 user=postgres password=asgard_secure_2026 dbname=asgard sslmode=disable
+host=localhost port=55432 user=postgres password=asgard_secure_2026 dbname=asgard sslmode=disable
 ```
 
 **Source Files:**
 - `Data/docker-compose.yml` (lines 6-8)
 - `internal/platform/db/config.go` (lines 31-36)
-- `Data/init_databases.ps1` (line 64)
+- `Data/init_databases.ps1` (line 66)
 
 ---
 
@@ -161,7 +164,7 @@ docker exec -it asgard_redis redis-cli -a asgard_redis_2026
 ```bash
 # PostgreSQL
 POSTGRES_HOST=localhost
-POSTGRES_PORT=5432
+POSTGRES_PORT=55432
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=asgard_secure_2026
 POSTGRES_DB=asgard
@@ -326,6 +329,80 @@ docker exec -it asgard_redis redis-cli -a asgard_redis_2026
 - No SSL/TLS enabled
 - No authentication on NATS
 - Redis: Password enabled, bound to localhost only
+
+### 2.1 Stripe API Configuration
+
+**⚠️ IMPORTANT:** Use environment variables for Stripe keys. Never commit keys to version control.
+
+| Property | Environment Variable | Description |
+|----------|---------------------|-------------|
+| **API Secret Key** | `STRIPE_SECRET_KEY` | Live or test secret key from Stripe Dashboard |
+| **Webhook Secret** | `STRIPE_WEBHOOK_SECRET` | Webhook signing secret from Stripe Dashboard |
+| **Success URL** | `STRIPE_SUCCESS_URL` | Redirect URL after successful checkout |
+| **Cancel URL** | `STRIPE_CANCEL_URL` | Redirect URL if checkout cancelled |
+| **Portal Return URL** | `STRIPE_PORTAL_RETURN_URL` | Return URL for customer portal |
+
+**Setup Instructions:**
+
+1. **Get your Stripe API keys:**
+   - Log into [Stripe Dashboard](https://dashboard.stripe.com)
+   - Go to Developers → API keys
+   - Copy your **Secret key** (starts with `sk_live_` or `sk_test_`)
+
+2. **Set environment variables:**
+   ```bash
+   # Windows PowerShell
+   $env:STRIPE_SECRET_KEY="sk_live_YOUR_KEY_HERE"
+   $env:STRIPE_WEBHOOK_SECRET="whsec_YOUR_WEBHOOK_SECRET"
+   $env:STRIPE_SUCCESS_URL="https://yourdomain.com/dashboard?success=true"
+   $env:STRIPE_CANCEL_URL="https://yourdomain.com/pricing"
+   $env:STRIPE_PORTAL_RETURN_URL="https://yourdomain.com/dashboard"
+   
+   # Linux/Mac
+   export STRIPE_SECRET_KEY="sk_live_YOUR_KEY_HERE"
+   export STRIPE_WEBHOOK_SECRET="whsec_YOUR_WEBHOOK_SECRET"
+   export STRIPE_SUCCESS_URL="https://yourdomain.com/dashboard?success=true"
+   export STRIPE_CANCEL_URL="https://yourdomain.com/pricing"
+   export STRIPE_PORTAL_RETURN_URL="https://yourdomain.com/dashboard"
+   ```
+
+3. **Or use .env file** (ensure it's in .gitignore):
+   ```
+   STRIPE_SECRET_KEY=sk_live_YOUR_KEY_HERE
+   STRIPE_WEBHOOK_SECRET=whsec_YOUR_WEBHOOK_SECRET
+   STRIPE_SUCCESS_URL=https://yourdomain.com/dashboard?success=true
+   STRIPE_CANCEL_URL=https://yourdomain.com/pricing
+   STRIPE_PORTAL_RETURN_URL=https://yourdomain.com/dashboard
+   ```
+
+4. **Configure Stripe Price IDs:**
+   - In Stripe Dashboard, create Products and Prices
+   - Update `PlanPriceMap` in `internal/services/stripe.go`:
+     ```go
+     var PlanPriceMap = map[string]string{
+         "plan_observer":  "price_YOUR_OBSERVER_PRICE_ID",
+         "plan_supporter": "price_YOUR_SUPPORTER_PRICE_ID",
+         "plan_commander": "price_YOUR_COMMANDER_PRICE_ID",
+     }
+     ```
+
+5. **Set up Webhooks:**
+   - In Stripe Dashboard → Developers → Webhooks
+   - Add endpoint: `https://yourdomain.com/api/webhooks/stripe`
+   - Select events:
+     - `checkout.session.completed`
+     - `customer.subscription.updated`
+     - `customer.subscription.deleted`
+     - `invoice.payment_succeeded`
+     - `invoice.payment_failed`
+   - Copy the **Signing secret** to `STRIPE_WEBHOOK_SECRET`
+
+**Verification:**
+- The service will return an error if `STRIPE_SECRET_KEY` is not set
+- Check logs for "stripe is not configured" errors
+- Test with Stripe test mode first (`sk_test_...` keys)
+
+---
 
 ### Production Requirements (TODO)
 - [ ] Generate unique passwords for each environment

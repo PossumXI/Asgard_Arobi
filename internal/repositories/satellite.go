@@ -62,19 +62,10 @@ func (r *SatelliteRepository) GetAll() ([]*db.Satellite, error) {
 			return nil, fmt.Errorf("failed to scan satellite: %w", err)
 		}
 
-		if noradID.Valid {
-			sat.NoradID = &noradID.Int32
-		}
-		if battery.Valid {
-			sat.CurrentBatteryPercent = &battery.Float64
-		}
-		if lastTelemetry.Valid {
-			sat.LastTelemetry = &lastTelemetry.Time
-		}
-		if firmware.Valid {
-			sat.FirmwareVersion = &firmware.String
-		}
-
+		sat.NoradID = noradID
+		sat.CurrentBatteryPercent = battery
+		sat.LastTelemetry = lastTelemetry
+		sat.FirmwareVersion = firmware
 		sat.OrbitalElements = orbitalElementsJSON
 		sat.HardwareConfig = hardwareConfigJSON
 
@@ -126,19 +117,10 @@ func (r *SatelliteRepository) GetByID(id string) (*db.Satellite, error) {
 		return nil, fmt.Errorf("failed to query satellite: %w", err)
 	}
 
-	if noradID.Valid {
-		sat.NoradID = &noradID.Int32
-	}
-	if battery.Valid {
-		sat.CurrentBatteryPercent = &battery.Float64
-	}
-	if lastTelemetry.Valid {
-		sat.LastTelemetry = &lastTelemetry.Time
-	}
-	if firmware.Valid {
-		sat.FirmwareVersion = &firmware.String
-	}
-
+	sat.NoradID = noradID
+	sat.CurrentBatteryPercent = battery
+	sat.LastTelemetry = lastTelemetry
+	sat.FirmwareVersion = firmware
 	sat.OrbitalElements = orbitalElementsJSON
 	sat.HardwareConfig = hardwareConfigJSON
 
@@ -154,6 +136,40 @@ func (r *SatelliteRepository) GetActiveCount() (int, error) {
 		return 0, fmt.Errorf("failed to count satellites: %w", err)
 	}
 	return count, nil
+}
+
+// SatelliteTelemetry represents satellite telemetry fields from the API view.
+type SatelliteTelemetry struct {
+	BatteryPercent sql.NullFloat64
+	Status         string
+	LastTelemetry  sql.NullTime
+}
+
+// GetTelemetry returns telemetry fields for a satellite.
+func (r *SatelliteRepository) GetTelemetry(id string) (*SatelliteTelemetry, error) {
+	if r.db == nil {
+		return nil, fmt.Errorf("postgres database not configured")
+	}
+
+	satID, err := uuid.Parse(id)
+	if err != nil {
+		return nil, fmt.Errorf("invalid satellite ID: %w", err)
+	}
+
+	var telemetry SatelliteTelemetry
+	err = r.db.QueryRow(`
+		SELECT current_battery_percent, status, last_telemetry
+		FROM satellites_api
+		WHERE id = $1
+	`, satID).Scan(&telemetry.BatteryPercent, &telemetry.Status, &telemetry.LastTelemetry)
+	if err == sql.ErrNoRows {
+		return nil, fmt.Errorf("satellite not found")
+	}
+	if err != nil {
+		return nil, fmt.Errorf("failed to query satellite telemetry: %w", err)
+	}
+
+	return &telemetry, nil
 }
 
 // ParseOrbitalElements parses JSONB orbital elements into a map.

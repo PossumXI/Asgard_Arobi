@@ -1,6 +1,9 @@
 // ASGARD MongoDB Schema for Time-Series Data
 // MongoDB 7+
 
+// Use dedicated database
+db = db.getSiblingDB("asgard");
+
 // Satellite telemetry (high-frequency time-series)
 db.createCollection("satellite_telemetry", {
     timeseries: {

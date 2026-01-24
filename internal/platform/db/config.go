@@ -1,9 +1,13 @@
 package db
 
 import (
+	"errors"
 	"fmt"
 	"os"
 )
+
+// ErrMissingPassword is returned when required password environment variables are not set.
+var ErrMissingPassword = errors.New("required password environment variable not set")
 
 type Config struct {
 	PostgresHost     string
@@ -27,19 +31,65 @@ type Config struct {
 	RedisPassword string
 }
 
+// isDevelopmentMode returns true if ASGARD_ENV is set to "development".
+func isDevelopmentMode() bool {
+	return os.Getenv("ASGARD_ENV") == "development"
+}
+
+// LoadConfig loads database configuration from environment variables.
+// In production mode, password environment variables are required and will
+// cause an error if not set. In development mode, default values are used.
 func LoadConfig() (*Config, error) {
+	isDev := isDevelopmentMode()
+
+	// Get passwords - required in production, defaults in development
+	postgresPassword := os.Getenv("POSTGRES_PASSWORD")
+	mongoPassword := os.Getenv("MONGO_PASSWORD")
+	redisPassword := os.Getenv("REDIS_PASSWORD")
+
+	// In production, require passwords to be explicitly set
+	if !isDev {
+		var missing []string
+		if postgresPassword == "" {
+			missing = append(missing, "POSTGRES_PASSWORD")
+		}
+		if mongoPassword == "" {
+			missing = append(missing, "MONGO_PASSWORD")
+		}
+		if redisPassword == "" {
+			missing = append(missing, "REDIS_PASSWORD")
+		}
+		if len(missing) > 0 {
+			return nil, fmt.Errorf("%w: %v (set ASGARD_ENV=development to use defaults)", ErrMissingPassword, missing)
+		}
+	} else {
+		// Development mode: use defaults if not set (but log a warning)
+		if postgresPassword == "" {
+			postgresPassword = "dev_postgres_password"
+			fmt.Println("[CONFIG] WARNING: Using default POSTGRES_PASSWORD for development")
+		}
+		if mongoPassword == "" {
+			mongoPassword = "dev_mongo_password"
+			fmt.Println("[CONFIG] WARNING: Using default MONGO_PASSWORD for development")
+		}
+		if redisPassword == "" {
+			redisPassword = "dev_redis_password"
+			fmt.Println("[CONFIG] WARNING: Using default REDIS_PASSWORD for development")
+		}
+	}
+
 	cfg := &Config{
 		PostgresHost:     getEnv("POSTGRES_HOST", "localhost"),
-		PostgresPort:     getEnv("POSTGRES_PORT", "5432"),
+		PostgresPort:     getEnv("POSTGRES_PORT", "55432"),
 		PostgresUser:     getEnv("POSTGRES_USER", "postgres"),
-		PostgresPassword: getEnv("POSTGRES_PASSWORD", "asgard_secure_2026"),
+		PostgresPassword: postgresPassword,
 		PostgresDB:       getEnv("POSTGRES_DB", "asgard"),
 		PostgresSSLMode:  getEnv("POSTGRES_SSLMODE", "disable"),
 
 		MongoHost:     getEnv("MONGO_HOST", "localhost"),
 		MongoPort:     getEnv("MONGO_PORT", "27017"),
 		MongoUser:     getEnv("MONGO_USER", "admin"),
-		MongoPassword: getEnv("MONGO_PASSWORD", "asgard_mongo_2026"),
+		MongoPassword: mongoPassword,
 		MongoDB:       getEnv("MONGO_DB", "asgard"),
 
 		NATSHost: getEnv("NATS_HOST", "localhost"),
@@ -47,7 +97,7 @@ func LoadConfig() (*Config, error) {
 
 		RedisHost:     getEnv("REDIS_HOST", "localhost"),
 		RedisPort:     getEnv("REDIS_PORT", "6379"),
-		RedisPassword: getEnv("REDIS_PASSWORD", "asgard_redis_2026"),
+		RedisPassword: redisPassword,
 	}
 
 	return cfg, nil
@@ -81,6 +131,14 @@ func (c *Config) NATSURI() string {
 
 func (c *Config) RedisAddr() string {
 	return fmt.Sprintf("%s:%s", c.RedisHost, c.RedisPort)
+}
+
+// RedisURL returns a Redis connection URL with authentication if configured.
+func (c *Config) RedisURL() string {
+	if c.RedisPassword != "" {
+		return fmt.Sprintf("redis://:%s@%s:%s", c.RedisPassword, c.RedisHost, c.RedisPort)
+	}
+	return fmt.Sprintf("redis://%s:%s", c.RedisHost, c.RedisPort)
 }
 
 func getEnv(key, defaultValue string) string {

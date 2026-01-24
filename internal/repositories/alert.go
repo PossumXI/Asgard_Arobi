@@ -57,13 +57,8 @@ func (r *AlertRepository) GetAll() ([]*db.Alert, error) {
 			return nil, fmt.Errorf("failed to scan alert: %w", err)
 		}
 
-		if satelliteID.Valid {
-			alert.SatelliteID = &satelliteID.String
-		}
-		if videoURL.Valid {
-			alert.VideoSegmentURL = &videoURL.String
-		}
-
+		alert.SatelliteID = satelliteID
+		alert.VideoSegmentURL = videoURL
 		alert.DetectionLocation = location
 		alert.Metadata = metadata
 
@@ -110,13 +105,8 @@ func (r *AlertRepository) GetByID(id string) (*db.Alert, error) {
 		return nil, fmt.Errorf("failed to query alert: %w", err)
 	}
 
-	if satelliteID.Valid {
-		alert.SatelliteID = &satelliteID.String
-	}
-	if videoURL.Valid {
-		alert.VideoSegmentURL = &videoURL.String
-	}
-
+	alert.SatelliteID = satelliteID
+	alert.VideoSegmentURL = videoURL
 	alert.DetectionLocation = location
 	alert.Metadata = metadata
 

@@ -8,6 +8,7 @@ const CivilianHub = lazy(() => import('./pages/CivilianHub'));
 const MilitaryHub = lazy(() => import('./pages/MilitaryHub'));
 const InterstellarHub = lazy(() => import('./pages/InterstellarHub'));
 const StreamView = lazy(() => import('./pages/StreamView'));
+const MissionHub = lazy(() => import('./pages/MissionHub'));
 
 export default function App() {
   return (
@@ -20,6 +21,8 @@ export default function App() {
           <Route path="interstellar/*" element={<InterstellarHub />} />
           <Route path="stream/:streamId" element={<StreamView />} />
         </Route>
+        {/* Mission Hub - Standalone with tiered access */}
+        <Route path="/missions/*" element={<MissionHub />} />
       </Routes>
     </Suspense>
   );

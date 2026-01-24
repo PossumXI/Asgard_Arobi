@@ -1,0 +1,14 @@
+{
+  "name": "asgard-e2e-tests",
+  "version": "1.0.0",
+  "description": "End-to-end tests and demo video generation for ASGARD",
+  "scripts": {
+    "test": "npx playwright test",
+    "demo": "npx playwright test demo.spec.ts --headed",
+    "demo:record": "npx playwright test demo.spec.ts",
+    "report": "npx playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0"
+  }
+}

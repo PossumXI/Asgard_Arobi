@@ -1,0 +1,29 @@
+groups:
+  - name: asgard-service-health
+    rules:
+      - alert: AsgardHighErrorRate
+        expr: sum(rate(asgard_http_requests_total{status="5xx"}[5m])) > 1
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High error rate detected"
+          description: "HTTP 5xx errors exceed threshold."
+
+      - alert: AsgardNATSDisconnected
+        expr: asgard_nats_connection_status == 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "NATS disconnected"
+          description: "NATS connection status is disconnected."
+
+      - alert: AsgardWebSocketBackpressure
+        expr: asgard_events_queued > 500
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Event backlog detected"
+          description: "Event queue size indicates possible backpressure."
