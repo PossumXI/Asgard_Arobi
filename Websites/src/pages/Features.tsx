@@ -4,8 +4,6 @@ import {
   Bot, 
   Shield, 
   Globe, 
-  Zap, 
-  Eye,
   Network,
   Brain,
   Lock,

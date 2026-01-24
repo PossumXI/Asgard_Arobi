@@ -1,6 +1,6 @@
 import { Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { 
   LayoutDashboard, 
   Satellite, 
@@ -13,26 +13,20 @@ import {
   Shield,
   TerminalSquare,
   AlertTriangle,
-  TrendingUp,
-  Users,
   Clock,
   MapPin,
-  Filter,
   Search,
   ChevronRight,
   Play,
   Eye,
   CheckCircle2,
-  XCircle,
   AlertCircle,
   Loader2,
   User,
-  Mail,
   Lock,
   Moon,
   Sun,
   BellRing,
-  CreditCardIcon,
   Receipt,
   ExternalLink,
   Zap,
@@ -733,7 +727,8 @@ function DashboardActivity() {
 
 // Dashboard Subscription Component
 function DashboardSubscription() {
-  const { user } = useAuth();
+  // Auth context available for subscription tier info
+  useAuth();
 
   return (
     <div className="space-y-6">

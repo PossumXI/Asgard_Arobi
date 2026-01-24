@@ -184,8 +184,9 @@ export class WebRTCStreamClient {
   private mode: WebRTCClientMode;
   private localStream: MediaStream | null;
   private onTrackCallback: ((stream: MediaStream) => void) | null = null;
-  // Stats callback for future use (currently unused)
-  private _onStatsCallback: ((stats: RTCStatsReport) => void) | null = null;
+  // Stats callback for future use
+  // @ts-ignore - Reserved for future WebRTC stats monitoring
+  private onStatsCallback: ((stats: RTCStatsReport) => void) | null = null;
 
   constructor(session: StreamSession, options: WebRTCClientOptions = {}) {
     this.streamId = session.streamId;

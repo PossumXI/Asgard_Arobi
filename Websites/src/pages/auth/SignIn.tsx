@@ -7,7 +7,7 @@ import { z } from 'zod';
 import { Eye, EyeOff, ArrowRight, Fingerprint } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
+import { Card, CardContent } from '@/components/ui/Card';
 import { useAuth } from '@/providers/AuthProvider';
 import { useToast } from '@/components/ui/Toaster';
 

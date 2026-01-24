@@ -30,7 +30,9 @@ interface Mission {
   viewers: number;
 }
 
-interface _LiveFeed {
+// Reserved for live feed integration
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+interface LiveFeedType {
   id: string;
   missionId: string;
   payloadId: string;

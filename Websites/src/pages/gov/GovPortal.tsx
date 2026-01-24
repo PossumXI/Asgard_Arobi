@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
+import { Routes, Route, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   Shield, 
@@ -17,7 +17,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { useAuth } from '@/providers/AuthProvider';
-import { cn } from '@/lib/utils';
+// Utils imported for future use
 
 function GovLanding() {
   const [showLogin, setShowLogin] = useState(false);
