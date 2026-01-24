@@ -59,7 +59,7 @@ No action required. Database operating normally.
 |----------|-------|
 | Image | mongo:7 |
 | Port | 27017:27017 |
-| Auth | admin / asgard_mongo_2026 |
+| Auth | admin / ${MONGO_PASSWORD} |
 
 ### Health Status: HEALTHY
 
@@ -222,9 +222,9 @@ All containers can communicate within the `asgard_network` bridge network using 
 
 | Check | Status | Notes |
 |-------|--------|-------|
-| PostgreSQL password set | PASS | asgard_secure_2026 |
-| MongoDB authentication enabled | PASS | admin / asgard_mongo_2026 |
-| Redis password enabled | PASS | asgard_redis_2026 |
+| PostgreSQL password set | PASS | via env var |
+| MongoDB authentication enabled | PASS | via env var |
+| Redis password enabled | PASS | via env var |
 | Redis bound to localhost | PASS | 127.0.0.1:6379 |
 | NATS authentication | N/A | Not configured (dev environment) |
 | SSL/TLS enabled | FAIL | Not configured (dev environment) |

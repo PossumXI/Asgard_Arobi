@@ -31,12 +31,12 @@ service occupying 5432.
 | **Port** | `55432` |
 | **Database** | `asgard` |
 | **Username** | `postgres` |
-| **Password** | `asgard_secure_2026` |
+| **Password** | `${POSTGRES_PASSWORD}` (set in .env) |
 | **SSL Mode** | `disable` (dev only) |
 
 **Connection String:**
 ```
-postgres://postgres:asgard_secure_2026@localhost:55432/asgard?sslmode=disable
+postgres://postgres:${POSTGRES_PASSWORD}@localhost:55432/asgard?sslmode=disable
 ```
 
 **DSN Format (Go):**
@@ -61,7 +61,7 @@ host=localhost port=55432 user=postgres password=asgard_secure_2026 dbname=asgar
 | **Port** | `27017` |
 | **Database** | `asgard` |
 | **Username** | `admin` |
-| **Password** | `asgard_mongo_2026` |
+| **Password** | `${MONGO_PASSWORD}` (set in .env) |
 | **Auth DB** | `admin` |
 
 **Connection URI:**
@@ -113,7 +113,7 @@ http://localhost:8222/healthz
 | **Image** | `redis:7-alpine` |
 | **Host** | `localhost` (bound to 127.0.0.1 only) |
 | **Port** | `6379` |
-| **Password** | `asgard_redis_2026` |
+| **Password** | `${REDIS_PASSWORD}` (set in .env) |
 | **Persistence** | AOF (appendonly yes) |
 | **Protected Mode** | Enabled |
 
@@ -124,7 +124,7 @@ redis://:asgard_redis_2026@localhost:6379
 
 **Redis CLI Connection:**
 ```powershell
-docker exec -it asgard_redis redis-cli -a asgard_redis_2026
+docker exec -it asgard_redis redis-cli -a $REDIS_PASSWORD
 ```
 
 **Source Files:**
@@ -166,7 +166,7 @@ docker exec -it asgard_redis redis-cli -a asgard_redis_2026
 POSTGRES_HOST=localhost
 POSTGRES_PORT=55432
 POSTGRES_USER=postgres
-POSTGRES_PASSWORD=asgard_secure_2026
+POSTGRES_PASSWORD=your_secure_postgres_password
 POSTGRES_DB=asgard
 POSTGRES_SSLMODE=disable
 
@@ -174,7 +174,7 @@ POSTGRES_SSLMODE=disable
 MONGO_HOST=localhost
 MONGO_PORT=27017
 MONGO_USER=admin
-MONGO_PASSWORD=asgard_mongo_2026
+MONGO_PASSWORD=your_secure_mongo_password
 MONGO_DB=asgard
 
 # NATS
@@ -184,7 +184,7 @@ NATS_PORT=4222
 # Redis
 REDIS_HOST=localhost
 REDIS_PORT=6379
-REDIS_PASSWORD=asgard_redis_2026
+REDIS_PASSWORD=your_secure_redis_password
 ```
 
 ### 3.2 Frontend Environment Variables
@@ -233,7 +233,7 @@ VITE_WS_URL=ws://localhost:8080/ws
 | Property | Value |
 |----------|-------|
 | **Location** | `internal/services/auth.go` line 36 |
-| **Current Value** | `asgard_jwt_secret_change_in_production_2026` |
+| **Current Value** | `${ASGARD_JWT_SECRET}` (set in .env, min 32 chars) |
 | **Token Expiry** | 24 hours |
 | **Algorithm** | HS256 |
 
@@ -307,7 +307,7 @@ docker exec -it asgard_postgres psql -U postgres -d asgard
 
 ### Connect to MongoDB
 ```powershell
-docker exec -it asgard_mongodb mongosh -u admin -p asgard_mongo_2026
+docker exec -it asgard_mongodb mongosh -u admin -p $MONGO_PASSWORD
 ```
 
 ### View NATS Monitoring
@@ -317,7 +317,7 @@ http://localhost:8222
 
 ### Connect to Redis
 ```powershell
-docker exec -it asgard_redis redis-cli -a asgard_redis_2026
+docker exec -it asgard_redis redis-cli -a $REDIS_PASSWORD
 ```
 
 ---
@@ -421,5 +421,5 @@ docker exec -it asgard_redis redis-cli -a asgard_redis_2026
 |------|--------|--------|
 | 2026-01-21 | Audit Agent | Initial document creation |
 | 2026-01-21 | Audit Agent | Added all database credentials from agent work |
-| 2026-01-21 | Docker Monitor | Added Redis password authentication (asgard_redis_2026) |
+| 2026-01-21 | Docker Monitor | Added Redis password authentication (via env var) |
 | 2026-01-21 | Docker Monitor | Bound Redis to localhost only for security |

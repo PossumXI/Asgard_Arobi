@@ -289,8 +289,8 @@ The frontend is production-ready and waiting for backend implementation.
 
 | Service | Host | Port | Username | Password |
 |---------|------|------|----------|----------|
-| PostgreSQL | localhost | 5432 | postgres | asgard_secure_2026 |
-| MongoDB | localhost | 27017 | admin | asgard_mongo_2026 |
+| PostgreSQL | localhost | 5432 | postgres | ${POSTGRES_PASSWORD} |
+| MongoDB | localhost | 27017 | admin | ${MONGO_PASSWORD} |
 | NATS | localhost | 4222 | N/A | N/A |
 | Redis | localhost | 6379 | N/A | N/A |
 
@@ -529,7 +529,7 @@ Added:
 
 New JWT secret added by agent in `internal/services/auth.go`:
 ```
-asgard_jwt_secret_change_in_production_2026
+${ASGARD_JWT_SECRET}
 ```
 **Note**: This needs to be moved to environment variable for production!
 
@@ -584,7 +584,7 @@ Go files increased from **43 to 57** - Phases 3 and 4 are now underway!
 
 **Docker Security Fixes Applied (by Docker Monitor agent)**
 - PostgreSQL port changed: `5432` → `55432` (conflict with host PostgreSQL)
-- Redis password added: `asgard_redis_2026`
+- Redis password added: via ${REDIS_PASSWORD} environment variable
 - Redis bound to localhost only: `127.0.0.1:6379`
 - Redis protected mode enabled
 - NATS healthcheck removed (minimal image has no shell)

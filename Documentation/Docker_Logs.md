@@ -74,7 +74,7 @@ ports:
 
 **Resolution Applied**:
 1. Bound Redis to localhost only: `127.0.0.1:6379:6379`
-2. Added password authentication: `asgard_redis_2026`
+2. Added password authentication via environment variable `REDIS_PASSWORD`
 3. Enabled protected mode
 
 **Current Configuration** (docker-compose.yml):
@@ -82,7 +82,7 @@ ports:
 redis:
   ports:
     - "127.0.0.1:6379:6379"
-  command: redis-server --appendonly yes --requirepass asgard_redis_2026 --protected-mode yes
+  command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD} --protected-mode yes
 ```
 
 ---

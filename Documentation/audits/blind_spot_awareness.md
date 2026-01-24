@@ -89,7 +89,7 @@ CheckOrigin: func(r *http.Request) bool {
 
 #### SEC-003: Hardcoded Secrets
 **Files:** `Data/docker-compose.yml`, `internal/platform/db/config.go`, `Control_net/kubernetes/secrets.yaml`  
-**Evidence:** Passwords like `asgard_secure_2026`, `asgard_mongo_2026` hardcoded across configuration.  
+**Evidence:** Passwords were previously hardcoded - now require environment variables.  
 **Impact:** Secrets are committed to version control and used as fallbacks in code.
 
 ---

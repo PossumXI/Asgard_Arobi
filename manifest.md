@@ -81,7 +81,7 @@ Install PostgreSQL 15+
 
 Download from https://postgresql.org/download/
 Install both server and pgAdmin
-Create superuser: postgres with password asgard_secure_2026
+Create superuser: postgres with password from ${POSTGRES_PASSWORD} env var
 Verify connection: psql -U postgres
 
 
@@ -917,7 +917,7 @@ yaml   version: '3.8'
        environment:
          POSTGRES_DB: asgard
          POSTGRES_USER: postgres
-         POSTGRES_PASSWORD: asgard_secure_2026
+         POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
        ports:
          - "5432:5432"
        volumes:
@@ -934,7 +934,7 @@ yaml   version: '3.8'
        container_name: asgard_mongodb
        environment:
          MONGO_INITDB_ROOT_USERNAME: admin
-         MONGO_INITDB_ROOT_PASSWORD: asgard_mongo_2026
+         MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
        ports:
          - "27017:27017"
        volumes:
@@ -1013,7 +1013,7 @@ powershell   # ASGARD Database Initialization Script
    
    # Initialize MongoDB collections
    Write-Host "Initializing MongoDB collections..." -ForegroundColor Green
-   mongosh "mongodb://admin:asgard_mongo_2026@localhost:27017" --file ./migrations/mongo/001_create_collections.js
+   mongosh "mongodb://admin:$env:MONGO_PASSWORD@localhost:27017" --file ./migrations/mongo/001_create_collections.js
    
    Write-Host "Database stack initialized successfully!" -ForegroundColor Green
    Write-Host "PostgreSQL: localhost:5432 (user: postgres, db: asgard)" -ForegroundColor Cyan
@@ -1070,7 +1070,7 @@ go   package db
            MongoHost:     getEnv("MONGO_HOST", "localhost"),
            MongoPort:     getEnv("MONGO_PORT", "27017"),
            MongoUser:     getEnv("MONGO_USER", "admin"),
-           MongoPassword: getEnv("MONGO_PASSWORD", "asgard_mongo_2026"),
+           MongoPassword: getEnv("MONGO_PASSWORD", ""),
            MongoDB:       getEnv("MONGO_DB", "asgard"),
            
            NATSHost: getEnv("NATS_HOST", "localhost"),

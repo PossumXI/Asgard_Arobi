@@ -510,8 +510,14 @@ func accessLevelFromToken(role, tier string, isGovernment bool) realtime.AccessL
 }
 
 func getJWTSecret() []byte {
-	if secret := os.Getenv("ASGARD_JWT_SECRET"); len(secret) >= 32 {
+	secret := os.Getenv("ASGARD_JWT_SECRET")
+	if len(secret) >= 32 {
 		return []byte(secret)
 	}
-	return []byte("asgard_jwt_secret_change_in_production_2026")
+	// In development mode only, use a default (but log warning)
+	if os.Getenv("ASGARD_ENV") == "development" {
+		fmt.Println("[WARNING] Using default JWT secret - set ASGARD_JWT_SECRET in production!")
+		return []byte("dev_jwt_secret_not_for_production_use")
+	}
+	panic("ASGARD_JWT_SECRET environment variable must be set (min 32 characters)")
 }

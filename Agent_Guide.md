@@ -81,7 +81,7 @@ Install PostgreSQL 15+
 
 Download from https://postgresql.org/download/
 Install both server and pgAdmin
-Create superuser: postgres with password asgard_secure_2026
+Create superuser: postgres with password from ${POSTGRES_PASSWORD} env var
 Verify connection: psql -U postgres
 
 
@@ -917,7 +917,7 @@ yaml   version: '3.8'
        environment:
          POSTGRES_DB: asgard
          POSTGRES_USER: postgres
-         POSTGRES_PASSWORD: asgard_secure_2026
+         POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
        ports:
          - "5432:5432"
        volumes:
@@ -934,7 +934,7 @@ yaml   version: '3.8'
        container_name: asgard_mongodb
        environment:
          MONGO_INITDB_ROOT_USERNAME: admin
-         MONGO_INITDB_ROOT_PASSWORD: asgard_mongo_2026
+         MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
        ports:
          - "27017:27017"
        volumes:
@@ -1008,7 +1008,7 @@ powershell   # ASGARD Database Initialization Script
    
    # Run PostgreSQL migrations
    Write-Host "Running PostgreSQL migrations..." -ForegroundColor Green
-   $env:DATABASE_URL = "postgres://postgres:asgard_secure_2026@localhost:5432/asgard?sslmode=disable"
+   $env:DATABASE_URL = "postgres://postgres:$env:POSTGRES_PASSWORD@localhost:5432/asgard?sslmode=disable"
    migrate -path ./migrations/postgres -database $env:DATABASE_URL up
    
    # Initialize MongoDB collections
@@ -1063,14 +1063,14 @@ go   package db
            PostgresHost:     getEnv("POSTGRES_HOST", "localhost"),
            PostgresPort:     getEnv("POSTGRES_PORT", "5432"),
            PostgresUser:     getEnv("POSTGRES_USER", "postgres"),
-           PostgresPassword: getEnv("POSTGRES_PASSWORD", "asgard_secure_2026"),
+           PostgresPassword: getEnv("POSTGRES_PASSWORD", ""),
            PostgresDB:       getEnv("POSTGRES_DB", "asgard"),
            PostgresSSLMode:  getEnv("POSTGRES_SSLMODE", "disable"),
            
            MongoHost:     getEnv("MONGO_HOST", "localhost"),
            MongoPort:     getEnv("MONGO_PORT", "27017"),
            MongoUser:     getEnv("MONGO_USER", "admin"),
-           MongoPassword: getEnv("MONGO_PASSWORD", "asgard_mongo_2026"),
+           MongoPassword: getEnv("MONGO_PASSWORD", ""),
            MongoDB:       getEnv("MONGO_DB", "asgard"),
            
            NATSHost: getEnv("NATS_HOST", "localhost"),
