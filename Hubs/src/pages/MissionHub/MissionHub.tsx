@@ -30,20 +30,8 @@ interface Mission {
   viewers: number;
 }
 
-// Reserved for live feed integration
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-interface LiveFeedType {
-  id: string;
-  missionId: string;
-  payloadId: string;
-  payloadType: string;
-  streamType: string;
-  clearance: number;
-  name: string;
-  status: string;
-  viewerCount: number;
-  quality: string;
-}
+// LiveFeed interface reserved for future live feed integration
+// Will be used when real-time mission video streaming is implemented
 
 interface TelemetryFrame {
   payloadId: string;

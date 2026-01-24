@@ -318,7 +318,7 @@ export class WebRTCStreamClient {
   }
 
   onStats(callback: (stats: RTCStatsReport) => void): void {
-    this._onStatsCallback = callback;
+    this.onStatsCallback = callback;
   }
 
   async getStats(): Promise<RTCStatsReport | null> {
