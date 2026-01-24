@@ -1,5 +1,12 @@
 # Build Log
 
+## 2026-01-24 (Percila Build + Smoke Run)
+- Built `Percila/cmd/percila` to `bin/percila.exe` successfully.
+- Smoke run started and initialized services; HTTP/metrics failed to bind on `:8089`/`:9089` (ports already in use).
+- Assigned Percila ports: HTTP `8092`, Metrics `9092` (see `Documentation/Port_Allocations.md`).
+- Reassigned HTTP from `8091` to `8092` after detecting `8091` in use.
+- Percila running at `http://localhost:8092` with metrics at `http://localhost:9092/metrics`.
+
 ## 2026-01-23 (Status Reconciliation & API Updates)
 - Reconciled project status: Phases 1-12 complete; Phases 13-15 pending verification/execution (supersedes earlier "all phases complete" claims).
 - Persisted stream chat to Postgres (`stream_chat_messages`) and required auth for posting.
@@ -1919,8 +1926,8 @@ PERCILA is now fully integrated with all ASGARD systems:
 
 # With full configuration
 .\bin\percila.exe `
-    -http-port 8089 `
-    -metrics-port 9089 `
+    -http-port 8092 `
+    -metrics-port 9092 `
     -nysus http://localhost:8080 `
     -satnet http://localhost:8081 `
     -giru http://localhost:9090 `

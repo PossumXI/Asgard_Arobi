@@ -20,7 +20,7 @@ PERCILA (Precision Engagement & Routing Control with Integrated Learning Archite
 $env:ASGARD_ENV = "development"
 
 # Start PERCILA
-.\bin\percila.exe -http-port 8089 -metrics-port 9089
+.\bin\percila.exe -http-port 8092 -metrics-port 9092
 ```
 
 ### 2. Run Demo Script
@@ -61,7 +61,7 @@ Deviation % = ((Planned Distance - Direct Distance) / Direct Distance) × 100
 **How to measure:**
 ```powershell
 # Via API
-$mission = Invoke-RestMethod -Uri "http://localhost:8089/api/v1/missions" -Method Post -Body $missionJson
+$mission = Invoke-RestMethod -Uri "http://localhost:8092/api/v1/missions" -Method Post -Body $missionJson
 
 # Calculate
 $waypoints = $mission.trajectory.waypoints
@@ -186,7 +186,7 @@ BenchmarkStealthCalculation-8     50000      23456 ns/op      789 B/op      8 al
 
 ```bash
 # Get all PERCILA metrics
-curl http://localhost:9089/metrics | grep percila
+curl http://localhost:9092/metrics | grep percila
 ```
 
 ### Key Metrics to Monitor

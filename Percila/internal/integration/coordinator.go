@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"math"
 	"sync"
 	"time"
 
@@ -214,7 +213,7 @@ func (c *SystemCoordinator) monitorMission(ctx context.Context, mission *GuidedM
 
 			// Check if target reached
 			targetPos := mission.CurrentTraj.Waypoints[len(mission.CurrentTraj.Waypoints)-1].Position
-			distance := math.Sqrt(guidance.Distance(state.Position, targetPos))
+			distance := guidance.CalculateDistance(state.Position, targetPos)
 
 			if distance < 10.0 { // Within 10 meters
 				mission.TargetReached = true

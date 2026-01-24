@@ -128,7 +128,8 @@ Get-NetAdapter | ForEach-Object {
 |---------|------|----------|
 | Nysus API | 8080 | HTTP/WS |
 | Giru Metrics | 9091 | HTTP |
-| PERCILA API | 8089 | HTTP |
+| PERCILA API | 8092 | HTTP |
+| PERCILA Metrics | 9092 | HTTP |
 | PostgreSQL | 55432 | TCP |
 | MongoDB | 27017 | TCP |
 | NATS | 4222 | TCP |

@@ -878,7 +878,7 @@ Located at: `http://localhost:5173/missions`
 
 ```bash
 # Login with username
-curl -X POST http://localhost:8089/api/v1/auth/login \
+curl -X POST http://localhost:8092/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{"username": "military_commander", "password": "secret"}'
 
@@ -898,7 +898,7 @@ curl -X POST http://localhost:8089/api/v1/auth/login \
 
 ```bash
 # Get feeds (filtered by clearance header)
-curl http://localhost:8089/api/v1/feeds \
+curl http://localhost:8092/api/v1/feeds \
   -H "X-Clearance: MILITARY"
 
 # Response shows only feeds at or below MILITARY clearance
@@ -927,8 +927,8 @@ go build -o bin/percila.exe ./Percila/cmd/percila/main.go
 
 # With custom configuration
 .\bin\percila.exe `
-    -http-port 8089 `
-    -metrics-port 9089 `
+    -http-port 8092 `
+    -metrics-port 9092 `
     -nysus http://localhost:8080 `
     -satnet http://localhost:8081 `
     -giru http://localhost:9090 `
@@ -948,7 +948,7 @@ FROM alpine:latest
 RUN apk --no-cache add ca-certificates
 WORKDIR /root/
 COPY --from=builder /app/percila .
-EXPOSE 8089 9089
+EXPOSE 8092 9092
 CMD ["./percila"]
 ```
 
@@ -974,8 +974,8 @@ spec:
       - name: percila
         image: asgard/percila:latest
         ports:
-        - containerPort: 8089
-        - containerPort: 9089
+        - containerPort: 8092
+        - containerPort: 9092
         env:
         - name: NYSUS_ENDPOINT
           value: "http://nysus-service:8080"
@@ -1001,11 +1001,11 @@ spec:
     app: percila
   ports:
   - name: http
-    port: 8089
-    targetPort: 8089
+    port: 8092
+    targetPort: 8092
   - name: metrics
-    port: 9089
-    targetPort: 9089
+    port: 9092
+    targetPort: 9092
 ```
 
 ---
@@ -1016,8 +1016,8 @@ spec:
 
 | Flag | Default | Description |
 |------|---------|-------------|
-| `-http-port` | 8089 | HTTP API port |
-| `-metrics-port` | 9089 | Metrics/health port |
+| `-http-port` | 8092 | HTTP API port |
+| `-metrics-port` | 9092 | Metrics/health port |
 | `-nysus` | http://localhost:8080 | Nysus API endpoint |
 | `-satnet` | http://localhost:8081 | Sat_Net endpoint |
 | `-giru` | http://localhost:9090 | Giru endpoint |

@@ -4619,10 +4619,10 @@ cd C:\Users\hp\Desktop\Asgard
 go build -o bin/percila.exe ./Percila/cmd/percila/main.go
 
 # Run PERCILA
-.\bin\percila.exe -http-port 8089 -stealth=true -prediction=true
+.\bin\percila.exe -http-port 8092 -stealth=true -prediction=true
 
 # Test API
-curl http://localhost:8089/api/v1/status
+curl http://localhost:8092/api/v1/status
 ```
 
 **7.4. Payload Capabilities:**

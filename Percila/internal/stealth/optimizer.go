@@ -96,7 +96,8 @@ func (s *StealthOptimizer) CalculateRadarCrossSection(wp guidance.Waypoint, head
 	altitudeFactor := math.Exp(-wp.Position.Z / 8000.0)
 
 	// Speed affects Doppler signature
-	speed := math.Sqrt(guidance.Magnitude(wp.Velocity))
+	speedSq := guidance.Magnitude(wp.Velocity)
+	speed := math.Sqrt(speedSq)
 	dopplerFactor := 1.0 + (speed / 340.0) // Mach effect
 
 	// Aspect angle (simplified)
@@ -134,7 +135,8 @@ func (s *StealthOptimizer) OptimizeTerrainMasking(traj *guidance.Trajectory, ter
 
 // CalculateThermalSignature estimates IR detectability.
 func (s *StealthOptimizer) CalculateThermalSignature(wp guidance.Waypoint) float64 {
-	speed := math.Sqrt(guidance.Magnitude(wp.Velocity))
+	speedSq := guidance.Magnitude(wp.Velocity)
+	speed := math.Sqrt(speedSq)
 
 	// Friction heating
 	frictionTemp := s.thermalModel.AmbientTemp + (speed*speed*0.001)

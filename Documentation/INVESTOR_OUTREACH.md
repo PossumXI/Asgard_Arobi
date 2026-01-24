@@ -416,14 +416,14 @@ export ASGARD_JWT_SECRET=demo_secret_for_presentation
 export N2YO_API_KEY=<your_key>
 
 # Start PERCILA
-./bin/percila.exe -http-port 8089
+./bin/percila.exe -http-port 8092
 
 # Start Nysus
 ./bin/nysus.exe -http-port 8080
 
 # Access
 # - API: http://localhost:8080
-# - PERCILA: http://localhost:8089
+# - PERCILA: http://localhost:8092
 # - Metrics: http://localhost:9090
 ```
 

@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: asgard-config
+  namespace: asgard
+data:
+  # API Configuration
+  HTTP_PORT: "8080"
+  METRICS_PORT: "9090"
+  
+  # Database Configuration
+  POSTGRES_DB: "asgard"
+  POSTGRES_PORT: "5432"
+  MONGO_PORT: "27017"
+  MONGO_DB: "asgard"
+  
+  # Service Endpoints
+  NYSUS_ENDPOINT: "http://nysus-service:8080"
+  PERCILA_ENDPOINT: "http://percila-service:8089"
+  GIRU_ENDPOINT: "http://giru-service:9090"
+  SILENUS_ENDPOINT: "http://silenus-service:8082"
+  HUNOID_ENDPOINT: "http://hunoid-service:8083"
+  
+  # NATS Configuration
+  NATS_URL: "nats://nats:4222"
+  
+  # Redis Configuration
+  REDIS_HOST: "redis"
+  REDIS_PORT: "6379"
+  
+  # Logging
+  LOG_LEVEL: "info"
+  LOG_FORMAT: "json"
+  
+  # Feature Flags
+  ENABLE_STEALTH: "true"
+  ENABLE_PREDICTION: "true"
+  ENABLE_SENSOR_FUSION: "true"
+  ENABLE_WEBRTC: "true"

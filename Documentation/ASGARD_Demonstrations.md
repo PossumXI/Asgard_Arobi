@@ -192,7 +192,7 @@ Current Position (propagated):
 .\scripts\percila_demo.ps1
 
 # Or start the service directly
-.\bin\percila.exe -http-port 8089
+.\bin\percila.exe -http-port 8092
 ```
 
 ---
@@ -314,7 +314,7 @@ $mission = @{
     start = @{ lat = 40.7128; lon = -74.0060; alt = 100 }
     target = @{ lat = 40.7580; lon = -73.9855; alt = 50 }
 }
-Invoke-RestMethod -Uri "http://localhost:8089/api/v1/missions" -Method Post -Body ($mission | ConvertTo-Json) -ContentType "application/json"
+Invoke-RestMethod -Uri "http://localhost:8092/api/v1/missions" -Method Post -Body ($mission | ConvertTo-Json) -ContentType "application/json"
 ```
 
 ---

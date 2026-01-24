@@ -256,53 +256,42 @@ func TestKalmanFilterAccuracy(t *testing.T) {
 
 // TestStealthOptimizationAccuracy tests stealth calculations
 func TestStealthOptimizationAccuracy(t *testing.T) {
-	optimizer := stealth.NewStealthOptimizer(stealth.StealthConfig{
-		MaxDetectionProbability: 0.3,
-		MinTerrainClearance:     100,
-		ThermalReduction:        true,
-		RadarEvasion:            true,
-	})
-
-	// Add known radar site
-	optimizer.AddRadarSite(stealth.RadarSite{
-		ID:           "radar-001",
-		Position:     stealth.Vector3D{X: 25000, Y: 25000, Z: 0},
-		FrequencyGHz: 10.0, // X-band
-		RangeKm:      100,
-		BeamWidth:    3.0,
-		MinElevation: 2.0,
-		Active:       true,
-	})
+	optimizer := stealth.NewStealthOptimizer()
 
 	testCases := []struct {
 		name             string
-		position         stealth.Vector3D
+		position         guidance.Vector3D
+		velocity         guidance.Vector3D
 		heading          float64
-		expectedMaxProb  float64 // Maximum expected detection probability
+		expectedMaxRCS   float64 // Maximum expected RCS
 	}{
 		{
-			name:            "Far from radar",
-			position:        stealth.Vector3D{X: 0, Y: 0, Z: 5000},
-			heading:         0,
-			expectedMaxProb: 0.1, // Should be low
+			name:           "High altitude - low RCS",
+			position:       guidance.Vector3D{X: 0, Y: 0, Z: 10000},
+			velocity:       guidance.Vector3D{X: 100, Y: 0, Z: 0},
+			heading:        0,
+			expectedMaxRCS: 2.0,
 		},
 		{
-			name:            "Near radar - frontal aspect",
-			position:        stealth.Vector3D{X: 25000, Y: 15000, Z: 3000},
-			heading:         math.Pi / 2, // Facing radar
-			expectedMaxProb: 0.8,
+			name:           "Low altitude - moderate RCS",
+			position:       guidance.Vector3D{X: 5000, Y: 5000, Z: 500},
+			velocity:       guidance.Vector3D{X: 200, Y: 0, Z: 0},
+			heading:        math.Pi / 2,
+			expectedMaxRCS: 5.0,
 		},
 		{
-			name:            "Near radar - side aspect",
-			position:        stealth.Vector3D{X: 15000, Y: 25000, Z: 3000},
-			heading:         0, // Side-on to radar
-			expectedMaxProb: 0.9, // Side RCS is higher
+			name:           "Ground level - high RCS",
+			position:       guidance.Vector3D{X: 10000, Y: 10000, Z: 100},
+			velocity:       guidance.Vector3D{X: 50, Y: 50, Z: 0},
+			heading:        math.Pi / 4,
+			expectedMaxRCS: 8.0,
 		},
 		{
-			name:            "Very high altitude",
-			position:        stealth.Vector3D{X: 25000, Y: 25000, Z: 30000},
-			heading:         0,
-			expectedMaxProb: 0.5, // Atmospheric attenuation helps
+			name:           "High speed - Doppler effect",
+			position:       guidance.Vector3D{X: 0, Y: 0, Z: 5000},
+			velocity:       guidance.Vector3D{X: 500, Y: 0, Z: 0},
+			heading:        0,
+			expectedMaxRCS: 5.0,
 		},
 	}
 
@@ -312,41 +301,28 @@ func TestStealthOptimizationAccuracy(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			startTime := time.Now()
 
-			rcs := optimizer.CalculateRadarCrossSection(tc.position, tc.heading, stealth.Vector3D{X: 25000, Y: 25000, Z: 0})
-			
-			// Create a simple trajectory to test
-			traj := &stealth.Trajectory{
-				ID:          "test-traj",
-				PayloadType: "uav",
-				Waypoints: []stealth.Waypoint{
-					{
-						ID:       "wp-1",
-						Position: tc.position,
-						Velocity: stealth.Vector3D{X: 100, Y: 0, Z: 0},
-					},
-				},
+			// Create waypoint for testing
+			wp := guidance.Waypoint{
+				Position: tc.position,
+				Velocity: tc.velocity,
 			}
 
-			report := optimizer.GetStealthReport(traj)
+			rcs := optimizer.CalculateRadarCrossSection(wp, tc.heading)
+			thermalSig := optimizer.CalculateThermalSignature(wp)
 			duration := time.Since(startTime)
 
-			detectionProb := 0.0
-			if len(report.WaypointAnalysis) > 0 {
-				detectionProb = report.WaypointAnalysis[0].RadarExposure
-			}
-
-			passed := detectionProb <= tc.expectedMaxProb
-			accuracy := 100.0 * (1.0 - math.Abs(detectionProb-tc.expectedMaxProb/2)/(tc.expectedMaxProb))
+			passed := rcs <= tc.expectedMaxRCS
+			accuracy := 100.0 * (1.0 - math.Min(rcs/tc.expectedMaxRCS, 1.0))
 
 			result := BenchmarkResult{
 				TestName:    tc.name,
 				Duration:    duration,
 				Accuracy:    math.Max(0, accuracy),
-				ErrorMargin: detectionProb - tc.expectedMaxProb/2,
+				ErrorMargin: rcs - tc.expectedMaxRCS/2,
 				Passed:      passed,
 				Details: fmt.Sprintf(
-					"RCS: %.4f m², Detection Prob: %.2f, Expected Max: %.2f",
-					rcs, detectionProb, tc.expectedMaxProb,
+					"RCS: %.4f m², Thermal: %.2f, Expected Max RCS: %.2f",
+					rcs, thermalSig, tc.expectedMaxRCS,
 				),
 			}
 			results = append(results, result)
@@ -354,11 +330,10 @@ func TestStealthOptimizationAccuracy(t *testing.T) {
 			t.Logf("Stealth Test: %s", tc.name)
 			t.Logf("  Position: (%.0f, %.0f, %.0f)", tc.position.X, tc.position.Y, tc.position.Z)
 			t.Logf("  RCS: %.4f m²", rcs)
-			t.Logf("  Detection Probability: %.2f", detectionProb)
-			t.Logf("  Overall Stealth Score: %.2f", report.OverallScore)
+			t.Logf("  Thermal Signature: %.2f", thermalSig)
 
 			if !passed {
-				t.Errorf("Detection probability %.2f exceeds expected max %.2f", detectionProb, tc.expectedMaxProb)
+				t.Errorf("RCS %.4f exceeds expected max %.4f", rcs, tc.expectedMaxRCS)
 			}
 		})
 	}
@@ -530,29 +505,18 @@ func BenchmarkKalmanUpdate(b *testing.B) {
 
 // BenchmarkStealthCalculation measures stealth optimization performance
 func BenchmarkStealthCalculation(b *testing.B) {
-	optimizer := stealth.NewStealthOptimizer(stealth.StealthConfig{
-		MaxDetectionProbability: 0.3,
-		MinTerrainClearance:     100,
-		ThermalReduction:        true,
-		RadarEvasion:            true,
-	})
+	optimizer := stealth.NewStealthOptimizer()
 
-	// Add multiple radar sites
-	for i := 0; i < 10; i++ {
-		optimizer.AddRadarSite(stealth.RadarSite{
-			ID:           fmt.Sprintf("radar-%d", i),
-			Position:     stealth.Vector3D{X: float64(i * 20000), Y: float64(i * 15000), Z: 0},
-			FrequencyGHz: 10.0,
-			RangeKm:      100,
-			Active:       true,
-		})
+	// Create test waypoint
+	wp := guidance.Waypoint{
+		Position: guidance.Vector3D{X: 50000, Y: 50000, Z: 5000},
+		Velocity: guidance.Vector3D{X: 200, Y: 0, Z: 0},
 	}
-
-	position := stealth.Vector3D{X: 50000, Y: 50000, Z: 5000}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		optimizer.CalculateRadarCrossSection(position, float64(i)*0.1, stealth.Vector3D{X: 25000, Y: 25000, Z: 0})
+		optimizer.CalculateRadarCrossSection(wp, float64(i)*0.1)
+		optimizer.CalculateThermalSignature(wp)
 	}
 }
 

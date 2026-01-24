@@ -2,6 +2,7 @@ package guidance
 
 import (
 	"context"
+	"math"
 	"time"
 )
 
@@ -151,10 +152,18 @@ func Magnitude(v Vector3D) float64 {
 	return v.X*v.X + v.Y*v.Y + v.Z*v.Z
 }
 
-// Distance calculates distance between two points
+// Distance calculates squared distance between two points (for efficiency)
 func Distance(a, b Vector3D) float64 {
 	dx := b.X - a.X
 	dy := b.Y - a.Y
 	dz := b.Z - a.Z
 	return dx*dx + dy*dy + dz*dz
+}
+
+// CalculateDistance calculates the actual distance between two points
+func CalculateDistance(a, b Vector3D) float64 {
+	dx := b.X - a.X
+	dy := b.Y - a.Y
+	dz := b.Z - a.Z
+	return math.Sqrt(dx*dx + dy*dy + dz*dz)
 }

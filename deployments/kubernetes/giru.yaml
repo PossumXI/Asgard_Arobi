@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: giru
+  namespace: asgard
+  labels:
+    app: giru
+    component: security
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: giru
+  template:
+    metadata:
+      labels:
+        app: giru
+        component: security
+    spec:
+      containers:
+      - name: giru
+        image: asgard/giru:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 9090
+          name: http
+        - containerPort: 9190
+          name: metrics
+        envFrom:
+        - configMapRef:
+            name: asgard-config
+        env:
+        - name: POSTGRES_HOST
+          valueFrom:
+            secretKeyRef:
+              name: asgard-secrets
+              key: postgres-host
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: asgard-secrets
+              key: postgres-user
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: asgard-secrets
+              key: postgres-password
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 9090
+          initialDelaySeconds: 30
+          periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: giru-service
+  namespace: asgard
+spec:
+  selector:
+    app: giru
+  ports:
+  - name: http
+    port: 9090
+    targetPort: 9090
+  - name: metrics
+    port: 9190
+    targetPort: 9190
+  type: ClusterIP
