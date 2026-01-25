@@ -16,7 +16,7 @@ data:
   
   # Service Endpoints
   NYSUS_ENDPOINT: "http://nysus-service:8080"
-  PERCILA_ENDPOINT: "http://percila-service:8089"
+  PRICILLA_ENDPOINT: "http://pricilla-service:8089"
   GIRU_ENDPOINT: "http://giru-service:9090"
   SILENUS_ENDPOINT: "http://silenus-service:8082"
   HUNOID_ENDPOINT: "http://hunoid-service:8083"

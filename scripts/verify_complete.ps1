@@ -8,7 +8,7 @@ $ErrorCount = 0
 
 # Check for binaries
 Write-Host "Checking binaries..." -ForegroundColor Yellow
-$binaries = @("nysus.exe", "percila.exe", "hunoid.exe", "giru.exe", "silenus.exe", "satnet_router.exe")
+$binaries = @("nysus.exe", "pricilla.exe", "hunoid.exe", "giru.exe", "silenus.exe", "satnet_router.exe")
 foreach ($bin in $binaries) {
     $path = "bin\$bin"
     if (Test-Path $path) {
@@ -31,7 +31,7 @@ $manifests = @(
     "deployments\kubernetes\mongodb.yaml",
     "deployments\kubernetes\nysus.yaml",
     "deployments\kubernetes\giru.yaml",
-    "deployments\kubernetes\percila.yaml",
+    "deployments\kubernetes\pricilla.yaml",
     "deployments\kubernetes\kustomization.yaml"
 )
 foreach ($manifest in $manifests) {
@@ -83,7 +83,7 @@ if ($ErrorCount -eq 0) {
     Write-Host ""
     Write-Host "System Components:" -ForegroundColor White
     Write-Host "  - Nysus: Central orchestration (port 8080)" -ForegroundColor White
-    Write-Host "  - Percila: AI guidance system (port 8089)" -ForegroundColor White
+    Write-Host "  - Pricilla: AI guidance system (port 8092)" -ForegroundColor White
     Write-Host "  - Giru: Security & defense (port 9090)" -ForegroundColor White
     Write-Host "  - Silenus: Satellite perception" -ForegroundColor White
     Write-Host "  - Hunoid: Robotics control" -ForegroundColor White

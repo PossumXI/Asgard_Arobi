@@ -179,7 +179,7 @@ Current Position (propagated):
 
 ---
 
-### 7. PERCILA Guidance System ✅
+### 7. PRICILLA Guidance System ✅
 
 **What You Can Show**:
 - Trajectory planning for various payloads
@@ -188,11 +188,11 @@ Current Position (propagated):
 
 **Demo Command**:
 ```powershell
-# Run PERCILA demo
-.\scripts\percila_demo.ps1
+# Run PRICILLA demo
+.\scripts\pricilla_demo.ps1
 
 # Or start the service directly
-.\bin\percila.exe -http-port 8092
+.\bin\pricilla.exe -http-port 8092
 ```
 
 ---
@@ -303,10 +303,10 @@ nextHop, _ := router.SelectNextHop(ctx, bundle, neighbors)
 
 **Scenario**: Guide a supply drone to a remote location.
 
-**PERCILA Demo**:
+**PRICILLA Demo**:
 ```powershell
-# Start PERCILA
-.\bin\percila.exe
+# Start PRICILLA
+.\bin\pricilla.exe
 
 # Create mission via API
 $mission = @{
@@ -363,7 +363,7 @@ Write-Host "- NATS: localhost:4222"
 # Stop all services
 Stop-Process -Name nysus -Force -ErrorAction SilentlyContinue
 Stop-Process -Name giru -Force -ErrorAction SilentlyContinue
-Stop-Process -Name percila -Force -ErrorAction SilentlyContinue
+Stop-Process -Name pricilla -Force -ErrorAction SilentlyContinue
 
 # Stop databases
 Set-Location Data

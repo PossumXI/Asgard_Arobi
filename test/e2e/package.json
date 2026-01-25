@@ -6,6 +6,7 @@
     "test": "npx playwright test",
     "demo": "npx playwright test demo.spec.ts --headed",
     "demo:record": "npx playwright test demo.spec.ts",
+    "pricilla:demo": "npx playwright test pricilla-demo.spec.ts",
     "report": "npx playwright show-report"
   },
   "devDependencies": {

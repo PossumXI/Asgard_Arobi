@@ -150,7 +150,7 @@ I noticed [Company]'s recent work in [specific area - e.g., satellite servicing,
 We've built an integrated space operations platform that combines:
 
 - **Satellite Perception (Silenus)** - Computer vision, TensorFlow integration
-- **Precision Guidance (Percila)** - Sub-meter delivery accuracy, 8 payload types
+- **Precision Guidance (Pricilla)** - Sub-meter delivery accuracy, 8 payload types
 - **DTN Networking (Sat_Net)** - BPv7 for deep space, store-and-forward
 - **Command & Control (Nysus)** - 40+ APIs, real-time streaming
 

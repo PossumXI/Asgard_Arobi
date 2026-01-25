@@ -4561,65 +4561,65 @@ func (r *EnergyAwareRouter) Route(bundle Bundle, neighborsNode) Node {
 }
 Verification: Deploy a test pod and verify Nysus can restart it remotely.Phase 3: The Orbital Segment (Silenus & Sat_Net)Objective: Enable the eyes and the interstellar network.Develop Sat_Net (DTN):Implement Bundle Protocol v7 in internal/platform/dtn.Train the RL Routing Agent using a Python simulation, then export the model (ONNX) to Go.Implement the EnergyAwareRouter logic.Verification: Simulate a node failure (eclipse mode) and verify the RL agent re-routes traffic.Build Silenus Firmware:Write the TinyGo HAL for the camera sensors in internal/orbital/hal.Implement the "AI Track & Assess" loop using wazero to run the object detection model.Verification: Cross-compile cmd/silenus for ARM64 (Raspberry Pi/Jetson) and RISC-V targets.Phase 4: The Body (Hunoid)Objective: Awaken the physical avatar.Robotics Middleware:Set up the ROS2 Go bridge (rclgo).Implement the Ethical Pre-Processor middleware.VLA Integration:Create the Python service for OpenVLA inference.Build the gRPC bridge between Hunoid (Go) and VLA (Python).Verification: Send a text command "Lift Box" and verify the VLA returns valid joint trajectories.Phase 5: The Shield (Giru 2.0)Objective: Arm the immune system.Deploy Sentinel:Implement the traffic analyzer using gopacket.Connect the Metasploit RPC client.31Train Gaga Chat:Define the linguistic steganography rules in pkg/gagachat.Implement the rolling-code encryption.Verification: Run a Red Team simulation where the Red Agent attempts to hack Websites and Giru blocks it automatically.Phase 6: The Interface (Hubs & Websites)Objective: Connect humanity to the system.Frontend Development:Scaffold the React apps in Websites/.Implement the Subscription flow with Stripe.Hub Streaming:Deploy the WebRTC signaling server in Hubs/.Connect it to the Sat_Net egress point.Verification: Stream a video file from Silenus (simulated) through Sat_Net to the Hub browser with simulated latency.
 
-**Phase 7: The Guidance System (PERCILA)**
+**Phase 7: The Guidance System (PRICILLA)**
 
 Objective: Build the most advanced AI-controlled guidance system for all payload types.
 
-**7.1. PERCILA Core Architecture**
+**7.1. PRICILLA Core Architecture**
 
-PERCILA (Precision Engagement & Routing Control with Integrated Learning Architecture) is the guidance brain that navigates all ASGARD payloads.
+PRICILLA (Precision Engagement & Routing Control with Integrated Learning Architecture) is the guidance brain that navigates all ASGARD payloads.
 
-**Create PERCILA Directory Structure:**
+**Create PRICILLA Directory Structure:**
 ```powershell
-New-Item -ItemType Directory -Path "C:\Users\hp\Desktop\Asgard\Percila\internal\guidance" -Force
-New-Item -ItemType Directory -Path "C:\Users\hp\Desktop\Asgard\Percila\internal\navigation" -Force
-New-Item -ItemType Directory -Path "C:\Users\hp\Desktop\Asgard\Percila\internal\stealth" -Force
-New-Item -ItemType Directory -Path "C:\Users\hp\Desktop\Asgard\Percila\internal\prediction" -Force
-New-Item -ItemType Directory -Path "C:\Users\hp\Desktop\Asgard\Percila\internal\payload" -Force
-New-Item -ItemType Directory -Path "C:\Users\hp\Desktop\Asgard\Percila\internal\integration" -Force
-New-Item -ItemType Directory -Path "C:\Users\hp\Desktop\Asgard\Percila\cmd\percila" -Force
+New-Item -ItemType Directory -Path "C:\Users\hp\Desktop\Asgard\Pricilla\internal\guidance" -Force
+New-Item -ItemType Directory -Path "C:\Users\hp\Desktop\Asgard\Pricilla\internal\navigation" -Force
+New-Item -ItemType Directory -Path "C:\Users\hp\Desktop\Asgard\Pricilla\internal\stealth" -Force
+New-Item -ItemType Directory -Path "C:\Users\hp\Desktop\Asgard\Pricilla\internal\prediction" -Force
+New-Item -ItemType Directory -Path "C:\Users\hp\Desktop\Asgard\Pricilla\internal\payload" -Force
+New-Item -ItemType Directory -Path "C:\Users\hp\Desktop\Asgard\Pricilla\internal\integration" -Force
+New-Item -ItemType Directory -Path "C:\Users\hp\Desktop\Asgard\Pricilla\cmd\percila" -Force
 ```
 
 **7.2. Core Components:**
 
-1. **Navigation System** (`Percila/internal/navigation/navigator.go`):
+1. **Navigation System** (`Pricilla/internal/navigation/navigator.go`):
    - Waypoint management with terrain avoidance
    - Threat zone routing
    - Multiple navigation modes: direct, terrain, stealth, evasive, ballistic, orbital
    - 20 Hz steering command generation
 
-2. **Prediction Engine** (`Percila/internal/prediction/predictor.go`):
+2. **Prediction Engine** (`Pricilla/internal/prediction/predictor.go`):
    - 9-state Kalman filter for trajectory prediction
    - Proportional navigation intercept calculation
    - Fuel consumption forecasting
    - Contact window prediction for Sat_Net
 
-3. **Stealth Optimizer** (`Percila/internal/stealth/optimizer.go`):
+3. **Stealth Optimizer** (`Pricilla/internal/stealth/optimizer.go`):
    - Radar Cross Section (RCS) calculation
    - Thermal signature modeling (Stefan-Boltzmann)
    - Terrain masking analysis
    - SAM threat evaluation
 
-4. **Payload Controller** (`Percila/internal/payload/controller.go`):
+4. **Payload Controller** (`Pricilla/internal/payload/controller.go`):
    - Multi-payload management: Hunoid, UAV, Rocket, Missile, Spacecraft, Drone
    - Command processing: navigate_to, hold, arm, abort, engage_stealth
    - Telemetry collection at 10 Hz
 
-5. **ASGARD Integration** (`Percila/internal/integration/asgard.go`):
+5. **ASGARD Integration** (`Pricilla/internal/integration/asgard.go`):
    - Silenus: Terrain maps, satellite positions, alert feeds
    - Hunoid: Robot control and state monitoring
    - Sat_Net: DTN command/telemetry relay
    - Giru: Threat intelligence for route planning
    - Nysus: Mission orchestration
 
-**7.3. Build and Test PERCILA:**
+**7.3. Build and Test PRICILLA:**
 ```powershell
-# Build PERCILA executable
+# Build PRICILLA executable
 cd C:\Users\hp\Desktop\Asgard
-go build -o bin/percila.exe ./Percila/cmd/percila/main.go
+go build -o bin/pricilla.exe ./Pricilla/cmd/percila/main.go
 
-# Run PERCILA
-.\bin\percila.exe -http-port 8092 -stealth=true -prediction=true
+# Run PRICILLA
+.\bin\pricilla.exe -http-port 8092 -stealth=true -prediction=true
 
 # Test API
 curl http://localhost:8092/api/v1/status
@@ -4639,7 +4639,7 @@ curl http://localhost:8092/api/v1/status
 
 **7.5. Stealth Optimization:**
 
-PERCILA calculates optimal stealth trajectories using:
+PRICILLA calculates optimal stealth trajectories using:
 - **RCS Minimization**: Aspect angle optimization relative to radar sources
 - **Thermal Reduction**: Speed/altitude management to reduce IR signature
 - **Terrain Masking**: Nap-of-earth flying using Silenus terrain data
@@ -4660,7 +4660,7 @@ PERCILA calculates optimal stealth trajectories using:
 
 **7.7. Live Feed System (v2.0)**
 
-PERCILA v2.0 introduces real-time live feeds for payload delivery monitoring:
+PRICILLA v2.0 introduces real-time live feeds for payload delivery monitoring:
 
 | Endpoint | Method | Description | Headers |
 |----------|--------|-------------|---------|

@@ -13,7 +13,7 @@ The ASGARD platform has been comprehensively audited for production readiness. A
 
 | System | Status | Mock Code | Production Ready |
 |--------|--------|-----------|------------------|
-| **PERCILA** (Guidance) | ✅ Complete | None | Yes |
+| **PRICILLA** (Guidance) | ✅ Complete | None | Yes |
 | **Nysus** (Orchestration) | ✅ Complete | None | Yes |
 | **Silenus** (Satellite Vision) | ✅ Complete | None | Yes |
 | **Hunoid** (Robotics) | ✅ Complete | None | Yes |
@@ -27,10 +27,10 @@ The ASGARD platform has been comprehensively audited for production readiness. A
 
 ## System-by-System Analysis
 
-### 1. PERCILA - AI Guidance System
+### 1. PRICILLA - AI Guidance System
 
-**Location:** `Percila/`  
-**Binary:** `bin/percila.exe` (8.8 MB)  
+**Location:** `Pricilla/`  
+**Binary:** `bin/pricilla.exe` (8.8 MB)  
 **Status:** ✅ **100% Production-Ready**
 
 | Component | Implementation | Lines of Code |
@@ -232,7 +232,7 @@ The ASGARD platform has been comprehensively audited for production readiness. A
 
 | Binary | Size | Purpose | Status |
 |--------|------|---------|--------|
-| `percila.exe` | 8.8 MB | AI Guidance System | ✅ Production |
+| `pricilla.exe` | 8.8 MB | AI Guidance System | ✅ Production |
 | `nysus.exe` | 26.0 MB | Central Orchestration | ✅ Production |
 | `silenus.exe` | 16.8 MB | Satellite Vision | ✅ Production |
 | `hunoid.exe` | 14.3 MB | Robotics Control | ✅ Production |
@@ -248,7 +248,7 @@ The ASGARD platform has been comprehensively audited for production readiness. A
 
 ## Performance Benchmarks
 
-### PERCILA Guidance System
+### PRICILLA Guidance System
 
 | Metric | Value |
 |--------|-------|
@@ -331,7 +331,7 @@ STRIPE_WEBHOOK_SECRET=<webhook_secret>
 
 ### Ready for Live Demo:
 
-1. **PERCILA Trajectory Planning**
+1. **PRICILLA Trajectory Planning**
    - Create mission → Generate optimized trajectory
    - Real-time stealth scoring
    - Multi-payload guidance

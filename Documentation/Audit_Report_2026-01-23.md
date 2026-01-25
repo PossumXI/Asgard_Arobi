@@ -7,7 +7,7 @@
 
 ### What is real, working, and demonstratable
 - **Backend services (Go)** compile and run with real dependencies when configured.
-  - Entry points: `cmd/nysus`, `cmd/silenus`, `cmd/hunoid`, `cmd/giru`, `cmd/satnet_router`, `cmd/satellite_tracker`, `cmd/satnet_verify`, `Percila/cmd/percila`.
+  - Entry points: `cmd/nysus`, `cmd/silenus`, `cmd/hunoid`, `cmd/giru`, `cmd/satnet_router`, `cmd/satellite_tracker`, `cmd/satnet_verify`, `Pricilla/cmd/percila`.
 - **Database integration**: Postgres + MongoDB configuration is real (`internal/platform/db`) and wired in `cmd/nysus/main.go`.
 - **Observability**: Prometheus metrics + OpenTelemetry tracing are implemented in `internal/platform/observability`.
 - **Orbital hardware abstraction**: Camera and orbital position are real implementations (`internal/orbital/hal`).
@@ -54,7 +54,7 @@
 - **Backend API**: Ready for demo with real data sources configured (Postgres/Mongo/NATS).
 - **Silenus orbital**: Ready for demo with real camera + N2YO API configured.
 - **Hunoid robotics**: Ready for demo with remote control endpoints available.
-- **Percila**: Implemented algorithms; integration depends on upstream data feeds.
+- **Pricilla**: Implemented algorithms; integration depends on upstream data feeds.
 - **Hubs frontend**: UI is demo-ready visually, but data and streams are simulated.
 - **WebRTC streaming**: Client exists in `Hubs/src/lib/api.ts`, but UI is not wired to real streams.
 

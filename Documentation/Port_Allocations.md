@@ -1,6 +1,6 @@
 # Port Allocations
 
-## Percila (2026-01-24)
+## Pricilla (2026-01-24)
 - HTTP API: 8092
 - Metrics: 9092
 - Previous defaults 8089/9089 are already in use.

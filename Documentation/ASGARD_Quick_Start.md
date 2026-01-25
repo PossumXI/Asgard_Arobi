@@ -25,7 +25,7 @@ cd pandora
 # Build all binaries
 go build -o bin/nysus.exe ./cmd/nysus
 go build -o bin/giru.exe ./cmd/giru
-go build -o bin/percila.exe ./Percila/cmd/percila
+go build -o bin/pricilla.exe ./Pricilla/cmd/percila
 go build -o bin/db_migrate.exe ./cmd/db_migrate
 
 # Verify builds
@@ -128,8 +128,8 @@ Get-NetAdapter | ForEach-Object {
 |---------|------|----------|
 | Nysus API | 8080 | HTTP/WS |
 | Giru Metrics | 9091 | HTTP |
-| PERCILA API | 8092 | HTTP |
-| PERCILA Metrics | 9092 | HTTP |
+| PRICILLA API | 8092 | HTTP |
+| PRICILLA Metrics | 9092 | HTTP |
 | PostgreSQL | 55432 | TCP |
 | MongoDB | 27017 | TCP |
 | NATS | 4222 | TCP |
@@ -141,7 +141,7 @@ Get-NetAdapter | ForEach-Object {
 
 ```powershell
 # Stop Go services
-Stop-Process -Name nysus,giru,percila -Force -ErrorAction SilentlyContinue
+Stop-Process -Name nysus,giru,pricilla -Force -ErrorAction SilentlyContinue
 
 # Stop databases
 cd Data

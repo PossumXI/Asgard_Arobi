@@ -34,7 +34,7 @@ cd C:\Users\hp\Desktop\Asgard
 go build -o bin/nysus.exe ./cmd/nysus
 go build -o bin/silenus.exe ./cmd/silenus
 go build -o bin/hunoid.exe ./cmd/hunoid
-go build -o bin/percila.exe ./Percila/cmd/percila
+go build -o bin/pricilla.exe ./Pricilla/cmd/percila
 go build -o bin/giru.exe ./cmd/giru
 ```
 
@@ -65,7 +65,7 @@ go build -o bin/giru.exe ./cmd/giru
 > 1. **Nysus** - Central orchestration with 40+ API endpoints
 > 2. **Silenus** - Satellite vision and perception
 > 3. **Hunoid** - Humanoid robot control with ethics kernel
-> 4. **Percila** - AI-powered precision guidance
+> 4. **Pricilla** - AI-powered precision guidance
 > 5. **Giru** - Security threat detection and response
 > 6. **Sat_Net** - Delay-tolerant networking for deep space
 > 7. **Hubs** - Real-time streaming interface
@@ -132,7 +132,7 @@ npm run dev
 > "Our web interface provides tiered access:
 > - **Civilian** - Basic satellite imagery and alerts
 > - **Military** - Enhanced feeds and mission control
-> - **Interstellar** - Full access including DTN and Percila
+> - **Interstellar** - Full access including DTN and Pricilla
 > 
 > Government users authenticate with hardware security keys via FIDO2/WebAuthn."
 
@@ -160,12 +160,12 @@ npm run dev
 
 ---
 
-### Part 5: Percila Guidance Demo (10 minutes)
+### Part 5: Pricilla Guidance Demo (10 minutes)
 
-**Run Percila Tests:**
+**Run Pricilla Tests:**
 ```powershell
 cd C:\Users\hp\Desktop\Asgard
-go test -v ./Percila/internal/physics/... 2>&1 | Select-Object -First 50
+go test -v ./Pricilla/internal/physics/... 2>&1 | Select-Object -First 50
 ```
 
 **Demo Points:**
@@ -175,7 +175,7 @@ go test -v ./Percila/internal/physics/... 2>&1 | Select-Object -First 50
 4. **Delivery Accuracy** - CEP/SEP metrics
 
 **Script:**
-> "Percila's guidance engine uses Multi-Agent Reinforcement Learning combined with Physics-Informed Neural Networks. Our physics calculations have been validated:
+> "Pricilla's guidance engine uses Multi-Agent Reinforcement Learning combined with Physics-Informed Neural Networks. Our physics calculations have been validated:
 > 
 > - Surface gravity: 9.8203 m/s² (accurate to 0.02%)
 > - Delivery accuracy: 7.56m CEP

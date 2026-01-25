@@ -31,7 +31,7 @@ ASGARD is a comprehensive autonomous defense and space operations platform that 
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                         │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐   │
-│  │   SILENUS   │  │   HUNOID    │  │    GIRU     │  │   PERCILA   │   │
+│  │   SILENUS   │  │   HUNOID    │  │    GIRU     │  │  PRICILLA   │   │
 │  │  Satellite  │  │  Robotics   │  │  Security   │  │  Guidance   │   │
 │  │   Vision    │  │  Control    │  │   Scanner   │  │   System    │   │
 │  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘   │
@@ -148,7 +148,7 @@ ASGARD is a comprehensive autonomous defense and space operations platform that 
 
 ---
 
-### 5. PERCILA - AI Guidance System
+### 5. PRICILLA - AI Guidance System
 
 **Purpose**: Precision trajectory planning and payload guidance.
 
@@ -175,7 +175,7 @@ ASGARD is a comprehensive autonomous defense and space operations platform that 
 - Van Allen radiation belts
 - Sutton-Graves re-entry heating
 
-**Human Impact**: PERCILA can guide a supply drone to a stranded hiker with centimeter precision, or calculate the exact trajectory to intercept a debris cloud threatening a space station.
+**Human Impact**: PRICILLA can guide a supply drone to a stranded hiker with centimeter precision, or calculate the exact trajectory to intercept a debris cloud threatening a space station.
 
 ---
 
@@ -274,7 +274,7 @@ ASGARD is a comprehensive autonomous defense and space operations platform that 
 | silenus.exe | 17 MB | Satellite vision |
 | hunoid.exe | 14 MB | Robot control |
 | giru.exe | 17 MB | Security scanner |
-| percila.exe | 9 MB | Guidance system |
+| pricilla.exe | 9 MB | Guidance system |
 | satnet_router.exe | 11 MB | DTN routing |
 
 ---
@@ -282,13 +282,13 @@ ASGARD is a comprehensive autonomous defense and space operations platform that 
 ## Use Cases
 
 ### 1. Disaster Response
-A wildfire breaks out in California. Silenus satellites detect the fire within minutes. Nysus alerts emergency services and dispatches nearby Hunoid robots for evacuation assistance. PERCILA calculates optimal paths for firefighting drones. Giru ensures communication channels remain secure from interference.
+A wildfire breaks out in California. Silenus satellites detect the fire within minutes. Nysus alerts emergency services and dispatches nearby Hunoid robots for evacuation assistance. PRICILLA calculates optimal paths for firefighting drones. Giru ensures communication channels remain secure from interference.
 
 ### 2. Space Debris Tracking
-A defunct satellite is on collision course with ISS. Silenus tracks both objects. SAT_NET relays trajectory updates to ground control. PERCILA calculates evasive maneuvers. The astronauts receive warnings with 15+ hours lead time.
+A defunct satellite is on collision course with ISS. Silenus tracks both objects. SAT_NET relays trajectory updates to ground control. PRICILLA calculates evasive maneuvers. The astronauts receive warnings with 15+ hours lead time.
 
 ### 3. Humanitarian Aid Delivery
-Remote village needs medical supplies. PERCILA plans a drone delivery trajectory avoiding weather and terrain. Silenus provides visual confirmation of the drop zone. Hunoid robots on-site receive and distribute supplies.
+Remote village needs medical supplies. PRICILLA plans a drone delivery trajectory avoiding weather and terrain. Silenus provides visual confirmation of the drop zone. Hunoid robots on-site receive and distribute supplies.
 
 ### 4. Network Security
 An attacker attempts to compromise ASGARD systems. Giru detects the port scan within milliseconds. The threat is classified, logged, and the IP is blocked. Security events are published to NATS for audit logging.

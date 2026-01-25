@@ -40,7 +40,7 @@ ASGARD/
 │   │   │   ├── stream.go       # Streaming endpoints
 │   │   │   ├── subscription.go # Billing endpoints
 │   │   │   ├── health.go       # Health checks
-│   │   │   └── percila.go      # PERCILA API
+│   │   │   └── pricilla.go     # PRICILLA API
 │   │   ├── middleware/          # HTTP middleware
 │   │   │   ├── auth.go         # JWT validation
 │   │   │   ├── access.go       # Access control
@@ -59,7 +59,7 @@ ASGARD/
 │   │   ├── subscription.go     # Stripe integration
 │   │   ├── email.go            # SMTP service
 │   │   ├── satellite_tracking.go # Orbit propagation
-│   │   └── percila.go          # PERCILA integration
+│   │   └── pricilla.go         # PRICILLA integration
 │   │
 │   ├── repositories/            # Data access layer
 │   │   ├── user.go             # User CRUD
@@ -150,7 +150,7 @@ ASGARD/
 │       ├── bundle.go           # Bundle struct (BPv7)
 │       └── serialization.go    # Marshal/unmarshal
 │
-├── Percila/                     # PERCILA guidance system
+├── Pricilla/                    # PRICILLA guidance system
 │   ├── cmd/percila/main.go     # Entry point
 │   └── internal/
 │       ├── guidance/           # AI trajectory planning
@@ -208,7 +208,7 @@ ASGARD/
 │   ├── integration_test.ps1    # Full test suite
 │   ├── load_test_realtime.ps1  # WebSocket load test
 │   ├── load_test_signaling.ps1 # WebRTC load test
-│   └── percila_demo.ps1        # PERCILA demonstration
+│   └── pricilla_demo.ps1       # PRICILLA demonstration
 │
 └── Documentation/               # This documentation
 ```
@@ -408,7 +408,7 @@ func (n *Node) HandleIncoming(b *bundle.Bundle) error {
    User → API → Nysus → Event Bus → "mission.create"
    
 2. PLANNING
-   PERCILA → Trajectory Calc → Waypoints → Validation
+   PRICILLA → Trajectory Calc → Waypoints → Validation
    
 3. DISPATCH
    Nysus → Hunoid Selection → Mission Assignment
@@ -587,7 +587,7 @@ func calculateEntropy(data []byte) float64 {
 }
 ```
 
-### 4. PERCILA Multi-Agent RL
+### 4. PRICILLA Multi-Agent RL
 
 **Architecture**: 7 specialized agents with consensus voting
 

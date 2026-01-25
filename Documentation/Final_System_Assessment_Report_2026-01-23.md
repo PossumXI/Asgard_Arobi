@@ -28,7 +28,7 @@ ASGARD (Advanced Space Guardian & Autonomous Response Defense) has successfully 
 | **Nysus** | Central Orchestration Server | Operational | A |
 | **Silenus** | Satellite Perception System | Operational | A |
 | **Hunoid** | Humanoid Robotics Control | Operational | A- |
-| **Percila** | Precision Guidance System | Operational | A |
+| **Pricilla** | Precision Guidance System | Operational | A |
 | **Giru** | Security & Defense System | Operational | B+ |
 | **Sat_Net** | Delay-Tolerant Networking | Operational | A |
 | **Hubs** | Streaming Interface (Frontend) | Operational | A- |
@@ -61,7 +61,7 @@ ASGARD (Advanced Space Guardian & Autonomous Response Defense) has successfully 
 
 ## 2. Test Results Summary
 
-### 2.1 Physics Tests (Percila)
+### 2.1 Physics Tests (Pricilla)
 All orbital mechanics and physics calculations validated:
 
 | Test | Result | Details |
@@ -122,7 +122,7 @@ All orbital mechanics and physics calculations validated:
 - `/api/subscription/*` - Stripe subscription management
 - `/api/dashboard/*` - Dashboard stats and entities
 - `/api/streams/*` - Stream listing and WebRTC sessions
-- `/api/percila/*` - Percila mission management
+- `/api/pricilla/*` - Pricilla mission management
 - `/api/audit/*` - Audit logging
 - `/ws/realtime` - Real-time event stream
 - `/ws/signaling` - WebRTC signaling
@@ -166,7 +166,7 @@ All orbital mechanics and physics calculations validated:
 - Emergency stop capability
 - Human-in-the-loop escalation
 
-### 3.4 Percila - Precision Guidance System
+### 3.4 Pricilla - Precision Guidance System
 
 **AI Engine (v3.0):**
 - Multi-Agent Reinforcement Learning (MARL)

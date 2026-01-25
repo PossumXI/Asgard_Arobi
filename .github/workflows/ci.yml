@@ -20,8 +20,8 @@ jobs:
           go-version: "1.24.x"
       - name: Go test
         run: |
-          # Run tests excluding Percila/test (has build-time dependencies on stealth types)
-          go test -v $(go list ./... | grep -v "Percila/test") -skip "TestTrajectoryAccuracy|TestKalmanFilterAccuracy"
+          # Run tests excluding Pricilla benchmark directory
+          go test -v $(go list ./... | grep -v "Pricilla/test") -skip "TestTrajectoryAccuracy|TestKalmanFilterAccuracy"
 
   frontend-websites:
     runs-on: ubuntu-latest

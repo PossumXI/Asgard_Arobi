@@ -359,7 +359,7 @@ Description: High entropy payload detected (entropy: 7.63)
 | Silenus | Nysus | NATS | ✅ |
 | Giru | Nysus | NATS | ✅ |
 | Hunoid | Nysus | NATS + HTTP | ✅ |
-| PERCILA | Nysus | NATS + HTTP | ✅ |
+| PRICILLA | Nysus | NATS + HTTP | ✅ |
 | Nysus | WebSocket Clients | WS | ✅ |
 | Nysus | PostgreSQL | SQL | ✅ |
 | Nysus | MongoDB | Driver | ✅ |

@@ -12,7 +12,7 @@
 2. [Silenus - Orbital Vision](#2-silenus---orbital-vision)
 3. [Hunoid - Robotics System](#3-hunoid---robotics-system)
 4. [Giru - Security Scanner](#4-giru---security-scanner)
-5. [PERCILA - Guidance System](#5-percila---guidance-system)
+5. [PRICILLA - Guidance System](#5-pricilla---guidance-system)
 6. [SAT_NET - DTN Networking](#6-sat_net---dtn-networking)
 
 ---
@@ -538,7 +538,7 @@ func (m *Mitigator) Respond(threat *Threat) error {
 
 ---
 
-## 5. PERCILA - Guidance System
+## 5. PRICILLA - Guidance System
 
 ### Purpose
 
@@ -548,7 +548,7 @@ AI-powered precision trajectory planning for any payload type.
 
 #### Multi-Agent Reinforcement Learning
 
-PERCILA uses 7 specialized RL agents:
+PRICILLA uses 7 specialized RL agents:
 
 ```go
 type MARLEngine struct {
@@ -757,7 +757,7 @@ func (n *Node) ProcessBundle(b *Bundle) error {
 | Silenus | Nysus | NATS + DTN | Alerts, telemetry |
 | Hunoid | Nysus | NATS + HTTP | Commands, status |
 | Giru | Nysus | NATS | Threats, findings |
-| PERCILA | Nysus | NATS + HTTP | Trajectories, missions |
+| PRICILLA | Nysus | NATS + HTTP | Trajectories, missions |
 | Nysus | WebSocket | WS | Real-time to clients |
 | SAT_NET | All | DTN Bundle | Interplanetary relay |
 

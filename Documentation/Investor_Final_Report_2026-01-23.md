@@ -44,7 +44,7 @@ This report presents our final technical assessment and investment-readiness gra
 | Nysus (Orchestration) | TRL 8 | Production Ready |
 | Silenus (Satellite Vision) | TRL 7 | Prototype Validated |
 | Hunoid (Robotics) | TRL 6 | Demo Ready |
-| Percila (Guidance) | TRL 7 | Prototype Validated |
+| Pricilla (Guidance) | TRL 7 | Prototype Validated |
 | Giru (Security) | TRL 7 | Prototype Validated |
 | Sat_Net (DTN) | TRL 7 | Prototype Validated |
 | Control Plane | TRL 8 | Production Ready |

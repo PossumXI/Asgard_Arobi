@@ -11,6 +11,7 @@ const Landing = lazy(() => import('@/pages/Landing'));
 const About = lazy(() => import('@/pages/About'));
 const Features = lazy(() => import('@/pages/Features'));
 const Pricing = lazy(() => import('@/pages/Pricing'));
+const Pricilla = lazy(() => import('@/pages/Pricilla'));
 const SignIn = lazy(() => import('@/pages/auth/SignIn'));
 const SignUp = lazy(() => import('@/pages/auth/SignUp'));
 const Dashboard = lazy(() => import('@/pages/dashboard/Dashboard'));
@@ -27,6 +28,7 @@ export default function App() {
               <Route index element={<Landing />} />
               <Route path="about" element={<About />} />
               <Route path="features" element={<Features />} />
+              <Route path="pricilla" element={<Pricilla />} />
               <Route path="pricing" element={<Pricing />} />
               <Route path="signin" element={<SignIn />} />
               <Route path="signup" element={<SignUp />} />

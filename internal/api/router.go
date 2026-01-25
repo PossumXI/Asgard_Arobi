@@ -23,7 +23,7 @@ func NewRouter(
 	subscriptionService *services.SubscriptionService,
 	dashboardService *services.DashboardService,
 	streamService *services.StreamService,
-	percilaService *services.PercilaService,
+	pricillaService *services.PricillaService,
 	auditService *services.AuditService,
 	eventBroadcaster *realtime.Broadcaster,
 	signalingServer *signaling.Server,
@@ -53,7 +53,7 @@ func NewRouter(
 	subscriptionHandler := handlers.NewSubscriptionHandler(subscriptionService)
 	dashboardHandler := handlers.NewDashboardHandler(dashboardService)
 	streamHandler := handlers.NewStreamHandler(streamService)
-	percilaHandler := handlers.NewPercilaHandler(percilaService)
+	pricillaHandler := handlers.NewPricillaHandler(pricillaService)
 	auditHandler := handlers.NewAuditHandler(auditService)
 
 	// Initialize health handler
@@ -213,15 +213,15 @@ func NewRouter(
 			})
 		})
 
-		// Percila routes (protected)
-		r.Route("/percila", func(r chi.Router) {
+		// Pricilla routes (protected)
+		r.Route("/pricilla", func(r chi.Router) {
 			r.Use(apimiddleware.RequireAccessLevel(authService, realtimecore.AccessLevelGovernment))
 			r.Route("/missions", func(r chi.Router) {
-				r.Get("/", percilaHandler.HandleMissions)
-				r.Post("/", percilaHandler.HandleMissions)
-				r.Get("/{id}", percilaHandler.HandleMission)
+				r.Get("/", pricillaHandler.HandleMissions)
+				r.Post("/", pricillaHandler.HandleMissions)
+				r.Get("/{id}", pricillaHandler.HandleMission)
 			})
-			r.Post("/payloads", percilaHandler.HandlePayloads)
+			r.Post("/payloads", pricillaHandler.HandlePayloads)
 		})
 
 		// Audit routes (protected)

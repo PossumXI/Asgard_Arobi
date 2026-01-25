@@ -26,7 +26,7 @@ ASGARD is a comprehensive space situational awareness and autonomous defense pla
 | **Hunoid** | `Hunoid/` | Humanoid robotics systems with VLA (Vision-Language-Action) control |
 | **Nysus** | `Nysus/` | Central orchestration, MCP services, and API gateway |
 | **Giru** | `Giru/` | Security operations - red/blue teaming, IDS/IPS, and defensive automation |
-| **Percila** | `Percila/` | Precision guidance and missile defense coordination system |
+| **Pricilla** | `Pricilla/` | Precision guidance and missile defense coordination system |
 
 ## Supporting Infrastructure
 
@@ -53,7 +53,7 @@ ASGARD is a comprehensive space situational awareness and autonomous defense pla
 - **Ethics Kernel** - Asimov-compliant decision making
 - Mission planning and autonomous task execution
 
-### Precision Guidance (Percila)
+### Precision Guidance (Pricilla)
 - Missile defense coordination
 - Target tracking and intercept calculation
 - Real-time trajectory optimization
@@ -133,7 +133,7 @@ npm run dev
 │                         ASGARD Platform                          │
 ├─────────────────────────────────────────────────────────────────┤
 │  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌────────┐ │
-│  │ Silenus │  │ Sat_Net │  │ Hunoid  │  │ Percila │  │  Giru  │ │
+│  │ Silenus │  │ Sat_Net │  │ Hunoid  │  │ Pricilla │  │  Giru  │ │
 │  │Satellite│  │   DTN   │  │Robotics │  │Guidance │  │Security│ │
 │  └────┬────┘  └────┬────┘  └────┬────┘  └────┬────┘  └───┬────┘ │
 │       │            │            │            │           │      │

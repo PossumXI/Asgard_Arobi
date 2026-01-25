@@ -247,10 +247,10 @@ func (s *Server) registerRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/api/admin/users", s.handleAdminUsers)
 	mux.HandleFunc("/api/admin/users/", s.handleAdminUser)
 
-	// Percila endpoints
-	mux.HandleFunc("/api/percila/missions", s.handlePercilaMissions)
-	mux.HandleFunc("/api/percila/missions/", s.handlePercilaMission)
-	mux.HandleFunc("/api/percila/payloads", s.handlePercilaPayloads)
+	// Pricilla endpoints
+	mux.HandleFunc("/api/pricilla/missions", s.handlePricillaMissions)
+	mux.HandleFunc("/api/pricilla/missions/", s.handlePricillaMission)
+	mux.HandleFunc("/api/pricilla/payloads", s.handlePricillaPayloads)
 
 	// Control plane endpoints (admin/government)
 	mux.HandleFunc("/api/controlplane/status", s.handleControlPlaneStatus)

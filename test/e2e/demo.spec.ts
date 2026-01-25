@@ -36,7 +36,15 @@ test.describe('ASGARD Professional Demo', () => {
     await smoothScrollToBottom(page);
     await pause(1500);
     
-    // Scene 3: About - The Mission
+    // Scene 3: Pricilla - Guidance System
+    console.log('📍 Spotlighting Pricilla...');
+    await navigateTo(page, 'http://localhost:3000/pricilla', 'Pricilla');
+    await showTitle(page, '🎯 PRICILLA', 'Precision Payload Guidance');
+    await pause(2000);
+    await smoothScrollToBottom(page);
+    await pause(1500);
+
+    // Scene 4: About - The Mission
     console.log('📍 Revealing The Mission...');
     await navigateTo(page, 'http://localhost:3000/about', 'About');
     await showTitle(page, '🎯 THE MISSION', 'Protecting Earth from Space');
@@ -44,7 +52,7 @@ test.describe('ASGARD Professional Demo', () => {
     await smoothScrollToBottom(page);
     await pause(1500);
     
-    // Scene 4: Pricing - Access Tiers
+    // Scene 5: Pricing - Access Tiers
     console.log('📍 Displaying Access Tiers...');
     await navigateTo(page, 'http://localhost:3000/pricing', 'Pricing');
     await showTitle(page, '💎 ACCESS TIERS', 'From Civilian to Commander');
@@ -52,7 +60,7 @@ test.describe('ASGARD Professional Demo', () => {
     await smoothScrollToBottom(page);
     await pause(1500);
     
-    // Scene 5: Sign In - Secure Authentication
+    // Scene 6: Sign In - Secure Authentication
     console.log('📍 Demonstrating Secure Access...');
     await navigateTo(page, 'http://localhost:3000/signin', 'Sign In');
     await showTitle(page, '🔐 SECURE ACCESS', 'Military-Grade Authentication');

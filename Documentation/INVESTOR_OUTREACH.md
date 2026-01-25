@@ -8,7 +8,7 @@
 
 ASGARD (Autonomous Systems for Global Autonomous Response & Defense) is a planetary-scale autonomous systems platform offering:
 
-- **PERCILA**: AI-powered precision guidance for any payload type
+- **PRICILLA**: AI-powered precision guidance for any payload type
 - **Real-time satellite surveillance** with ML-based detection
 - **Humanoid robotics control** with ethical AI decision-making
 - **Delay-tolerant networking** for space communications
@@ -63,7 +63,7 @@ ASGARD (Autonomous Systems for Global Autonomous Response & Defense) is a planet
 |---------|----------|------------|------------------|
 | **Lockheed Martin** | Space Systems | Satellite perception, guidance | BD through LM Ventures |
 | **Northrop Grumman** | Space Systems | DTN for cislunar | Tech demonstration |
-| **Raytheon (RTX)** | Missiles & Defense | PERCILA guidance | Pilot program |
+| **Raytheon (RTX)** | Missiles & Defense | PRICILLA guidance | Pilot program |
 | **General Dynamics** | Mission Systems | Security ops center | RFI response |
 | **L3Harris** | Space & Airborne | Satellite tracking | Technology license |
 | **BAE Systems** | Electronic Systems | Threat detection | UK market entry |
@@ -134,7 +134,7 @@ ASGARD (Autonomous Systems for Global Autonomous Response & Defense) is a planet
 
 ## Demonstration Packages
 
-### Demo 1: PERCILA Guidance (30 min)
+### Demo 1: PRICILLA Guidance (30 min)
 
 **Target Audience:** Defense primes, missile programs
 
@@ -227,7 +227,7 @@ ASGARD (Autonomous Systems for Global Autonomous Response & Defense) is a planet
 
 ### Slide 3: Solution
 ASGARD: One platform for all autonomous operations
-- PERCILA: Universal guidance AI
+- PRICILLA: Universal guidance AI
 - Satellite surveillance pipeline
 - Humanoid robotics control
 - Secure communications
@@ -285,7 +285,7 @@ I'm reaching out about ASGARD, a planetary-scale autonomous systems
 platform we've built. Think Palantir meets Anduril for guidance AI.
 
 What we've built:
-• PERCILA: Multi-agent RL guidance for any payload (UAV, missile, robot)
+• PRICILLA: Multi-agent RL guidance for any payload (UAV, missile, robot)
 • Real-time satellite surveillance with edge AI
 • Delay-tolerant networking for space communications
 • Zero-trust security with FIDO2
@@ -306,7 +306,7 @@ Subject: Technology Partnership: AI Guidance System
 
 [Name],
 
-We've developed PERCILA, an AI guidance system that can control any 
+We've developed PRICILLA, an AI guidance system that can control any 
 payload type - from humanoid robots to guided missiles - with a 
 unified platform.
 
@@ -415,15 +415,15 @@ export ASGARD_ENV=development
 export ASGARD_JWT_SECRET=demo_secret_for_presentation
 export N2YO_API_KEY=<your_key>
 
-# Start PERCILA
-./bin/percila.exe -http-port 8092
+# Start PRICILLA
+./bin/pricilla.exe -http-port 8092
 
 # Start Nysus
 ./bin/nysus.exe -http-port 8080
 
 # Access
 # - API: http://localhost:8080
-# - PERCILA: http://localhost:8092
+# - PRICILLA: http://localhost:8092
 # - Metrics: http://localhost:9090
 ```
 

@@ -6,6 +6,10 @@ Write-Host "   ASGARD Demo Video Generator" -ForegroundColor Cyan
 Write-Host "============================================" -ForegroundColor Cyan
 Write-Host ""
 
+# Ensure we run from the e2e directory so Playwright
+# uses the local config and dependencies.
+Set-Location $PSScriptRoot
+
 # Check if apps are running
 $websitesRunning = $false
 $hubsRunning = $false
@@ -46,7 +50,7 @@ Write-Host "Starting Demo Recording..." -ForegroundColor Green
 Write-Host ""
 
 # Run the Playwright test
-npx playwright test demo.spec.ts
+npx playwright test demo.spec.ts --config playwright.config.ts
 
 # Check if video was created
 $videoDir = ".\demo-videos"

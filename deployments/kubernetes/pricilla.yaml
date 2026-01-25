@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pricilla
+  namespace: asgard
+  labels:
+    app: pricilla
+    component: guidance
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: pricilla
+  template:
+    metadata:
+      labels:
+        app: pricilla
+        component: guidance
+    spec:
+      containers:
+      - name: pricilla
+        image: asgard/pricilla:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8089
+          name: http
+        - containerPort: 9089
+          name: metrics
+        envFrom:
+        - configMapRef:
+            name: asgard-config
+        env:
+        - name: POSTGRES_HOST
+          valueFrom:
+            secretKeyRef:
+              name: asgard-secrets
+              key: postgres-host
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: asgard-secrets
+              key: postgres-user
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: asgard-secrets
+              key: postgres-password
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "1000m"
+          limits:
+            memory: "2Gi"
+            cpu: "2000m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8089
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8089
+          initialDelaySeconds: 10
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pricilla-service
+  namespace: asgard
+spec:
+  selector:
+    app: pricilla
+  ports:
+  - name: http
+    port: 8089
+    targetPort: 8089
+  - name: metrics
+    port: 9089
+    targetPort: 9089
+  type: ClusterIP

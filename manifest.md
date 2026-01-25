@@ -4553,24 +4553,24 @@ RUN apk --no-cache add ca-certificates
 COPY --from=builder /giru /giru
 EXPOSE 9090
 CMD ["/giru"]
-Create file C:\Users\hp\Desktop\Asgard\deployments\docker\Dockerfile.percila:
+Create file C:\Users\hp\Desktop\Asgard\deployments\docker\Dockerfile.pricilla:
 dockerfileFROM golang:1.21-alpine AS builder
 WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
-RUN CGO_ENABLED=0 go build -o /percila cmd/percila/main.go
+RUN CGO_ENABLED=0 go build -o /pricilla cmd/percila/main.go
 
 FROM alpine:latest
 RUN apk --no-cache add ca-certificates
-COPY --from=builder /percila /percila
+COPY --from=builder /pricilla /pricilla
 EXPOSE 8090
-CMD ["/percila"]
+CMD ["/pricilla"]
 Build Images
 bash# Build all images
 docker build -f deployments/docker/Dockerfile.nysus -t asgard/nysus:latest .
 docker build -f deployments/docker/Dockerfile.giru -t asgard/giru:latest .
-docker build -f deployments/docker/Dockerfile.percila -t asgard/percila:latest .
+docker build -f deployments/docker/Dockerfile.pricilla -t asgard/pricilla:latest .
 
 # Log completion
 go run scripts/append_build_log.go "All Docker images built successfully"
@@ -4589,7 +4589,7 @@ kubectl apply -f deployments/kubernetes/ --recursive
 Write-Host "Waiting for pods to be ready..." -ForegroundColor Yellow
 kubectl wait --for=condition=ready pod -l app=nysus -n asgard --timeout=300s
 kubectl wait --for=condition=ready pod -l app=giru -n asgard --timeout=300s
-kubectl wait --for=condition=ready pod -l app=percila -n asgard --timeout=300s
+kubectl wait --for=condition=ready pod -l app=pricilla -n asgard --timeout=300s
 
 # Run test scenarios
 Write-Host "`nRunning test scenarios..." -ForegroundColor Yellow
@@ -4598,9 +4598,9 @@ Write-Host "`nRunning test scenarios..." -ForegroundColor Yellow
 Write-Host "Test 1: Database Layer" -ForegroundColor Green
 kubectl exec -n asgard deployment/nysus -- /nysus -test-db
 
-# Test 2: Percila guidance
-Write-Host "Test 2: Percila Guidance System" -ForegroundColor Green
-kubectl exec -n asgard deployment/percila -- /percila -test-guidance
+# Test 2: Pricilla guidance
+Write-Host "Test 2: Pricilla Guidance System" -ForegroundColor Green
+kubectl exec -n asgard deployment/pricilla -- /pricilla -test-guidance
 
 # Test 3: Giru security
 Write-Host "Test 3: Giru Security" -ForegroundColor Green
@@ -4609,7 +4609,7 @@ kubectl exec -n asgard deployment/giru -- /giru -test-scan
 # Show logs
 Write-Host "`nSystem Logs:" -ForegroundColor Yellow
 kubectl logs -n asgard -l app=nysus --tail=20
-kubectl logs -n asgard -l app=percila --tail=20
+kubectl logs -n asgard -l app=pricilla --tail=20
 kubectl logs -n asgard -l app=giru --tail=20
 
 Write-Host "`n=== ALL TESTS PASSED ===" -ForegroundColor Green
@@ -4662,7 +4662,7 @@ Red Team penetration testing
 Blue Team autonomous defense
 Gaga Chat steganographic communication
 
-✅ Guidance (Percila)
+✅ Guidance (Pricilla)
 
 AI trajectory planning
 Multi-payload support (robots, rockets, drones, spacecraft)
@@ -4693,7 +4693,7 @@ Integration guides
 
 
 SYSTEM CAPABILITIES SUMMARY
-PERCILA is now the crown jewel of ASGARD, providing:
+PRICILLA is now the crown jewel of ASGARD, providing:
 
 Universal Guidance: Navigate any payload type (ground robots, aerial drones, ballistic missiles, spacecraft)
 Stealth Excellence: Minimize radar cross-section, thermal signature, and detection probability
@@ -4703,24 +4703,24 @@ Production Ready: Fully tested, containerized, and deployable
 
 The system is now ready to guide missions from humanitarian aid delivery to planetary defense scenarios, all while maintaining the highest standards of stealth, precision, and operational security.
 Build Status: ✅ COMPLETE AND OPERATIONAL
-# PERCILA - Complete Implementation Guide
+# PRICILLA - Complete Implementation Guide
 
 ## Overview
 
-PERCILA (Precision Engagement & Routing Control with Integrated Learning Architecture) is the most advanced AI guidance system in ASGARD, providing ultra-precision navigation for any payload type with full system integration.
+PRICILLA (Precision Engagement & Routing Control with Integrated Learning Architecture) is the most advanced AI guidance system in ASGARD, providing ultra-precision navigation for any payload type with full system integration.
 
 ---
 
 ## STEP 10.2: Stealth Module Implementation
 
-Create file: `C:\Users\hp\Desktop\Asgard\Percila\internal\stealth\optimizer.go`
+Create file: `C:\Users\hp\Desktop\Asgard\Pricilla\internal\stealth\optimizer.go`
 
 ```go
 package stealth
 
 import (
 	"math"
-	"github.com/asgard/pandora/Percila/internal/guidance"
+	"github.com/asgard/pandora/Pricilla/internal/guidance"
 )
 
 // StealthOptimizer minimizes detection probability
@@ -4858,7 +4858,7 @@ func getTerrainElevation(x, y float64, terrainMap [][]float64) float64 {
 
 ## STEP 10.3: Integration Layer
 
-Create file: `C:\Users\hp\Desktop\Asgard\Percila\internal\integration\coordinator.go`
+Create file: `C:\Users\hp\Desktop\Asgard\Pricilla\internal\integration\coordinator.go`
 
 ```go
 package integration
@@ -4868,13 +4868,13 @@ import (
 	"fmt"
 	"log"
 	
-	"github.com/asgard/pandora/Percila/internal/guidance"
+	"github.com/asgard/pandora/Pricilla/internal/guidance"
 	"github.com/asgard/pandora/internal/platform/dtn"
 	"github.com/asgard/pandora/Nysus/internal/events"
 	"github.com/google/uuid"
 )
 
-// SystemCoordinator integrates Percila with all ASGARD systems
+// SystemCoordinator integrates Pricilla with all ASGARD systems
 type SystemCoordinator struct {
 	guidanceEngine *guidance.AIGuidanceEngine
 	dtnNode        *dtn.Node
@@ -4903,7 +4903,7 @@ func NewSystemCoordinator(engine *guidance.AIGuidanceEngine, dtnNode *dtn.Node, 
 
 // StartGuidedMission initiates guidance for a payload
 func (c *SystemCoordinator) StartGuidedMission(ctx context.Context, payloadID string, payloadType guidance.PayloadType, target guidance.Vector3D) error {
-	log.Printf("Percila: Starting guided mission for %s (type: %s)", payloadID, payloadType)
+	log.Printf("Pricilla: Starting guided mission for %s (type: %s)", payloadID, payloadType)
 	
 	// Get current position from Nysus via event bus
 	currentPos, err := c.getCurrentPosition(payloadID)
@@ -4932,7 +4932,7 @@ func (c *SystemCoordinator) StartGuidedMission(ctx context.Context, payloadID st
 		return fmt.Errorf("trajectory planning failed: %w", err)
 	}
 	
-	log.Printf("Percila: Trajectory planned with %d waypoints, stealth score: %.2f", 
+	log.Printf("Pricilla: Trajectory planned with %d waypoints, stealth score: %.2f", 
 		len(traj.Waypoints), traj.StealthScore)
 	
 	// Create mission
@@ -4972,7 +4972,7 @@ func (c *SystemCoordinator) UpdateMission(missionID string, currentState guidanc
 	
 	// If trajectory changed significantly, retransmit
 	if newTraj.ID != mission.CurrentTraj.ID {
-		log.Printf("Percila: Trajectory updated for mission %s", missionID)
+		log.Printf("Pricilla: Trajectory updated for mission %s", missionID)
 		mission.CurrentTraj = newTraj
 		c.transmitTrajectory(newTraj, mission.PayloadID)
 	}
@@ -4982,7 +4982,7 @@ func (c *SystemCoordinator) UpdateMission(missionID string, currentState guidanc
 
 // IntegrateWithSilenus uses satellite imagery for terrain mapping
 func (c *SystemCoordinator) IntegrateWithSilenus(satelliteID string) ([][]float64, error) {
-	log.Printf("Percila: Requesting terrain data from Silenus satellite %s", satelliteID)
+	log.Printf("Pricilla: Requesting terrain data from Silenus satellite %s", satelliteID)
 	
 	// TODO: In production, fetch actual satellite imagery
 	// For now, generate mock terrain
@@ -5035,7 +5035,7 @@ func (c *SystemCoordinator) transmitTrajectory(traj *guidance.Trajectory, payloa
 		ID:             uuid.New(),
 		Version:        7,
 		DestinationEID: fmt.Sprintf("dtn://asgard/%s", payloadID),
-		SourceEID:      "dtn://asgard/percila",
+		SourceEID:      "dtn://asgard/pricilla",
 		Payload:        []byte(trajData),
 		Priority:       2, // Expedited
 	}
@@ -5045,13 +5045,13 @@ func (c *SystemCoordinator) transmitTrajectory(traj *guidance.Trajectory, payloa
 		return c.dtnNode.SendBundle(bundle)
 	}
 	
-	log.Printf("Percila: Trajectory transmitted to %s", payloadID)
+	log.Printf("Pricilla: Trajectory transmitted to %s", payloadID)
 	return nil
 }
 
 // monitorMission tracks mission progress
 func (c *SystemCoordinator) monitorMission(ctx context.Context, mission *GuidedMission) {
-	log.Printf("Percila: Monitoring mission %s", mission.ID)
+	log.Printf("Pricilla: Monitoring mission %s", mission.ID)
 	
 	for {
 		select {
@@ -5065,7 +5065,7 @@ func (c *SystemCoordinator) monitorMission(ctx context.Context, mission *GuidedM
 			
 			if distance < 10.0 { // Within 10 meters
 				mission.TargetReached = true
-				log.Printf("Percila: Mission %s completed - target reached", mission.ID)
+				log.Printf("Pricilla: Mission %s completed - target reached", mission.ID)
 				
 				// Publish mission complete event
 				c.publishMissionComplete(mission)
@@ -5073,7 +5073,7 @@ func (c *SystemCoordinator) monitorMission(ctx context.Context, mission *GuidedM
 			}
 			
 		case <-ctx.Done():
-			log.Printf("Percila: Mission %s monitoring stopped", mission.ID)
+			log.Printf("Pricilla: Mission %s monitoring stopped", mission.ID)
 			return
 		}
 	}
@@ -5085,7 +5085,7 @@ func (c *SystemCoordinator) publishMissionComplete(mission *GuidedMission) {
 		event := events.Event{
 			ID:        uuid.New(),
 			Type:      events.EventTypeMissionUpdate,
-			Source:    "percila",
+			Source:    "pricilla",
 			Timestamp: time.Now().UTC(),
 			Payload: map[string]interface{}{
 				"mission_id":   mission.ID,
@@ -5101,9 +5101,9 @@ func (c *SystemCoordinator) publishMissionComplete(mission *GuidedMission) {
 
 ---
 
-## STEP 10.4: Percila Main Service
+## STEP 10.4: Pricilla Main Service
 
-Create file: `C:\Users\hp\Desktop\Asgard\cmd\percila\main.go`
+Create file: `C:\Users\hp\Desktop\Asgard\Pricilla\cmd\percila\main.go`
 
 ```go
 package main
@@ -5117,18 +5117,18 @@ import (
 	"syscall"
 	"time"
 	
-	"github.com/asgard/pandora/Percila/internal/guidance"
-	"github.com/asgard/pandora/Percila/internal/integration"
-	"github.com/asgard/pandora/Percila/internal/stealth"
+	"github.com/asgard/pandora/Pricilla/internal/guidance"
+	"github.com/asgard/pandora/Pricilla/internal/integration"
+	"github.com/asgard/pandora/Pricilla/internal/stealth"
 	"github.com/asgard/pandora/Nysus/internal/events"
 	"github.com/asgard/pandora/internal/platform/dtn"
 )
 
 func main() {
-	systemID := flag.String("id", "percila001", "Percila system ID")
+	systemID := flag.String("id", "pricilla001", "Pricilla system ID")
 	flag.Parse()
 	
-	log.Printf("Starting ASGARD Percila - Advanced Guidance System %s", *systemID)
+	log.Printf("Starting ASGARD Pricilla - Advanced Guidance System %s", *systemID)
 	
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -5143,8 +5143,8 @@ func main() {
 	
 	// Initialize DTN Node for Sat_Net integration
 	storage := dtn.NewInMemoryStorage()
-	router := &guidance.PercilaRouter{} // Custom router for guidance missions
-	dtnNode := dtn.NewNode(*systemID, "dtn://asgard/percila", storage, router)
+	router := &guidance.PricillaRouter{} // Custom router for guidance missions
+	dtnNode := dtn.NewNode(*systemID, "dtn://asgard/pricilla", storage, router)
 	dtnNode.Start()
 	defer dtnNode.Stop()
 	
@@ -5172,16 +5172,16 @@ func main() {
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 	<-sigChan
 	
-	log.Println("Shutting down Percila...")
+	log.Println("Shutting down Pricilla...")
 	cancel()
 	time.Sleep(2 * time.Second)
-	log.Println("Percila stopped")
+	log.Println("Pricilla stopped")
 }
 
 func runTestMission(ctx context.Context, coord *integration.SystemCoordinator, engine *guidance.AIGuidanceEngine, stealthOpt *stealth.StealthOptimizer) {
 	time.Sleep(5 * time.Second) // Wait for system initialization
 	
-	log.Println("=== PERCILA TEST MISSION ===")
+	log.Println("=== PRICILLA TEST MISSION ===")
 	
 	// Test 1: Plan trajectory for Hunoid
 	log.Println("\nTest 1: Hunoid Navigation")
@@ -5261,7 +5261,7 @@ func listenForMissionCommands(ctx context.Context, coord *integration.SystemCoor
 	for {
 		select {
 		case <-ticker.C:
-			log.Println("Percila: Listening for mission commands...")
+			log.Println("Pricilla: Listening for mission commands...")
 		case <-ctx.Done():
 			return
 		}
@@ -5273,25 +5273,25 @@ func listenForMissionCommands(ctx context.Context, coord *integration.SystemCoor
 
 ## STEP 10.5: Build and Integration
 
-### Build Percila
+### Build Pricilla
 
 ```bash
 # Navigate to project root
 cd C:\Users\hp\Desktop\Asgard
 
-# Build Percila service
-go build -o bin/percila.exe cmd/percila/main.go
+# Build Pricilla service
+go build -o bin/pricilla.exe cmd/percila/main.go
 
 # Test run
-.\bin\percila.exe -id percila001
+.\bin\pricilla.exe -id pricilla001
 
 # Log completion
-go run scripts/append_build_log.go "PHASE 10: Percila advanced guidance system implemented"
+go run scripts/append_build_log.go "PHASE 10: Pricilla advanced guidance system implemented"
 ```
 
 ### Integration Points
 
-1. **Nysus Integration**: Percila subscribes to mission events and publishes completion events
+1. **Nysus Integration**: Pricilla subscribes to mission events and publishes completion events
 2. **Sat_Net Integration**: Uses DTN bundles for trajectory transmission
 3. **Silenus Integration**: Requests terrain/threat imagery for path planning
 4. **Giru Integration**: Consumes threat intelligence for route optimization
@@ -5299,29 +5299,29 @@ go run scripts/append_build_log.go "PHASE 10: Percila advanced guidance system i
 
 ---
 
-## STEP 10.6: Kubernetes Deployment for Percila
+## STEP 10.6: Kubernetes Deployment for Pricilla
 
-Create file: `C:\Users\hp\Desktop\Asgard\deployments\kubernetes\percila.yaml`
+Create file: `C:\Users\hp\Desktop\Asgard\deployments\kubernetes\pricilla.yaml`
 
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: percila
+  name: pricilla
   namespace: asgard
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: percila
+      app: pricilla
   template:
     metadata:
       labels:
-        app: percila
+        app: pricilla
     spec:
       containers:
-      - name: percila
-        image: asgard/percila:latest
+      - name: pricilla
+        image: asgard/pricilla:latest
         imagePullPolicy: IfNotPresent
         envFrom:
         - configMapRef:
@@ -5339,11 +5339,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: percila-service
+  name: pricilla-service
   namespace: asgard
 spec:
   selector:
-    app: percila
+    app: pricilla
   ports:
   - port: 8090
     targetPort: 8090
@@ -5366,7 +5366,7 @@ spec:
    └────┬────┘          └────┬────┘          └────┬────┘
         │                    │                     │
         │   ┌────────────────▼────────────┐        │
-        └──►│       PERCILA CORE          │◄───────┘
+        └──►│       PRICILLA CORE         │◄───────┘
             │   (AI Guidance Engine)      │
             └────────────┬────────────────┘
                          │
@@ -5406,7 +5406,7 @@ kubectl apply -f deployments/kubernetes/postgres.yaml
 kubectl apply -f deployments/kubernetes/mongodb.yaml
 kubectl apply -f deployments/kubernetes/nysus.yaml
 kubectl apply -f deployments/kubernetes/giru.yaml
-kubectl apply -f deployments/kubernetes/percila.yaml
+kubectl apply -f deployments/kubernetes/pricilla.yaml
 
 # Verify deployment
 kubectl get pods -n asgard
@@ -5427,16 +5427,16 @@ Write-Host "=== ASGARD COMPLETE SYSTEM VERIFICATION ===" -ForegroundColor Cyan
 Write-Host "`nChecking Kubernetes pods..." -ForegroundColor Yellow
 kubectl get pods -n asgard
 
-# Test Percila
-Write-Host "`nTesting Percila guidance..." -ForegroundColor Yellow
-.\bin\percila.exe -id test &
+# Test Pricilla
+Write-Host "`nTesting Pricilla guidance..." -ForegroundColor Yellow
+.\bin\pricilla.exe -id test &
 Start-Sleep -Seconds 10
-Stop-Process -Name "percila" -Force
+Stop-Process -Name "pricilla" -Force
 
 # Verify integration
 Write-Host "`nVerifying system integration..." -ForegroundColor Yellow
 kubectl logs -n asgard -l app=nysus --tail=50
-kubectl logs -n asgard -l app=percila --tail=50
+kubectl logs -n asgard -l app=pricilla --tail=50
 
 Write-Host "`n=== SYSTEM READY FOR PRODUCTION ===" -ForegroundColor Green
 '@
@@ -5458,7 +5458,7 @@ All components operational:
 - ✅ Nysus (Central orchestration with event bus)
 - ✅ Hunoid (Robotics with VLA and ethics)
 - ✅ Giru (Security with Red/Blue teams)
-- ✅ Percila (Advanced AI guidance for all payloads)
+- ✅ Pricilla (Advanced AI guidance for all payloads)
 - ✅ Hubs (Streaming interface)
 - ✅ Websites (Public portal)
 - ✅ Kubernetes deployment

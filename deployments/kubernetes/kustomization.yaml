@@ -11,7 +11,7 @@ resources:
   - mongodb.yaml
   - nysus.yaml
   - giru.yaml
-  - percila.yaml
+  - pricilla.yaml
 
 commonLabels:
   app.kubernetes.io/name: asgard

@@ -1,0 +1,258 @@
+{
+  "missionId": "b9738d94-b31f-4970-a860-1b5369bc91be",
+  "payloadId": "payload-demo-001",
+  "startedAt": "20260125_111420",
+  "samples": [
+    {
+      "step": 1,
+      "target": {
+        "z": 50,
+        "x": 1620,
+        "y": 1080
+      },
+      "payload": {
+        "z": 280,
+        "x": 200,
+        "y": 130
+      },
+      "replanCount": 2,
+      "lastReplanReason": "target_update",
+      "lastTrajectoryId": "3129021a-b99a-4181-b348-137ab841f3b1",
+      "missionStatus": "active",
+      "timestamp": "2026-01-25T11:14:20.3669361-05:00"
+    },
+    {
+      "step": 2,
+      "target": {
+        "z": 50,
+        "x": 1740,
+        "y": 1160
+      },
+      "payload": {
+        "z": 280,
+        "x": 400,
+        "y": 260
+      },
+      "replanCount": 4,
+      "lastReplanReason": "target_update",
+      "lastTrajectoryId": "400d3b0a-0cb1-4aab-80fe-012b355d0fe5",
+      "missionStatus": "active",
+      "timestamp": "2026-01-25T11:14:20.8251575-05:00"
+    },
+    {
+      "step": 3,
+      "target": {
+        "z": 50,
+        "x": 1860,
+        "y": 1240
+      },
+      "payload": {
+        "z": 280,
+        "x": 600,
+        "y": 390
+      },
+      "replanCount": 6,
+      "lastReplanReason": "target_update",
+      "lastTrajectoryId": "efbe4562-977e-4e1b-a2d8-feace9ad20c3",
+      "missionStatus": "active",
+      "timestamp": "2026-01-25T11:14:21.2467224-05:00"
+    },
+    {
+      "step": 4,
+      "target": {
+        "z": 50,
+        "x": 1980,
+        "y": 1320
+      },
+      "payload": {
+        "z": 280,
+        "x": 800,
+        "y": 520
+      },
+      "replanCount": 8,
+      "lastReplanReason": "target_update",
+      "lastTrajectoryId": "ca985da1-e58b-4981-a961-3f6bc5f049e1",
+      "missionStatus": "active",
+      "timestamp": "2026-01-25T11:14:21.6863764-05:00"
+    },
+    {
+      "step": 5,
+      "target": {
+        "z": 50,
+        "x": 2100,
+        "y": 1400
+      },
+      "payload": {
+        "z": 280,
+        "x": 1000,
+        "y": 650
+      },
+      "replanCount": 10,
+      "lastReplanReason": "target_update",
+      "lastTrajectoryId": "4c129e07-eb68-48a9-8ea0-ceac30bb4f20",
+      "missionStatus": "active",
+      "timestamp": "2026-01-25T11:14:22.1158744-05:00"
+    },
+    {
+      "step": 6,
+      "target": {
+        "z": 50,
+        "x": 2220,
+        "y": 1480
+      },
+      "payload": {
+        "z": 280,
+        "x": 1200,
+        "y": 780
+      },
+      "replanCount": 12,
+      "lastReplanReason": "target_update",
+      "lastTrajectoryId": "37feb851-1f89-4336-85fa-3457adfddc9e",
+      "missionStatus": "active",
+      "timestamp": "2026-01-25T11:14:22.5510216-05:00"
+    }
+  ],
+  "finalMetrics": {
+    "targetUpdates": 6,
+    "replanCount": 12,
+    "lastReplanReason": "target_update",
+    "lastReplanAt": "2026-01-25T11:14:22.5396455-05:00",
+    "lastTargetUpdateAt": "2026-01-25T11:14:22.5396455-05:00",
+    "lastTargetPosition": {
+      "x": 2220,
+      "y": 1480,
+      "z": 50
+    },
+    "lastPayloadPosition": {
+      "x": 2220,
+      "y": 1480,
+      "z": 50
+    },
+    "lastTrajectoryId": "37feb851-1f89-4336-85fa-3457adfddc9e",
+    "lastMissionId": "b9738d94-b31f-4970-a860-1b5369bc91be",
+    "completionDistance": 0,
+    "missionCompletedAt": "2026-01-25T11:14:22.9721931-05:00"
+  },
+  "finalMission": {
+    "id": "b9738d94-b31f-4970-a860-1b5369bc91be",
+    "type": "strike",
+    "payloadId": "payload-demo-001",
+    "payloadType": "uav",
+    "startPosition": {
+      "x": 1200,
+      "y": 780,
+      "z": 280
+    },
+    "targetPosition": {
+      "x": 2220,
+      "y": 1480,
+      "z": 50
+    },
+    "priority": 1,
+    "stealthRequired": true,
+    "status": "completed",
+    "trajectory": {
+      "id": "37feb851-1f89-4336-85fa-3457adfddc9e",
+      "payloadId": "payload-demo-001",
+      "payloadType": "uav",
+      "waypoints": [
+        {
+          "id": "a9ed1bc4-bd84-46d0-8653-26d54e04762e",
+          "position": {
+            "x": 1200,
+            "y": 780,
+            "z": 280
+          },
+          "velocity": {
+            "x": 3.4,
+            "y": 2.3333333333333335,
+            "z": 12
+          },
+          "timestamp": "2026-01-25T11:14:22.5396455-05:00",
+          "stealth": true
+        },
+        {
+          "id": "d1ac293d-2ed2-4788-836b-1dd84ed9c08f",
+          "position": {
+            "x": 1404,
+            "y": 920,
+            "z": 1000
+          },
+          "velocity": {
+            "x": 3.4,
+            "y": 2.3333333333333335,
+            "z": 0
+          },
+          "timestamp": "2026-01-25T11:15:22.5396455-05:00",
+          "stealth": true
+        },
+        {
+          "id": "842cb692-c6ad-4e30-bc61-9dbfb6adec08",
+          "position": {
+            "x": 1608,
+            "y": 1060,
+            "z": 1000
+          },
+          "velocity": {
+            "x": 3.4,
+            "y": 2.3333333333333335,
+            "z": 0
+          },
+          "timestamp": "2026-01-25T11:16:22.5396455-05:00",
+          "stealth": true
+        },
+        {
+          "id": "6d03b02e-43c1-49e9-b2ca-1126ec5419ee",
+          "position": {
+            "x": 1812,
+            "y": 1200,
+            "z": 1000
+          },
+          "velocity": {
+            "x": 3.4,
+            "y": 2.3333333333333335,
+            "z": 0
+          },
+          "timestamp": "2026-01-25T11:17:22.5396455-05:00",
+          "stealth": true
+        },
+        {
+          "id": "8b4cb0bf-3d6d-44bf-808f-8e576bd0cfed",
+          "position": {
+            "x": 2016,
+            "y": 1340,
+            "z": 1000
+          },
+          "velocity": {
+            "x": 3.4,
+            "y": 2.3333333333333335,
+            "z": -15.833333333333334
+          },
+          "timestamp": "2026-01-25T11:18:22.5396455-05:00",
+          "stealth": true
+        },
+        {
+          "id": "24e477d5-63b7-4a6d-b999-dbdd787a162c",
+          "position": {
+            "x": 2220,
+            "y": 1480,
+            "z": 50
+          },
+          "velocity": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "timestamp": "2026-01-25T11:19:22.5396455-05:00",
+          "stealth": true
+        }
+      ],
+      "stealthScore": 0.85,
+      "confidence": 0.92,
+      "status": "planned",
+      "createdAt": "2026-01-25T11:14:22.5396455-05:00"
+    },
+    "createdAt": "2026-01-25T11:14:20.2826417-05:00",
+    "updatedAt": "2026-01-25T11:14:22.9721931-05:00"
+  }
+}
