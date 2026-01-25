@@ -2,7 +2,7 @@ import { defineConfig, devices } from '@playwright/test';
 
 /**
  * ASGARD Demo Video Configuration
- * Records a 30-second demo video of the application
+ * Records comprehensive demo videos of the ASGARD platform
  */
 export default defineConfig({
   testDir: '.',
@@ -12,8 +12,8 @@ export default defineConfig({
   workers: 1,
   reporter: 'html',
   
-  // Global timeout for demo (2 minutes to be safe)
-  timeout: 120000,
+  // Global timeout for comprehensive demos (10 minutes)
+  timeout: 600000,
   
   use: {
     // Base URL for the Websites app
