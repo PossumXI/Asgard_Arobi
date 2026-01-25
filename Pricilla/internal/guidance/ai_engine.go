@@ -1292,8 +1292,27 @@ func (pool *MARLAgentPool) reachConsensus(proposals map[string]*Trajectory, req 
 		totalWeight += weight
 	}
 
+	// Get constraints from first proposal (they should all have same payload type)
+	var maxSpeed, maxAccel, minAlt, maxAlt float64 = 100.0, 10.0, 0, 10000
+	for _, traj := range proposals {
+		if len(traj.Waypoints) > 0 {
+			constraints := traj.Waypoints[0].Constraints
+			if constraints.MaxSpeed > 0 {
+				maxSpeed = constraints.MaxSpeed
+			}
+			if constraints.MaxAcceleration > 0 {
+				maxAccel = constraints.MaxAcceleration
+			}
+			minAlt = constraints.MinAltitude
+			maxAlt = constraints.MaxAltitude
+			break
+		}
+	}
+
 	// Create consensus trajectory
 	consensusWaypoints := make([]Waypoint, targetWaypointCount)
+	baseTime := time.Now()
+	
 	for i := 0; i < targetWaypointCount; i++ {
 		wp := weightedWaypoints[i]
 		consensusWaypoints[i] = Waypoint{
@@ -1302,25 +1321,44 @@ func (pool *MARLAgentPool) reachConsensus(proposals map[string]*Trajectory, req 
 				Y: wp.Y / totalWeight,
 				Z: wp.Z / totalWeight,
 			},
-			Timestamp: time.Now().Add(time.Duration(i) * time.Second),
+			Timestamp: baseTime, // Will be adjusted below
 			Constraints: WaypointConstraints{
-				MaxSpeed:        100.0,
-				MaxAcceleration: 10.0,
-				MinAltitude:     0,
-				MaxAltitude:     10000,
+				MaxSpeed:        maxSpeed,
+				MaxAcceleration: maxAccel,
+				MinAltitude:     minAlt,
+				MaxAltitude:     maxAlt,
 			},
 		}
 	}
 
-	// Calculate velocities between waypoints
+	// Calculate velocities between waypoints with proper speed limiting
 	for i := 1; i < len(consensusWaypoints); i++ {
-		dt := consensusWaypoints[i].Timestamp.Sub(consensusWaypoints[i-1].Timestamp).Seconds()
-		if dt > 0 {
+		// Calculate position change
+		dx := consensusWaypoints[i].Position.X - consensusWaypoints[i-1].Position.X
+		dy := consensusWaypoints[i].Position.Y - consensusWaypoints[i-1].Position.Y
+		dz := consensusWaypoints[i].Position.Z - consensusWaypoints[i-1].Position.Z
+		distance := math.Sqrt(dx*dx + dy*dy + dz*dz)
+
+		// Calculate minimum time needed at max speed
+		minTimeNeeded := distance / maxSpeed
+		if minTimeNeeded < 1.0 {
+			minTimeNeeded = 1.0
+		}
+
+		// Set timestamp based on required travel time
+		consensusWaypoints[i].Timestamp = consensusWaypoints[i-1].Timestamp.Add(
+			time.Duration(minTimeNeeded * float64(time.Second)))
+
+		// Calculate velocity (guaranteed <= maxSpeed)
+		if distance > 0 {
+			speed := distance / minTimeNeeded
 			consensusWaypoints[i].Velocity = Vector3D{
-				X: (consensusWaypoints[i].Position.X - consensusWaypoints[i-1].Position.X) / dt,
-				Y: (consensusWaypoints[i].Position.Y - consensusWaypoints[i-1].Position.Y) / dt,
-				Z: (consensusWaypoints[i].Position.Z - consensusWaypoints[i-1].Position.Z) / dt,
+				X: (dx / distance) * speed,
+				Y: (dy / distance) * speed,
+				Z: (dz / distance) * speed,
 			}
+		} else {
+			consensusWaypoints[i].Velocity = Vector3D{X: 0, Y: 0, Z: 0}
 		}
 	}
 
@@ -1446,15 +1484,41 @@ func (e *AIGuidanceEngine) generateExplorationTrajectory(req TrajectoryRequest, 
 		},
 	})
 
-	// Calculate velocities
+	// Calculate velocities with proper speed limiting
 	for i := 1; i < len(waypoints); i++ {
+		dx := waypoints[i].Position.X - waypoints[i-1].Position.X
+		dy := waypoints[i].Position.Y - waypoints[i-1].Position.Y
+		dz := waypoints[i].Position.Z - waypoints[i-1].Position.Z
+		distance := math.Sqrt(dx*dx + dy*dy + dz*dz)
+
+		// Calculate minimum time needed at max speed
+		maxSpeed := waypoints[i].Constraints.MaxSpeed
+		if maxSpeed <= 0 {
+			maxSpeed = profile.MaxSpeed
+		}
+		minTimeNeeded := distance / maxSpeed
+		if minTimeNeeded < 1.0 {
+			minTimeNeeded = 1.0
+		}
+
+		// Adjust timestamp if needed
+		currentDt := waypoints[i].Timestamp.Sub(waypoints[i-1].Timestamp).Seconds()
+		if currentDt < minTimeNeeded {
+			waypoints[i].Timestamp = waypoints[i-1].Timestamp.Add(
+				time.Duration(minTimeNeeded * float64(time.Second)))
+		}
+
+		// Recalculate dt after adjustment
 		dt := waypoints[i].Timestamp.Sub(waypoints[i-1].Timestamp).Seconds()
-		if dt > 0 {
+		if dt > 0 && distance > 0 {
+			speed := distance / dt
 			waypoints[i].Velocity = Vector3D{
-				X: (waypoints[i].Position.X - waypoints[i-1].Position.X) / dt,
-				Y: (waypoints[i].Position.Y - waypoints[i-1].Position.Y) / dt,
-				Z: (waypoints[i].Position.Z - waypoints[i-1].Position.Z) / dt,
+				X: (dx / distance) * speed,
+				Y: (dy / distance) * speed,
+				Z: (dz / distance) * speed,
 			}
+		} else {
+			waypoints[i].Velocity = Vector3D{X: 0, Y: 0, Z: 0}
 		}
 	}
 
@@ -1644,15 +1708,46 @@ func (p *PINNTrajectoryOptimizer) calculatePhysicsCorrection(idx int, residuals 
 // recalculateVelocities updates velocities based on positions
 func (p *PINNTrajectoryOptimizer) recalculateVelocities(traj *Trajectory) {
 	for i := 1; i < len(traj.Waypoints); i++ {
-		dt := traj.Waypoints[i].Timestamp.Sub(traj.Waypoints[i-1].Timestamp).Seconds()
-		if dt <= 0 {
-			dt = 1.0
+		// Get max speed from waypoint constraints
+		maxSpeed := traj.Waypoints[i].Constraints.MaxSpeed
+		if maxSpeed <= 0 {
+			maxSpeed = 100.0 // Default fallback
 		}
 
-		traj.Waypoints[i].Velocity = Vector3D{
-			X: (traj.Waypoints[i].Position.X - traj.Waypoints[i-1].Position.X) / dt,
-			Y: (traj.Waypoints[i].Position.Y - traj.Waypoints[i-1].Position.Y) / dt,
-			Z: (traj.Waypoints[i].Position.Z - traj.Waypoints[i-1].Position.Z) / dt,
+		// Calculate position change
+		dx := traj.Waypoints[i].Position.X - traj.Waypoints[i-1].Position.X
+		dy := traj.Waypoints[i].Position.Y - traj.Waypoints[i-1].Position.Y
+		dz := traj.Waypoints[i].Position.Z - traj.Waypoints[i-1].Position.Z
+
+		// Calculate distance to travel
+		distance := math.Sqrt(dx*dx + dy*dy + dz*dz)
+
+		// Calculate minimum time needed at max speed
+		minTimeNeeded := distance / maxSpeed
+		if minTimeNeeded < 1.0 {
+			minTimeNeeded = 1.0
+		}
+
+		// Get actual time interval
+		dt := traj.Waypoints[i].Timestamp.Sub(traj.Waypoints[i-1].Timestamp).Seconds()
+		if dt < minTimeNeeded {
+			// Adjust timestamp to ensure we don't exceed max speed
+			dt = minTimeNeeded
+			traj.Waypoints[i].Timestamp = traj.Waypoints[i-1].Timestamp.Add(
+				time.Duration(dt * float64(time.Second)))
+		}
+
+		// Calculate velocity (now guaranteed to be <= maxSpeed)
+		if distance > 0 {
+			speed := distance / dt
+			// Normalize direction and apply clamped speed
+			traj.Waypoints[i].Velocity = Vector3D{
+				X: (dx / distance) * speed,
+				Y: (dy / distance) * speed,
+				Z: (dz / distance) * speed,
+			}
+		} else {
+			traj.Waypoints[i].Velocity = Vector3D{X: 0, Y: 0, Z: 0}
 		}
 	}
 }
@@ -2226,7 +2321,7 @@ func (e *AIGuidanceEngine) ValidateTrajectory(traj *Trajectory) error {
 		if profile != nil && profile.MaxSpeed > 0 {
 			maxSpeed = profile.MaxSpeed
 		}
-		if speed > maxSpeed*1.1 { // Allow 10% tolerance
+		if speed > maxSpeed*1.05 { // Allow 5% tolerance for numerical precision
 			return fmt.Errorf("waypoint %d exceeds max speed: %.2f > %.2f", i, speed, maxSpeed)
 		}
 

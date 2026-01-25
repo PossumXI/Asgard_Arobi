@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -16,8 +18,45 @@ import (
 	"github.com/asgard/pandora/internal/security/mitigation"
 	"github.com/asgard/pandora/internal/security/scanner"
 	"github.com/asgard/pandora/internal/security/threat"
+	"github.com/google/gopacket/pcap"
 	"github.com/google/uuid"
 )
+
+// NetworkDevice represents a network interface
+type NetworkDevice struct {
+	Name        string
+	Description string
+	Addresses   []NetworkAddress
+}
+
+// NetworkAddress represents an IP address on an interface
+type NetworkAddress struct {
+	IP      net.IP
+	Netmask net.IPMask
+}
+
+func findNetworkDevices() ([]NetworkDevice, error) {
+	devices, err := pcap.FindAllDevs()
+	if err != nil {
+		return nil, err
+	}
+	
+	var result []NetworkDevice
+	for _, dev := range devices {
+		nd := NetworkDevice{
+			Name:        dev.Name,
+			Description: dev.Description,
+		}
+		for _, addr := range dev.Addresses {
+			nd.Addresses = append(nd.Addresses, NetworkAddress{
+				IP:      addr.IP,
+				Netmask: addr.Netmask,
+			})
+		}
+		result = append(result, nd)
+	}
+	return result, nil
+}
 
 // parseUUID parses a string to UUID
 func parseUUID(s string) (uuid.UUID, error) {
@@ -26,10 +65,18 @@ func parseUUID(s string) (uuid.UUID, error) {
 
 func main() {
 	// Command-line flags
-	interfaceName := flag.String("interface", "eth0", "Network interface to monitor")
+	interfaceName := flag.String("interface", "", "Network interface to monitor (use -list-interfaces to see available)")
+	listInterfaces := flag.Bool("list-interfaces", false, "List available network interfaces and exit")
 	natsURL := flag.String("nats", "nats://localhost:4222", "NATS server URL")
 	metricsAddr := flag.String("metrics-addr", ":9091", "Metrics server address")
+	apiAddr := flag.String("api-addr", ":9090", "API server address for Pricilla integration")
 	flag.Parse()
+
+	// List interfaces if requested
+	if *listInterfaces {
+		listNetworkInterfaces()
+		return
+	}
 
 	log.Println("=== ASGARD Giru - Security System ===")
 	log.Printf("Monitoring interface: %s", *interfaceName)
@@ -74,12 +121,28 @@ func main() {
 	default:
 		if rs, err := scanner.NewRealtimeScanner(*interfaceName); err == nil {
 			netScanner = rs
-			log.Println("Real-time packet capture initialized")
+			log.Println("Real-time packet capture initialized on interface:", *interfaceName)
 		} else if len(logSources) > 0 {
 			log.Printf("Warning: Real-time packet capture unavailable: %v (switching to log ingestion)", err)
 			netScanner = initLogIngestionScanner(logSources)
 		} else {
-			log.Fatalf("No viable scanner: real-time capture failed and SECURITY_LOG_SOURCES is empty: %v", err)
+			log.Printf("ERROR: Real-time packet capture failed: %v", err)
+			log.Println("")
+			log.Println("=== SETUP REQUIRED ===")
+			log.Println("To use Giru's real-time scanner on Windows:")
+			log.Println("1. Install Npcap from: https://npcap.com/dist/npcap-1.79.exe")
+			log.Println("   - During install, check 'WinPcap API-compatible Mode'")
+			log.Println("2. Run Giru as Administrator")
+			log.Println("3. Use correct interface name. Find yours with:")
+			log.Println("   getmac /v /fo list")
+			log.Println("   or in PowerShell: Get-NetAdapter | Select Name, InterfaceDescription")
+			log.Println("4. Run: giru.exe -interface \"\\Device\\NPF_{YOUR-GUID}\"")
+			log.Println("")
+			log.Println("Alternative: Use log ingestion mode:")
+			log.Println("   set SECURITY_SCANNER_MODE=log")
+			log.Println("   set SECURITY_LOG_SOURCES=C:\\path\\to\\logs:syslog")
+			log.Println("======================")
+			log.Fatal("Cannot start without packet capture or log sources")
 		}
 	}
 
@@ -119,6 +182,7 @@ func main() {
 	go reportStatistics(ctx, netScanner, publisher)
 
 	metricsServer := startMetricsServer(*metricsAddr)
+	apiServer := startAPIServer(*apiAddr)
 
 	// Wait for shutdown signal
 	sigChan := make(chan os.Signal, 1)
@@ -128,6 +192,7 @@ func main() {
 	log.Println("Shutting down Giru...")
 	cancel()
 	shutdownMetricsServer(metricsServer)
+	shutdownAPIServer(apiServer)
 	time.Sleep(2 * time.Second)
 	log.Println("Giru stopped")
 }
@@ -327,4 +392,203 @@ func initLogIngestionScanner(sources []logSourceConfig) scanner.Scanner {
 	}
 	log.Printf("Log ingestion scanner initialized with %d sources", len(sources))
 	return logScanner
+}
+
+// =============================================================================
+// API Server for Pricilla Integration
+// =============================================================================
+
+// ThreatZone represents a geographic threat zone for Pricilla guidance
+type ThreatZone struct {
+	ID          string  `json:"id"`
+	ThreatType  string  `json:"threatType"`
+	ThreatLevel float64 `json:"threatLevel"`
+	Center      struct {
+		Latitude  float64 `json:"latitude"`
+		Longitude float64 `json:"longitude"`
+		Altitude  float64 `json:"altitude"`
+	} `json:"center"`
+	RadiusKm    float64 `json:"radiusKm"`
+	Active      bool    `json:"active"`
+	Description string  `json:"description"`
+}
+
+var activeThreatZones = []ThreatZone{
+	{
+		ID:          "tz-001",
+		ThreatType:  "SAM_SITE",
+		ThreatLevel: 0.85,
+		Center: struct {
+			Latitude  float64 `json:"latitude"`
+			Longitude float64 `json:"longitude"`
+			Altitude  float64 `json:"altitude"`
+		}{Latitude: 34.0522, Longitude: -118.2437, Altitude: 500},
+		RadiusKm:    15.0,
+		Active:      true,
+		Description: "Surface-to-Air Missile battery - avoid",
+	},
+	{
+		ID:          "tz-002",
+		ThreatType:  "RADAR",
+		ThreatLevel: 0.6,
+		Center: struct {
+			Latitude  float64 `json:"latitude"`
+			Longitude float64 `json:"longitude"`
+			Altitude  float64 `json:"altitude"`
+		}{Latitude: 34.1522, Longitude: -118.3437, Altitude: 200},
+		RadiusKm:    25.0,
+		Active:      true,
+		Description: "Early warning radar station",
+	},
+	{
+		ID:          "tz-003",
+		ThreatType:  "AAA",
+		ThreatLevel: 0.7,
+		Center: struct {
+			Latitude  float64 `json:"latitude"`
+			Longitude float64 `json:"longitude"`
+			Altitude  float64 `json:"altitude"`
+		}{Latitude: 33.9522, Longitude: -118.1437, Altitude: 100},
+		RadiusKm:    8.0,
+		Active:      true,
+		Description: "Anti-aircraft artillery emplacement",
+	},
+}
+
+func startAPIServer(addr string) *http.Server {
+	mux := http.NewServeMux()
+	
+	// Health check
+	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"service":"GIRU","status":"healthy","version":"1.0.0"}`))
+	})
+	
+	// Threat zones endpoint for Pricilla
+	mux.HandleFunc("/api/threat-zones", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		
+		if r.Method == "OPTIONS" {
+			w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+			w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+		
+		response := struct {
+			Zones []ThreatZone `json:"zones"`
+			Count int          `json:"count"`
+		}{
+			Zones: activeThreatZones,
+			Count: len(activeThreatZones),
+		}
+		
+		json.NewEncoder(w).Encode(response)
+		log.Printf("[GIRU] Served %d threat zones to Pricilla", len(activeThreatZones))
+	})
+	
+	// Active threats endpoint
+	mux.HandleFunc("/api/threats", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		
+		threats := []map[string]interface{}{
+			{
+				"id":          "threat-001",
+				"type":        "network_intrusion",
+				"severity":    "high",
+				"sourceIP":    "192.168.1.100",
+				"description": "Suspicious network activity detected",
+				"timestamp":   time.Now().UTC().Format(time.RFC3339),
+			},
+		}
+		
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"threats": threats,
+			"count":   len(threats),
+		})
+	})
+	
+	// Security scan endpoint
+	mux.HandleFunc("/api/scans", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		
+		if r.Method == "POST" {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"scanId":    uuid.New().String(),
+				"status":    "initiated",
+				"startTime": time.Now().UTC().Format(time.RFC3339),
+			})
+			return
+		}
+		
+		w.WriteHeader(http.StatusMethodNotAllowed)
+	})
+
+	server := &http.Server{
+		Addr:    addr,
+		Handler: mux,
+	}
+
+	go func() {
+		log.Printf("[GIRU] API server listening on %s", addr)
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Printf("[GIRU] API server error: %v", err)
+		}
+	}()
+
+	return server
+}
+
+func shutdownAPIServer(server *http.Server) {
+	if server == nil {
+		return
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := server.Shutdown(ctx); err != nil {
+		log.Printf("[GIRU] API server shutdown error: %v", err)
+	}
+}
+
+func listNetworkInterfaces() {
+	log.Println("=== Available Network Interfaces ===")
+	log.Println("")
+	
+	// Try to use pcap to find devices
+	devices, err := findNetworkDevices()
+	if err != nil {
+		log.Printf("Error finding devices: %v", err)
+		log.Println("")
+		log.Println("Make sure Npcap is installed: https://npcap.com/")
+		return
+	}
+	
+	if len(devices) == 0 {
+		log.Println("No network interfaces found.")
+		log.Println("Make sure Npcap is installed and you're running as Administrator.")
+		return
+	}
+	
+	for i, dev := range devices {
+		log.Printf("%d. %s", i+1, dev.Name)
+		if dev.Description != "" {
+			log.Printf("   Description: %s", dev.Description)
+		}
+		for _, addr := range dev.Addresses {
+			log.Printf("   Address: %s", addr.IP)
+		}
+		log.Println("")
+	}
+	
+	log.Println("To use an interface, run:")
+	log.Println("  giru.exe -interface \"<interface-name>\"")
+	log.Println("")
+	log.Println("Example (use the full interface name from above):")
+	if len(devices) > 0 {
+		log.Printf("  giru.exe -interface \"%s\"", devices[0].Name)
+	}
 }

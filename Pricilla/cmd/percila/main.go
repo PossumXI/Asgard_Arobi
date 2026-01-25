@@ -11,13 +11,16 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"sync"
 	"syscall"
 	"time"
 
+	"github.com/asgard/pandora/Pricilla/internal/guidance"
 	"github.com/asgard/pandora/Pricilla/internal/integration"
 	"github.com/asgard/pandora/Pricilla/internal/metrics"
 	"github.com/asgard/pandora/Pricilla/internal/sensors"
+	"github.com/asgard/pandora/Pricilla/internal/stealth"
 	"github.com/google/uuid"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
@@ -133,6 +136,7 @@ type Config struct {
 	NysusEndpoint      string `json:"nysusEndpoint"`
 	SatNetEndpoint     string `json:"satnetEndpoint"`
 	GiruEndpoint       string `json:"giruEndpoint"`
+	SilenusEndpoint    string `json:"silenusEndpoint"`
 	NATSURL            string `json:"natsUrl"`
 	EnableStealth      bool   `json:"enableStealth"`
 	EnablePrediction   bool   `json:"enablePrediction"`
@@ -280,6 +284,14 @@ type GuidanceEngine struct {
 	natsBridge   *integration.NATSBridge
 	sensorFusion *sensors.SensorFusion
 	metrics      *metrics.Metrics
+	asgardIntegration *integration.ASGARDIntegration
+	silenusClient     integration.SilenusClient
+	giruClient        integration.GiruClient
+	nysusClient       integration.NysusClient
+	satnetClient      integration.SatNetClient
+	aiGuidance        *guidance.AIGuidanceEngine
+	stealthOptimizer  *stealth.StealthOptimizer
+	threatIDs         []string
 	replanInterval time.Duration
 	lastReplan      time.Time
 	wifiModel       *sensors.WiFiImagingModel
@@ -291,6 +303,9 @@ type GuidanceEngine struct {
 	ecmThreats        map[string]*ECMThreat
 	terminalConfig    TerminalGuidanceConfig
 	abortedMissions   map[string]string // missionID -> abort reason
+	
+	// Warning throttling
+	lastStaleWarning  map[string]time.Time // payloadID -> last warning time
 	
 	config       Config
 	ctx          context.Context
@@ -315,16 +330,11 @@ func NewGuidanceEngine(config Config) *GuidanceEngine {
 		config:       config,
 		replanInterval: replanInterval,
 		wifiRouters:  make(map[string]sensors.WiFiRouter),
-		targetingMetrics: TargetingMetrics{HitProbability: 0.0, CEP: 100.0},
+		targetingMetrics: TargetingMetrics{},
 		// Enhanced systems initialization
-		weather: &WeatherCondition{
-			WindSpeed:     0,
-			Visibility:    10000, // 10km default visibility
-			Temperature:   15,    // 15C default
-			Turbulence:    0,
-		},
-		ecmThreats:      make(map[string]*ECMThreat),
-		abortedMissions: make(map[string]string),
+		ecmThreats:       make(map[string]*ECMThreat),
+		abortedMissions:  make(map[string]string),
+		lastStaleWarning: make(map[string]time.Time),
 		terminalConfig: TerminalGuidanceConfig{
 			Enabled:            true,
 			ActivationDistance: 1000,  // 1km terminal phase
@@ -338,6 +348,9 @@ func NewGuidanceEngine(config Config) *GuidanceEngine {
 	if config.EnableWiFiImaging {
 		ge.wifiModel = sensors.NewWiFiImagingModel()
 	}
+
+	ge.stealthOptimizer = stealth.NewStealthOptimizer()
+	ge.aiGuidance = guidance.NewAIGuidanceEngine(ge.stealthOptimizer)
 
 	// Initialize Prometheus metrics
 	ge.metrics = metrics.GetMetrics()
@@ -367,6 +380,13 @@ func (ge *GuidanceEngine) Start(ctx context.Context) error {
 		} else {
 			log.Printf("[%s] Sensor fusion initialized", AppName)
 		}
+	}
+
+	// Initialize ASGARD subsystem integration
+	if err := ge.initASGARDIntegration(); err != nil {
+		log.Printf("[%s] Warning: Failed to initialize ASGARD integration: %v", AppName, err)
+	} else {
+		log.Printf("[%s] ASGARD integration initialized", AppName)
 	}
 
 	// Start background processes
@@ -449,6 +469,47 @@ func (ge *GuidanceEngine) initSensorFusion() error {
 	return nil
 }
 
+func (ge *GuidanceEngine) initASGARDIntegration() error {
+	cfg := integration.IntegrationConfig{
+		SilenusEndpoint: ge.config.SilenusEndpoint,
+		HunoidEndpoint:  "",
+		SatNetEndpoint:  ge.config.SatNetEndpoint,
+		GiruEndpoint:    ge.config.GiruEndpoint,
+		NysusEndpoint:   ge.config.NysusEndpoint,
+		EventBufferSize: 500,
+	}
+
+	asgard := integration.NewASGARDIntegration(cfg)
+	silenusClient, hunoidClient, satnetClient, giruClient, nysusClient := integration.CreateRealClients(cfg)
+
+	if silenusClient != nil {
+		asgard.SetSilenusClient(silenusClient)
+		ge.silenusClient = silenusClient
+	}
+	if hunoidClient != nil {
+		asgard.SetHunoidClient(hunoidClient)
+	}
+	if satnetClient != nil {
+		asgard.SetSatNetClient(satnetClient)
+		ge.satnetClient = satnetClient
+	}
+	if giruClient != nil {
+		asgard.SetGiruClient(giruClient)
+		ge.giruClient = giruClient
+	}
+	if nysusClient != nil {
+		asgard.SetNysusClient(nysusClient)
+		ge.nysusClient = nysusClient
+	}
+
+	if err := asgard.Start(ge.ctx); err != nil {
+		return err
+	}
+
+	ge.asgardIntegration = asgard
+	return nil
+}
+
 // NATS event handlers
 func (ge *GuidanceEngine) handleThreatEvent(threat integration.Threat) {
 	log.Printf("[%s] Received threat event: %s (severity: %s)", AppName, threat.ID, threat.Severity)
@@ -479,6 +540,12 @@ func (ge *GuidanceEngine) handleTelemetryEvent(telemetry integration.Telemetry) 
 
 	// Record metric
 	metrics.RecordPositionUpdate()
+
+	for _, mission := range ge.missions {
+		if mission.PayloadID == telemetry.PayloadID {
+			ge.updateTargetingMetricsLocked(mission, state)
+		}
+	}
 
 	ge.requestFastReplanLocked(telemetry.PayloadID, "telemetry_update")
 }
@@ -699,6 +766,8 @@ func (ge *GuidanceEngine) UpdatePayloadState(state *PayloadState) {
 				log.Printf("[%s] Mission %s completed (distance %.2fm)", AppName, mission.ID, distance)
 			}
 		}
+
+		ge.updateTargetingMetricsLocked(mission, state)
 	}
 
 	ge.requestFastReplanLocked(state.ID, "payload_update")
@@ -750,6 +819,9 @@ func (ge *GuidanceEngine) UpdateMissionTarget(missionID string, target Vector3D)
 		ge.targetingMetrics.ReplanCount++
 		ge.targetingMetrics.LastTrajectoryID = trajectory.ID
 		ge.targetingMetrics.LastMissionID = missionID
+		if payload != nil {
+			ge.updateTargetingMetricsLocked(liveMission, payload)
+		}
 	}
 	ge.mu.Unlock()
 
@@ -770,6 +842,46 @@ func vectorDistance(a, b Vector3D) float64 {
 	return math.Sqrt(dx*dx + dy*dy + dz*dz)
 }
 
+func (ge *GuidanceEngine) updateTargetingMetricsLocked(mission *Mission, payload *PayloadState) {
+	if mission == nil || payload == nil {
+		return
+	}
+
+	distance := vectorDistance(payload.Position, mission.TargetPosition)
+	closingVelocity := 0.0
+	if distance > 0 {
+		rel := Vector3D{
+			X: mission.TargetPosition.X - payload.Position.X,
+			Y: mission.TargetPosition.Y - payload.Position.Y,
+			Z: mission.TargetPosition.Z - payload.Position.Z,
+		}
+		unit := Vector3D{X: rel.X / distance, Y: rel.Y / distance, Z: rel.Z / distance}
+		closingVelocity = payload.Velocity.X*unit.X + payload.Velocity.Y*unit.Y + payload.Velocity.Z*unit.Z
+		if closingVelocity < 0 {
+			closingVelocity = 0
+		}
+	}
+
+	timeToImpact := 0.0
+	if closingVelocity > 0 {
+		timeToImpact = distance / closingVelocity
+	}
+
+	crossTrack := 0.0
+	if mission.Trajectory != nil && len(mission.Trajectory.Waypoints) > 1 {
+		crossTrack = ge.calculateCrossTrackError(payload.Position, mission.Trajectory)
+	}
+
+	ge.targetingMetrics.HitProbability = ge.calculateHitProbabilityLocked(mission, payload, distance)
+	ge.targetingMetrics.CEP = ge.calculateCEPLocked(mission)
+	ge.targetingMetrics.TerminalGuidanceOn = ge.terminalConfig.Enabled && distance < ge.terminalConfig.ActivationDistance
+	ge.targetingMetrics.TimeToImpact = timeToImpact
+	ge.targetingMetrics.ClosingVelocity = closingVelocity
+	ge.targetingMetrics.CrossTrackError = crossTrack
+	ge.targetingMetrics.WeatherImpact = ge.calculateWeatherImpactLocked()
+	ge.targetingMetrics.ECMDetected = ge.calculateECMImpactLocked(payload.Position) < 1.0
+}
+
 func (ge *GuidanceEngine) RegisterWiFiRouter(router sensors.WiFiRouter) {
 	ge.mu.Lock()
 	defer ge.mu.Unlock()
@@ -786,9 +898,12 @@ func (ge *GuidanceEngine) GetWiFiRouters() []sensors.WiFiRouter {
 	return routers
 }
 
-func (ge *GuidanceEngine) ProcessWiFiImaging(frame sensors.WiFiImagingFrame) ([]sensors.ThroughWallObservation, error) {
+func (ge *GuidanceEngine) ProcessWiFiImaging(frames []sensors.WiFiImagingFrame) ([]sensors.ThroughWallObservation, error) {
 	if ge.wifiModel == nil || !ge.config.EnableWiFiImaging {
 		return nil, fmt.Errorf("wifi imaging disabled")
+	}
+	if len(frames) == 0 {
+		return nil, fmt.Errorf("wifi imaging requires at least one frame")
 	}
 
 	ge.mu.RLock()
@@ -798,18 +913,21 @@ func (ge *GuidanceEngine) ProcessWiFiImaging(frame sensors.WiFiImagingFrame) ([]
 	}
 	ge.mu.RUnlock()
 
-	observations, confidence := ge.wifiModel.EstimateThroughWall(frame, routers)
+	observations, confidence, err := ge.wifiModel.EstimateThroughWallMulti(frames, routers)
+	if err != nil {
+		return nil, err
+	}
 	if len(observations) == 0 {
 		return observations, nil
 	}
 
 	reading := sensors.SensorReading{
-		SensorID:   frame.RouterID + "-wifi",
+		SensorID:   "wifi-imaging-primary",
 		SensorType: sensors.SensorWiFi,
 		Position:   observations[0].EstimatedPosition,
 		Velocity:   sensors.Vector3D{},
 		Covariance: sensors.Matrix3x3{{2, 0, 0}, {0, 2, 0}, {0, 0, 2}},
-		Timestamp:  frame.Timestamp,
+		Timestamp:  frames[len(frames)-1].Timestamp,
 		Confidence: confidence,
 		IsValid:    confidence >= 0.2,
 	}
@@ -866,7 +984,7 @@ func (ge *GuidanceEngine) replanMission(missionID, payloadID, reason string) {
 	missionCopy.StartPosition = payload.Position
 	missionCopy.UpdatedAt = time.Now()
 
-	trajectory, err := ge.generateTrajectory(&missionCopy)
+	trajectory, err := ge.replanTrajectory(&missionCopy, payload)
 	if err != nil {
 		log.Printf("[%s] Rapid replan failed for mission %s: %v", AppName, missionID, err)
 		return
@@ -883,6 +1001,7 @@ func (ge *GuidanceEngine) replanMission(missionID, payloadID, reason string) {
 		ge.targetingMetrics.LastReplanAt = time.Now()
 		ge.targetingMetrics.LastTrajectoryID = trajectory.ID
 		ge.targetingMetrics.LastMissionID = missionID
+		ge.updateTargetingMetricsLocked(liveMission, payload)
 		log.Printf("[%s] Rapid replan complete for mission %s (%s)", AppName, missionID, reason)
 	}
 	ge.mu.Unlock()
@@ -917,10 +1036,7 @@ func (ge *GuidanceEngine) CalculateHitProbability(missionID string) float64 {
 	distanceFactor := 1.0 / (1.0 + distance/10000.0)
 
 	// Weather impact
-	weatherFactor := 1.0
-	if ge.weather != nil {
-		weatherFactor = ge.calculateWeatherImpact()
-	}
+	weatherFactor := 1.0 - ge.calculateWeatherImpact()
 
 	// ECM impact
 	ecmFactor := 1.0
@@ -1031,25 +1147,25 @@ func (ge *GuidanceEngine) calculateWeatherImpact() float64 {
 
 func (ge *GuidanceEngine) calculateWeatherImpactLocked() float64 {
 	if ge.weather == nil {
-		return 1.0
+		return 0.0
 	}
-	impact := 1.0
-	// High wind reduces accuracy
-	if ge.weather.WindSpeed > 10 {
-		impact -= (ge.weather.WindSpeed - 10) * 0.01
+	visibilityImpact := clampFloat(1.0-(ge.weather.Visibility/10000.0), 0, 1)
+	windImpact := clampFloat(ge.weather.WindSpeed/50.0, 0, 1)
+	precipImpact := clampFloat(ge.weather.Precipitation/50.0, 0, 1)
+	turbulenceImpact := clampFloat(ge.weather.Turbulence, 0, 1)
+	icingImpact := clampFloat(ge.weather.IcingRisk, 0, 1)
+
+	return clampFloat((visibilityImpact+windImpact+precipImpact+turbulenceImpact+icingImpact)/5.0, 0, 1)
+}
+
+func clampFloat(value, min, max float64) float64 {
+	if value < min {
+		return min
 	}
-	// Low visibility reduces accuracy
-	if ge.weather.Visibility < 5000 {
-		impact -= (5000 - ge.weather.Visibility) / 10000
+	if value > max {
+		return max
 	}
-	// Turbulence
-	impact -= ge.weather.Turbulence * 0.2
-	// Icing risk
-	impact -= ge.weather.IcingRisk * 0.15
-	if impact < 0.3 {
-		impact = 0.3
-	}
-	return impact
+	return value
 }
 
 // RegisterECMThreat registers a detected ECM threat
@@ -1059,7 +1175,9 @@ func (ge *GuidanceEngine) RegisterECMThreat(ecm ECMThreat) {
 	if ecm.ID == "" {
 		ecm.ID = uuid.New().String()
 	}
-	ecm.DetectedAt = time.Now()
+	if ecm.DetectedAt.IsZero() {
+		ecm.DetectedAt = time.Now()
+	}
 	ecm.Active = true
 	ge.ecmThreats[ecm.ID] = &ecm
 	ge.targetingMetrics.ECMDetected = true
@@ -1209,38 +1327,7 @@ func (ge *GuidanceEngine) UpdateEnhancedTargetingMetrics(missionID string) {
 		return
 	}
 
-	// Calculate distance and closing velocity
-	distance := vectorDistance(payload.Position, mission.TargetPosition)
-
-	// Calculate closing velocity (assuming target is stationary for now)
-	speed := math.Sqrt(payload.Velocity.X*payload.Velocity.X +
-		payload.Velocity.Y*payload.Velocity.Y +
-		payload.Velocity.Z*payload.Velocity.Z)
-
-	// Estimate time to impact
-	timeToImpact := 0.0
-	if speed > 0 {
-		timeToImpact = distance / speed
-	}
-
-	// Calculate cross-track error if we have trajectory
-	crossTrackError := 0.0
-	if mission.Trajectory != nil && len(mission.Trajectory.Waypoints) > 1 {
-		crossTrackError = ge.calculateCrossTrackError(payload.Position, mission.Trajectory)
-	}
-
-	// Check terminal phase
-	inTerminal := ge.terminalConfig.Enabled && distance < ge.terminalConfig.ActivationDistance
-
-	// Update metrics (these need unlocked versions since we already have the lock)
-	ge.targetingMetrics.HitProbability = ge.calculateHitProbabilityLocked(mission, payload, distance)
-	ge.targetingMetrics.CEP = ge.calculateCEPLocked(mission)
-	ge.targetingMetrics.TerminalGuidanceOn = inTerminal
-	ge.targetingMetrics.TimeToImpact = timeToImpact
-	ge.targetingMetrics.ClosingVelocity = speed
-	ge.targetingMetrics.CrossTrackError = crossTrackError
-	ge.targetingMetrics.WeatherImpact = ge.calculateWeatherImpactLocked()
-	ge.targetingMetrics.ECMDetected = len(ge.ecmThreats) > 0
+	ge.updateTargetingMetricsLocked(mission, payload)
 }
 
 func (ge *GuidanceEngine) calculateHitProbabilityLocked(mission *Mission, payload *PayloadState, distance float64) float64 {
@@ -1249,7 +1336,7 @@ func (ge *GuidanceEngine) calculateHitProbabilityLocked(mission *Mission, payloa
 	}
 	baseProbability := mission.Trajectory.Confidence
 	distanceFactor := 1.0 / (1.0 + distance/10000.0)
-	weatherFactor := ge.calculateWeatherImpactLocked()
+	weatherFactor := 1.0 - ge.calculateWeatherImpactLocked()
 	ecmFactor := ge.calculateECMImpactLocked(payload.Position)
 	terminalBoost := 1.0
 	if ge.terminalConfig.Enabled && distance < ge.terminalConfig.ActivationDistance {
@@ -1270,33 +1357,47 @@ func (ge *GuidanceEngine) calculateHitProbabilityLocked(mission *Mission, payloa
 }
 
 func (ge *GuidanceEngine) calculateCEPLocked(mission *Mission) float64 {
-	baseCEP := 50.0
-	if !ge.terminalConfig.Enabled {
-		baseCEP = 100.0
-	}
-	weatherDegradation := 1.0
-	if ge.weather != nil {
-		if ge.weather.WindSpeed > 20 {
-			weatherDegradation += (ge.weather.WindSpeed - 20) * 0.05
-		}
-		if ge.weather.Visibility < 5000 {
-			weatherDegradation += (5000 - ge.weather.Visibility) / 5000 * 0.5
-		}
-		if ge.weather.Turbulence > 0.3 {
-			weatherDegradation += ge.weather.Turbulence * 0.3
+	baseCEP := ge.cepFromFusionLocked()
+	if baseCEP <= 0 {
+		baseCEP = 50.0
+		if !ge.terminalConfig.Enabled {
+			baseCEP = 100.0
 		}
 	}
+
+	weatherDegradation := 1.0 + ge.calculateWeatherImpactLocked()
 	ecmDegradation := 1.0
 	for _, ecm := range ge.ecmThreats {
 		if ecm.Active {
-			ecmDegradation += ecm.Strength * 0.5
+			ecmDegradation += ecm.Strength * 0.3
 		}
 	}
+
 	stealthBonus := 1.0
 	if mission.StealthRequired {
 		stealthBonus = 0.9
 	}
+
 	return baseCEP * weatherDegradation * ecmDegradation * stealthBonus
+}
+
+func (ge *GuidanceEngine) cepFromFusionLocked() float64 {
+	if ge.sensorFusion == nil {
+		return 0
+	}
+
+	state := ge.sensorFusion.GetFusedState()
+	if state.Confidence <= 0 {
+		return 0
+	}
+
+	sigmaX := math.Sqrt(math.Max(state.Covariance[0][0], 0))
+	sigmaY := math.Sqrt(math.Max(state.Covariance[1][1], 0))
+	if sigmaX == 0 || sigmaY == 0 {
+		return 0
+	}
+
+	return 0.59 * (sigmaX + sigmaY)
 }
 
 func (ge *GuidanceEngine) calculateECMImpactLocked(position Vector3D) float64 {
@@ -1390,66 +1491,341 @@ func (ge *GuidanceEngine) GetPayloadState(payloadID string) (*PayloadState, erro
 
 // generateTrajectory creates an optimal trajectory for a mission
 func (ge *GuidanceEngine) generateTrajectory(mission *Mission) (*Trajectory, error) {
-	trajectory := &Trajectory{
-		ID:          uuid.New().String(),
-		PayloadID:   mission.PayloadID,
-		PayloadType: mission.PayloadType,
-		Waypoints:   make([]Waypoint, 0),
-		Status:      "planned",
-		CreatedAt:   time.Now(),
+	if ge.aiGuidance == nil {
+		return nil, fmt.Errorf("ai guidance engine not initialized")
+	}
+	if mission == nil {
+		return nil, fmt.Errorf("mission is required")
 	}
 
-	// Generate waypoints based on mission parameters
-	numWaypoints := 5
-	for i := 0; i <= numWaypoints; i++ {
-		t := float64(i) / float64(numWaypoints)
-		
-		// Linear interpolation with altitude variation
-		wp := Waypoint{
-			ID: uuid.New().String(),
-			Position: Vector3D{
-				X: mission.StartPosition.X + t*(mission.TargetPosition.X-mission.StartPosition.X),
-				Y: mission.StartPosition.Y + t*(mission.TargetPosition.Y-mission.StartPosition.Y),
-				Z: mission.StartPosition.Z + t*(mission.TargetPosition.Z-mission.StartPosition.Z),
+	payloadType, err := mapPayloadType(mission.PayloadType)
+	if err != nil {
+		return nil, err
+	}
+
+	req := guidance.TrajectoryRequest{
+		PayloadType:    payloadType,
+		PayloadID:      mission.PayloadID,
+		StartPosition:  toGuidanceVector(mission.StartPosition),
+		TargetPosition: toGuidanceVector(mission.TargetPosition),
+		Priority:       mapPriority(mission.Priority),
+		MaxTime:        ge.estimateMaxTime(mission, payloadType),
+		Constraints: guidance.MissionConstraints{
+			StealthRequired:  mission.StealthRequired,
+			MaxDetectionRisk: detectionRiskForPriority(mission.Priority),
+		},
+		StealthMode: mapStealthMode(mission.StealthRequired),
+	}
+
+	threats, err := ge.fetchThreatLocations(ge.ctx)
+	if err != nil {
+		return nil, err
+	}
+	req.Constraints.MustAvoidThreats = threats
+	ge.refreshThreatDatabase(threats)
+
+	trajectory, err := ge.aiGuidance.PlanTrajectory(ge.ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	if err := ge.aiGuidance.ValidateTrajectory(trajectory); err != nil {
+		return nil, err
+	}
+
+	if mission.StealthRequired && ge.stealthOptimizer != nil {
+		if terrain, terrErr := ge.fetchTerrainForTrajectory(trajectory); terrErr == nil && len(terrain) > 0 {
+			if masked := ge.stealthOptimizer.OptimizeTerrainMasking(trajectory, terrain); masked != nil {
+				trajectory = masked
+			}
+		}
+	}
+
+	return toLocalTrajectory(trajectory, mission.PayloadID), nil
+}
+
+func (ge *GuidanceEngine) replanTrajectory(mission *Mission, payload *PayloadState) (*Trajectory, error) {
+	if ge.aiGuidance == nil {
+		return nil, fmt.Errorf("ai guidance engine not initialized")
+	}
+	if mission == nil {
+		return nil, fmt.Errorf("mission is required")
+	}
+
+	payloadType, err := mapPayloadType(mission.PayloadType)
+	if err != nil {
+		return nil, err
+	}
+
+	threats, err := ge.fetchThreatLocations(ge.ctx)
+	if err != nil {
+		return nil, err
+	}
+	ge.refreshThreatDatabase(threats)
+
+	if mission.Trajectory != nil && payload != nil {
+		aiTrajectory := ge.toGuidanceTrajectory(mission.Trajectory, payloadType)
+		if aiTrajectory != nil {
+			updated, err := ge.aiGuidance.UpdateTrajectory(ge.ctx, toGuidanceState(payload), aiTrajectory)
+			if err == nil && updated != nil {
+				if mission.StealthRequired && ge.stealthOptimizer != nil {
+					if terrain, terrErr := ge.fetchTerrainForTrajectory(updated); terrErr == nil && len(terrain) > 0 {
+						if masked := ge.stealthOptimizer.OptimizeTerrainMasking(updated, terrain); masked != nil {
+							updated = masked
+						}
+					}
+				}
+				return toLocalTrajectory(updated, mission.PayloadID), nil
+			}
+		}
+	}
+
+	return ge.generateTrajectory(mission)
+}
+
+func mapPayloadType(payloadType string) (guidance.PayloadType, error) {
+	switch strings.ToLower(payloadType) {
+	case "hunoid":
+		return guidance.PayloadHunoid, nil
+	case "uav":
+		return guidance.PayloadUAV, nil
+	case "rocket":
+		return guidance.PayloadRocket, nil
+	case "missile":
+		return guidance.PayloadMissile, nil
+	case "spacecraft":
+		return guidance.PayloadSpacecraft, nil
+	case "drone":
+		return guidance.PayloadDrone, nil
+	case "ground_robot", "groundrobot":
+		return guidance.PayloadGroundRobot, nil
+	case "submarine":
+		return guidance.PayloadSubmarine, nil
+	case "interstellar":
+		return guidance.PayloadInterstellar, nil
+	default:
+		return "", fmt.Errorf("unsupported payload type: %s", payloadType)
+	}
+}
+
+func mapPriority(priority int) guidance.Priority {
+	switch {
+	case priority >= 9:
+		return guidance.PriorityCritical
+	case priority >= 7:
+		return guidance.PriorityHigh
+	case priority >= 4:
+		return guidance.PriorityNormal
+	default:
+		return guidance.PriorityLow
+	}
+}
+
+func mapStealthMode(stealthRequired bool) guidance.StealthMode {
+	if !stealthRequired {
+		return guidance.StealthModeNone
+	}
+	return guidance.StealthModeHigh
+}
+
+func detectionRiskForPriority(priority int) float64 {
+	switch {
+	case priority >= 9:
+		return 0.2
+	case priority >= 7:
+		return 0.3
+	case priority >= 4:
+		return 0.5
+	default:
+		return 0.7
+	}
+}
+
+func toGuidanceVector(vec Vector3D) guidance.Vector3D {
+	return guidance.Vector3D{X: vec.X, Y: vec.Y, Z: vec.Z}
+}
+
+func toGuidanceState(payload *PayloadState) guidance.State {
+	return guidance.State{
+		Position:  toGuidanceVector(payload.Position),
+		Velocity:  toGuidanceVector(payload.Velocity),
+		Heading:   payload.Heading,
+		Fuel:      payload.Fuel,
+		Battery:   payload.Battery,
+		Timestamp: payload.LastUpdate,
+		PayloadID: payload.ID,
+	}
+}
+
+func toLocalTrajectory(traj *guidance.Trajectory, payloadID string) *Trajectory {
+	if traj == nil {
+		return nil
+	}
+
+	local := &Trajectory{
+		ID:           traj.ID,
+		PayloadID:    payloadID,
+		PayloadType:  string(traj.PayloadType),
+		Waypoints:    make([]Waypoint, 0, len(traj.Waypoints)),
+		StealthScore: traj.StealthScore,
+		Confidence:   traj.Confidence,
+		Status:       "planned",
+		CreatedAt:    traj.CreatedAt,
+	}
+
+	for i, wp := range traj.Waypoints {
+		local.Waypoints = append(local.Waypoints, Waypoint{
+			ID:        fmt.Sprintf("%s-%d", traj.ID, i),
+			Position:  Vector3D{X: wp.Position.X, Y: wp.Position.Y, Z: wp.Position.Z},
+			Velocity:  Vector3D{X: wp.Velocity.X, Y: wp.Velocity.Y, Z: wp.Velocity.Z},
+			Timestamp: wp.Timestamp,
+			Stealth:   wp.Constraints.StealthRequired || traj.StealthScore >= 0.5,
+		})
+	}
+
+	return local
+}
+
+func (ge *GuidanceEngine) toGuidanceTrajectory(traj *Trajectory, payloadType guidance.PayloadType) *guidance.Trajectory {
+	if traj == nil {
+		return nil
+	}
+
+	aiTraj := &guidance.Trajectory{
+		ID:          traj.ID,
+		PayloadType: payloadType,
+		Waypoints:   make([]guidance.Waypoint, 0, len(traj.Waypoints)),
+		CreatedAt:   traj.CreatedAt,
+		Confidence:  traj.Confidence,
+		StealthScore: traj.StealthScore,
+	}
+
+	var profile *guidance.PayloadProfile
+	if ge.aiGuidance != nil {
+		profile = ge.aiGuidance.GetPayloadProfile(payloadType)
+	}
+	for _, wp := range traj.Waypoints {
+		constraints := guidance.WaypointConstraints{
+			StealthRequired: wp.Stealth,
+		}
+		if profile != nil {
+			constraints.MaxSpeed = profile.MaxSpeed
+			constraints.MaxAcceleration = profile.MaxAcceleration
+			constraints.MinAltitude = profile.MinAltitude
+			constraints.MaxAltitude = profile.MaxAltitude
+		}
+
+		aiTraj.Waypoints = append(aiTraj.Waypoints, guidance.Waypoint{
+			Position: guidance.Vector3D{X: wp.Position.X, Y: wp.Position.Y, Z: wp.Position.Z},
+			Velocity: guidance.Vector3D{X: wp.Velocity.X, Y: wp.Velocity.Y, Z: wp.Velocity.Z},
+			Timestamp: wp.Timestamp,
+			Constraints: constraints,
+		})
+	}
+
+	return aiTraj
+}
+
+func (ge *GuidanceEngine) estimateMaxTime(mission *Mission, payloadType guidance.PayloadType) time.Duration {
+	distance := vectorDistance(mission.StartPosition, mission.TargetPosition)
+	speed := 0.0
+
+	if state, ok := ge.payloads[mission.PayloadID]; ok {
+		speed = math.Sqrt(state.Velocity.X*state.Velocity.X + state.Velocity.Y*state.Velocity.Y + state.Velocity.Z*state.Velocity.Z)
+	}
+
+	if speed <= 0 && ge.aiGuidance != nil {
+		if profile := ge.aiGuidance.GetPayloadProfile(payloadType); profile != nil && profile.MaxSpeed > 0 {
+			speed = profile.MaxSpeed * 0.6
+		}
+	}
+
+	if speed <= 0 {
+		speed = 50.0
+	}
+
+	seconds := distance / speed
+	if seconds < 60 {
+		seconds = 60
+	}
+
+	return time.Duration(seconds) * time.Second
+}
+
+func (ge *GuidanceEngine) fetchThreatLocations(ctx context.Context) ([]guidance.ThreatLocation, error) {
+	if ge.giruClient == nil {
+		return nil, nil
+	}
+
+	timeoutCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	zones, err := ge.giruClient.GetThreatZones(timeoutCtx)
+	if err != nil {
+		// Log warning but don't fail - allow operation without Giru
+		log.Printf("[%s] Warning: Failed to fetch threat zones from Giru: %v (continuing without threat data)", AppName, err)
+		return nil, nil
+	}
+
+	threats := make([]guidance.ThreatLocation, 0, len(zones))
+	for _, zone := range zones {
+		if !zone.Active {
+			continue
+		}
+		threats = append(threats, guidance.ThreatLocation{
+			Position: guidance.Vector3D{
+				X: zone.Center.Longitude * 111000,
+				Y: zone.Center.Latitude * 111000,
+				Z: zone.Center.Altitude,
 			},
-			Timestamp: time.Now().Add(time.Duration(i*60) * time.Second),
-			Stealth:   mission.StealthRequired,
-		}
-
-		// Add mid-course altitude for terrain clearance
-		if i > 0 && i < numWaypoints {
-			if wp.Position.Z < 1000 {
-				wp.Position.Z = 1000 // Minimum altitude
-			}
-		}
-
-		trajectory.Waypoints = append(trajectory.Waypoints, wp)
+			ThreatType:   zone.ThreatType,
+			EffectRadius: zone.RadiusKm * 1000,
+			Confidence:   zone.ThreatLevel,
+			LastUpdated:  time.Now().UTC(),
+		})
 	}
 
-	// Calculate velocities between waypoints
-	for i := 0; i < len(trajectory.Waypoints)-1; i++ {
-		curr := &trajectory.Waypoints[i]
-		next := trajectory.Waypoints[i+1]
-		dt := next.Timestamp.Sub(curr.Timestamp).Seconds()
-		if dt > 0 {
-			curr.Velocity = Vector3D{
-				X: (next.Position.X - curr.Position.X) / dt,
-				Y: (next.Position.Y - curr.Position.Y) / dt,
-				Z: (next.Position.Z - curr.Position.Z) / dt,
-			}
-		}
+	return threats, nil
+}
+
+func (ge *GuidanceEngine) refreshThreatDatabase(threats []guidance.ThreatLocation) {
+	if ge.aiGuidance == nil {
+		return
 	}
 
-	// Calculate stealth score
-	if mission.StealthRequired {
-		trajectory.StealthScore = 0.85 // Simulated stealth optimization
-	} else {
-		trajectory.StealthScore = 0.50
+	for _, id := range ge.threatIDs {
+		ge.aiGuidance.ClearThreat(id)
+	}
+	ge.threatIDs = ge.threatIDs[:0]
+
+	for _, threat := range threats {
+		ge.aiGuidance.RegisterThreat(threat)
+		ge.threatIDs = append(ge.threatIDs, threatIDFor(threat))
+	}
+}
+
+func threatIDFor(threat guidance.ThreatLocation) string {
+	return fmt.Sprintf("threat-%d-%d-%d", int(threat.Position.X), int(threat.Position.Y), int(threat.Position.Z))
+}
+
+func (ge *GuidanceEngine) fetchTerrainForTrajectory(traj *guidance.Trajectory) ([][]float64, error) {
+	if ge.asgardIntegration == nil || traj == nil {
+		return nil, nil
 	}
 
-	trajectory.Confidence = 0.92
+	route := make([]integration.Vector3D, 0, len(traj.Waypoints))
+	for _, wp := range traj.Waypoints {
+		route = append(route, integration.Vector3D{X: wp.Position.X, Y: wp.Position.Y, Z: wp.Position.Z})
+	}
 
-	return trajectory, nil
+	timeoutCtx, cancel := context.WithTimeout(ge.ctx, 10*time.Second)
+	defer cancel()
+
+	terrain, err := ge.asgardIntegration.GetTerrainForRoute(timeoutCtx, route)
+	if err != nil || terrain == nil {
+		return nil, err
+	}
+
+	return terrain.Elevation, nil
 }
 
 // telemetryProcessor handles incoming telemetry
@@ -1473,15 +1849,25 @@ func (ge *GuidanceEngine) processTelemetry() {
 	defer ge.mu.RUnlock()
 
 	for payloadID, state := range ge.payloads {
-		// Check if payload is stale
+		// Check if payload is stale (throttle warnings to once per minute)
 		if time.Since(state.LastUpdate) > 30*time.Second {
-			log.Printf("[%s] Warning: Payload %s telemetry stale", AppName, payloadID)
+			lastWarning, warned := ge.lastStaleWarning[payloadID]
+			if !warned || time.Since(lastWarning) > 60*time.Second {
+				log.Printf("[%s] Warning: Payload %s telemetry stale (no updates for %.0fs)", 
+					AppName, payloadID, time.Since(state.LastUpdate).Seconds())
+				ge.lastStaleWarning[payloadID] = time.Now()
+			}
+		} else {
+			// Clear warning tracker when telemetry is fresh
+			delete(ge.lastStaleWarning, payloadID)
 		}
 
-		// Check fuel/battery levels
-		if state.Fuel < 10 || state.Battery < 10 {
-			log.Printf("[%s] Warning: Payload %s low resources (fuel=%.1f%%, battery=%.1f%%)",
-				AppName, payloadID, state.Fuel, state.Battery)
+		// Check fuel/battery levels (only warn if payload is active)
+		if state.Status == "navigating" || state.Status == "terminal" {
+			if state.Fuel < 10 || state.Battery < 10 {
+				log.Printf("[%s] Warning: Payload %s low resources (fuel=%.1f%%, battery=%.1f%%)",
+					AppName, payloadID, state.Fuel, state.Battery)
+			}
 		}
 	}
 }
@@ -1549,21 +1935,49 @@ func (ge *GuidanceEngine) trajectoryOptimizer() {
 
 // optimizeTrajectories optimizes trajectories based on current conditions
 func (ge *GuidanceEngine) optimizeTrajectories() {
-	ge.mu.Lock()
-	defer ge.mu.Unlock()
-
+	ge.mu.RLock()
+	activeMissions := make([]*Mission, 0, len(ge.missions))
+	payloadSnapshots := make(map[string]*PayloadState, len(ge.payloads))
+	for id, payload := range ge.payloads {
+		payloadSnapshots[id] = payload
+	}
 	for _, mission := range ge.missions {
-		if mission.Status != "active" || mission.Trajectory == nil {
+		if mission.Status == "active" && mission.Trajectory != nil {
+			activeMissions = append(activeMissions, mission)
+		}
+	}
+	ge.mu.RUnlock()
+
+	for _, mission := range activeMissions {
+		payload, exists := payloadSnapshots[mission.PayloadID]
+		if !exists {
 			continue
 		}
 
-		// In production, this would:
-		// 1. Get current threat data from Giru
-		// 2. Get terrain data from Silenus
-		// 3. Recalculate optimal path
-		// 4. Update trajectory
+		missionCopy := *mission
+		missionCopy.StartPosition = payload.Position
+		missionCopy.UpdatedAt = time.Now()
 
-		mission.UpdatedAt = time.Now()
+		trajectory, err := ge.replanTrajectory(&missionCopy, payload)
+		if err != nil {
+			log.Printf("[%s] Trajectory optimization failed for mission %s: %v", AppName, mission.ID, err)
+			continue
+		}
+
+		if trajectory == nil {
+			continue
+		}
+
+		ge.mu.Lock()
+		if liveMission, ok := ge.missions[mission.ID]; ok && liveMission.Status == "active" {
+			if liveMission.Trajectory == nil || trajectory.ID != liveMission.Trajectory.ID {
+				liveMission.Trajectory = trajectory
+				liveMission.UpdatedAt = time.Now()
+				ge.trajectories[trajectory.ID] = trajectory
+				ge.updateTargetingMetricsLocked(liveMission, payload)
+			}
+		}
+		ge.mu.Unlock()
 	}
 }
 
@@ -2225,15 +2639,30 @@ func (s *HTTPServer) wifiImagingHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	var frame sensors.WiFiImagingFrame
-	if err := json.NewDecoder(r.Body).Decode(&frame); err != nil {
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
 		http.Error(w, "Invalid imaging payload", http.StatusBadRequest)
 		return
 	}
-	if frame.Timestamp.IsZero() {
-		frame.Timestamp = time.Now()
+
+	var frames []sensors.WiFiImagingFrame
+	if err := json.Unmarshal(body, &frames); err != nil {
+		var single sensors.WiFiImagingFrame
+		if err := json.Unmarshal(body, &single); err != nil {
+			http.Error(w, "Invalid imaging payload", http.StatusBadRequest)
+			return
+		}
+		frames = []sensors.WiFiImagingFrame{single}
 	}
-	observations, err := s.engine.ProcessWiFiImaging(frame)
+
+	now := time.Now()
+	for i := range frames {
+		if frames[i].Timestamp.IsZero() {
+			frames[i].Timestamp = now
+		}
+	}
+
+	observations, err := s.engine.ProcessWiFiImaging(frames)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -2478,6 +2907,7 @@ func main() {
 	nysusEndpoint := flag.String("nysus", "http://localhost:8080", "Nysus API endpoint")
 	satnetEndpoint := flag.String("satnet", "http://localhost:8081", "Sat_Net endpoint")
 	giruEndpoint := flag.String("giru", "http://localhost:9090", "Giru endpoint")
+	silenusEndpoint := flag.String("silenus", "http://localhost:8082", "Silenus endpoint")
 	natsURL := flag.String("nats-url", "nats://localhost:4222", "NATS server URL")
 	enableStealth := flag.Bool("stealth", true, "Enable stealth optimization")
 	enablePrediction := flag.Bool("prediction", true, "Enable trajectory prediction")
@@ -2499,6 +2929,7 @@ func main() {
 		NysusEndpoint:      *nysusEndpoint,
 		SatNetEndpoint:     *satnetEndpoint,
 		GiruEndpoint:       *giruEndpoint,
+		SilenusEndpoint:    *silenusEndpoint,
 		NATSURL:            *natsURL,
 		EnableStealth:      *enableStealth,
 		EnablePrediction:   *enablePrediction,
