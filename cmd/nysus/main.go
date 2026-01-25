@@ -16,8 +16,10 @@ import (
 	"time"
 
 	"github.com/asgard/pandora/internal/controlplane"
+	"github.com/asgard/pandora/internal/nysus/agents"
 	"github.com/asgard/pandora/internal/nysus/api"
 	"github.com/asgard/pandora/internal/nysus/events"
+	"github.com/asgard/pandora/internal/nysus/mcp"
 	"github.com/asgard/pandora/internal/platform/db"
 	"github.com/asgard/pandora/internal/platform/observability"
 	"github.com/google/uuid"
@@ -134,6 +136,33 @@ func main() {
 	// Handle nil DB connections gracefully - API server handles nil DBs
 	server := api.NewServer(serverCfg, pgDB, mongoDB, eventBus)
 
+	// Start MCP Server for LLM integration
+	mcpCfg := mcp.DefaultConfig()
+	if mcpAddr := os.Getenv("MCP_ADDR"); mcpAddr != "" {
+		mcpCfg.Addr = mcpAddr
+	}
+	mcpServer := mcp.NewServer(mcpCfg)
+	mcpServer.RegisterDefaultTools()
+	if err := mcpServer.Start(); err != nil {
+		log.Printf("Warning: MCP server failed to start: %v", err)
+	} else {
+		defer func() {
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			defer cancel()
+			mcpServer.Stop(ctx)
+		}()
+		log.Println("MCP Server started - LLM tools available")
+	}
+
+	// Start AI Agent Coordinator
+	agentCoordinator := agents.NewCoordinator()
+	if err := agentCoordinator.Start(context.Background()); err != nil {
+		log.Printf("Warning: Agent coordinator failed to start: %v", err)
+	} else {
+		defer agentCoordinator.Stop()
+		log.Println("AI Agent Coordinator started with specialized agents")
+	}
+
 	// Start database-driven event publishing if DB is available
 	if pgDB != nil {
 		go startEventPublisher(context.Background(), eventBus, pgDB)
@@ -156,6 +185,7 @@ func main() {
 	log.Println("  - Streams:    GET  /api/streams, /api/streams/stats")
 	log.Println("  - WebSocket:  WS   /ws, /ws/events, /ws/realtime")
 	log.Println("  - Signaling:  WS   /ws/signaling (WebRTC SFU)")
+	log.Println("  - MCP:        HTTP :8085/mcp/* (LLM tools)")
 
 	// Wait for shutdown signal
 	sigChan := make(chan os.Signal, 1)

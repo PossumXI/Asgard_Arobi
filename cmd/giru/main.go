@@ -14,9 +14,13 @@ import (
 	"time"
 
 	"github.com/asgard/pandora/internal/platform/observability"
+	"github.com/asgard/pandora/internal/security/blueteam"
 	secevents "github.com/asgard/pandora/internal/security/events"
+	"github.com/asgard/pandora/internal/security/gagachat"
 	"github.com/asgard/pandora/internal/security/mitigation"
+	"github.com/asgard/pandora/internal/security/redteam"
 	"github.com/asgard/pandora/internal/security/scanner"
+	"github.com/asgard/pandora/internal/security/shadow"
 	"github.com/asgard/pandora/internal/security/threat"
 	"github.com/google/gopacket/pcap"
 	"github.com/google/uuid"
@@ -67,6 +71,7 @@ func main() {
 	// Command-line flags
 	interfaceName := flag.String("interface", "", "Network interface to monitor (use -list-interfaces to see available)")
 	listInterfaces := flag.Bool("list-interfaces", false, "List available network interfaces and exit")
+	apiOnly := flag.Bool("api-only", false, "Run API server only (no scanner) for demos/testing")
 	natsURL := flag.String("nats", "nats://localhost:4222", "NATS server URL")
 	metricsAddr := flag.String("metrics-addr", ":9091", "Metrics server address")
 	apiAddr := flag.String("api-addr", ":9090", "API server address for Pricilla integration")
@@ -79,6 +84,14 @@ func main() {
 	}
 
 	log.Println("=== ASGARD Giru - Security System ===")
+	
+	// API-only mode for demos
+	if *apiOnly {
+		log.Println("Running in API-only mode (no scanner)")
+		runAPIOnlyMode(*apiAddr, *metricsAddr)
+		return
+	}
+	
 	log.Printf("Monitoring interface: %s", *interfaceName)
 
 	shutdownTracing, err := observability.InitTracing(context.Background(), "giru")
@@ -172,11 +185,76 @@ func main() {
 	// Create mitigation responder
 	responder := mitigation.NewResponder(actionChan)
 
+	// Initialize Shadow Stack for zero-day detection
+	shadowCfg := shadow.DefaultConfig()
+	shadowStack := shadow.NewShadowStack(shadowCfg)
+	if err := shadowStack.Start(ctx); err != nil {
+		log.Printf("Warning: Shadow stack failed to start: %v", err)
+	} else {
+		defer shadowStack.Stop()
+		log.Println("Shadow Stack initialized - zero-day detection enabled")
+	}
+
+	// Initialize Red Team Agent (safe mode by default)
+	redTeamCfg := redteam.DefaultAgentConfig()
+	redTeamCfg.SafeMode = true
+	redTeamCfg.TargetScope = []string{"127.0.0.1", "localhost"}
+	redTeamAgent := redteam.NewAgent("Giru-RedTeam", redTeamCfg)
+	if err := redTeamAgent.Start(ctx); err != nil {
+		log.Printf("Warning: Red team agent failed to start: %v", err)
+	} else {
+		defer redTeamAgent.Stop()
+		log.Println("Red Team Agent initialized - penetration testing available")
+	}
+
+	// Initialize Blue Team Agent
+	blueTeamCfg := blueteam.DefaultAgentConfig()
+	blueTeamAgent := blueteam.NewAgent("Giru-BlueTeam", blueTeamCfg)
+	if err := blueTeamAgent.Start(ctx); err != nil {
+		log.Printf("Warning: Blue team agent failed to start: %v", err)
+	} else {
+		defer blueTeamAgent.Stop()
+		log.Println("Blue Team Agent initialized - defensive monitoring enabled")
+	}
+
+	// Initialize Gaga Chat for secure communication
+	gagaEncKey := os.Getenv("GAGA_ENCRYPTION_KEY")
+	if gagaEncKey == "" {
+		gagaEncKey = "asgard-secure-comms-default-key"
+	}
+	secureChat := gagachat.NewChat(gagaEncKey)
+	log.Println("Gaga Chat initialized - steganographic communication available")
+
+	// Store references for API access
+	_ = shadowStack
+	_ = redTeamAgent
+	_ = blueTeamAgent
+	_ = secureChat
+
 	// Start threat processor
 	go processThreats(ctx, threatChan, responder, publisher)
 
 	// Start action processor
 	go processActions(ctx, actionChan, publisher)
+
+	// Start shadow stack anomaly processor
+	go func() {
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case anomaly := <-shadowStack.AnomalyChan():
+				log.Printf("[Shadow] Anomaly detected: %s - %s", anomaly.Type, anomaly.Description)
+				// Bridge to blue team
+				blueTeamAgent.ReportDetection(blueteam.Detection{
+					Type:        string(anomaly.Type),
+					Source:      "shadow_stack",
+					ThreatLevel: blueteam.ThreatLevel(anomaly.Severity),
+					Description: anomaly.Description,
+				})
+			}
+		}
+	}()
 
 	// Start statistics reporter
 	go reportStatistics(ctx, netScanner, publisher)
@@ -320,6 +398,41 @@ func shutdownMetricsServer(server *http.Server) {
 	if err := server.Shutdown(ctx); err != nil {
 		log.Printf("Metrics server shutdown error: %v", err)
 	}
+}
+
+// runAPIOnlyMode runs Giru with just the API server (no scanner) for demos/testing
+func runAPIOnlyMode(apiAddr, metricsAddr string) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	// Start metrics server
+	metricsServer := startMetricsServer(metricsAddr)
+	defer shutdownMetricsServer(metricsServer)
+
+	// Start API server
+	apiServer := startAPIServer(apiAddr)
+	defer shutdownAPIServer(apiServer)
+
+	log.Println("")
+	log.Println("=== GIRU API-ONLY MODE ===")
+	log.Printf("API Server:     http://localhost%s", apiAddr)
+	log.Printf("Health:         http://localhost%s/health", apiAddr)
+	log.Printf("Threat Zones:   http://localhost%s/api/threat-zones", apiAddr)
+	log.Printf("Metrics:        http://localhost%s/metrics", metricsAddr)
+	log.Println("===========================")
+	log.Println("")
+
+	// Wait for shutdown signal
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+	
+	select {
+	case sig := <-sigChan:
+		log.Printf("Received signal %v, shutting down...", sig)
+	case <-ctx.Done():
+	}
+	
+	log.Println("Giru shutdown complete")
 }
 
 func reportStatistics(ctx context.Context, netScanner scanner.Scanner, publisher *secevents.Publisher) {

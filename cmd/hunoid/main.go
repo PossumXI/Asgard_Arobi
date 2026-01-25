@@ -18,6 +18,7 @@ import (
 
 	"github.com/asgard/pandora/internal/platform/observability"
 	"github.com/asgard/pandora/internal/robotics/control"
+	"github.com/asgard/pandora/internal/robotics/coordination"
 	"github.com/asgard/pandora/internal/robotics/ethics"
 	"github.com/asgard/pandora/internal/robotics/vla"
 )
@@ -1570,6 +1571,23 @@ func main() {
 	policyEngine := NewSafetyPolicyEngine(20.0)
 	interventionEngine := NewInterventionEngine(0.7, 5*time.Second)
 	executor := NewMissionExecutor(robot, manipulator, vlaModel, ethicsKernel, policyEngine, interventionEngine, actionRegistry, operator, auditLogger, missionState)
+
+	// Initialize Swarm Coordinator for multi-robot operations
+	swarmCfg := coordination.DefaultCoordinatorConfig()
+	swarmCoordinator := coordination.NewCoordinator(swarmCfg)
+	if err := swarmCoordinator.Start(ctx); err != nil {
+		log.Printf("Warning: Swarm coordinator failed to start: %v", err)
+	} else {
+		defer swarmCoordinator.Stop()
+		// Register this hunoid with the swarm
+		pos, _ := robot.GetCurrentPose()
+		swarmCoordinator.RegisterRobot(*hunoidID, coordination.Vector3{
+			X: pos.Position.X,
+			Y: pos.Position.Y,
+			Z: pos.Position.Z,
+		})
+		log.Println("Swarm Coordinator initialized - multi-robot coordination enabled")
+	}
 
 	go reportTelemetry(ctx, robot, *telemetryInterval, auditLogger, missionPlan.ID)
 
