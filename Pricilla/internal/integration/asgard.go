@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math"
 	"sync"
 	"time"
 )
@@ -669,7 +670,7 @@ func calculateDistance(a, b Vector3D) float64 {
 	dx := b.X - a.X
 	dy := b.Y - a.Y
 	dz := b.Z - a.Z
-	return (dx*dx + dy*dy + dz*dz)
+	return math.Sqrt(dx*dx + dy*dy + dz*dz)
 }
 
 // SerializeWaypoints serializes waypoints to JSON

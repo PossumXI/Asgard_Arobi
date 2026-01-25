@@ -6,13 +6,33 @@ PRICILLA is the most advanced AI-controlled guidance, navigation, and delivery s
 
 ## Features
 
+### Core Capabilities
 - **Multi-Payload Support**: Guides Hunoid robots, UAVs, rockets, missiles, drones, and spacecraft
 - **Super-Stealth Navigation**: Radar cross-section minimization, thermal signature reduction, terrain masking
-- **AI-Powered Planning**: Deep reinforcement learning for optimal trajectory generation
-- **Real-Time Adaptation**: < 100ms replanning for dynamic threat avoidance
+- **AI-Powered Planning**: Multi-Agent Reinforcement Learning (MARL) + Physics-Informed Neural Networks (PINN)
+- **Real-Time Adaptation**: < 100ms rapid replanning for dynamic threat avoidance
 - **Full ASGARD Integration**: Seamlessly integrates with Silenus, Sat_Net, Nysus, Giru, and Hunoid
+
+### Advanced Sensing
+- **WiFi CSI Imaging**: Through-wall perception using WiFi channel state information
+- **Multi-Sensor Fusion**: Extended Kalman Filter (EKF) combining GPS, INS, RADAR, LIDAR, visual, IR
+- **Anomaly Detection**: Real-time sensor health monitoring with automatic failover
+
+### Enhanced Targeting
+- **Terminal Guidance Mode**: Precision final approach with configurable PN gain
+- **Hit Probability Estimation**: Real-time P(hit) calculation based on conditions
+- **CEP Computation**: Dynamic Circular Error Probable tracking
+- **Cross-Track Error**: Continuous path deviation monitoring
+
+### Environmental Awareness
+- **Weather Impact Modeling**: Wind, visibility, turbulence, icing risk factors
+- **ECM/Jamming Detection**: Electronic countermeasure threat tracking and adaptation
 - **Threat Intelligence**: Real-time threat detection and avoidance using Giru
-- **Terrain Awareness**: Uses Silenus satellite imagery for optimal routing
+
+### Mission Control
+- **Mission Abort/RTB**: Emergency abort with optional return-to-base trajectory
+- **6 Clearance Levels**: PUBLIC to ULTRA access control tiers
+- **Live Feed System**: Real-time telemetry streaming with tiered access
 
 ## Quick Start
 
@@ -80,10 +100,30 @@ See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed system architecture.
 ## Performance Metrics
 
 - **Trajectory Planning**: < 100ms for real-time replanning
+- **Terminal Guidance Update Rate**: 50 Hz (configurable up to 100 Hz)
 - **Stealth Score**: > 0.95 (95%+ undetectability)
-- **Path Accuracy**: < 1m deviation for precision missions
+- **Path Accuracy**: < 1m deviation for precision missions (with terminal guidance)
+- **CEP (Circular Error Probable)**: 50m base, <10m with terminal guidance
+- **Hit Probability**: Real-time estimation with environmental factors
 - **Threat Avoidance**: 100% success rate for known threats
+- **ECM Adaptation**: Automatic countermeasure response < 250ms
+- **Sensor Fusion Rate**: 20 Hz (50ms update cycle)
 - **Fuel Efficiency**: 15-30% improvement over baseline
+
+## API Endpoints (Enhanced)
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/v1/missions` | GET/POST | List/create missions |
+| `/api/v1/missions/target/{id}` | POST | Update mission target |
+| `/api/v1/metrics/targeting` | GET | Get targeting metrics |
+| `/api/v1/guidance/terminal` | GET/POST | Terminal guidance config |
+| `/api/v1/guidance/weather` | GET/POST | Weather conditions |
+| `/api/v1/guidance/ecm` | GET/POST/DELETE | ECM threat management |
+| `/api/v1/guidance/abort/{id}` | POST | Abort mission |
+| `/api/v1/guidance/probability/{id}` | GET | Hit probability |
+| `/api/v1/wifi/routers` | GET/POST | WiFi imaging routers |
+| `/api/v1/wifi/imaging` | POST | Process WiFi CSI frame |
 
 ## Development
 

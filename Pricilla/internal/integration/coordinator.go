@@ -19,6 +19,10 @@ type SystemCoordinator struct {
 	guidanceEngine *guidance.AIGuidanceEngine
 	dtnNode        *dtn.Node
 	eventBus       *events.EventBus
+	silenusClient  SilenusClient
+	giruClient     GiruClient
+	nysusClient    NysusClient
+	satnetClient   SatNetClient
 	activeMissions map[string]*GuidedMission
 	mu             sync.RWMutex
 }
@@ -33,11 +37,23 @@ type GuidedMission struct {
 	TelemetryStream chan guidance.State
 }
 
-func NewSystemCoordinator(engine *guidance.AIGuidanceEngine, dtnNode *dtn.Node, eventBus *events.EventBus) *SystemCoordinator {
+func NewSystemCoordinator(
+	engine *guidance.AIGuidanceEngine,
+	dtnNode *dtn.Node,
+	eventBus *events.EventBus,
+	silenusClient SilenusClient,
+	giruClient GiruClient,
+	nysusClient NysusClient,
+	satnetClient SatNetClient,
+) *SystemCoordinator {
 	return &SystemCoordinator{
 		guidanceEngine: engine,
 		dtnNode:        dtnNode,
 		eventBus:       eventBus,
+		silenusClient:  silenusClient,
+		giruClient:     giruClient,
+		nysusClient:    nysusClient,
+		satnetClient:   satnetClient,
 		activeMissions: make(map[string]*GuidedMission),
 	}
 }
@@ -47,13 +63,16 @@ func (c *SystemCoordinator) StartGuidedMission(ctx context.Context, payloadID st
 	log.Printf("Pricilla: Starting guided mission for %s (type: %s)", payloadID, payloadType)
 
 	// Get current position from Nysus via event bus
-	currentPos, err := c.getCurrentPosition(payloadID)
+	currentPos, err := c.getCurrentPosition(ctx, payloadID)
 	if err != nil {
 		return fmt.Errorf("failed to get current position: %w", err)
 	}
 
 	// Get threat data from Giru
-	threats := c.getActiveThreatLocations()
+	threats, err := c.getActiveThreatLocations(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to get threat locations: %w", err)
+	}
 
 	// Plan trajectory
 	req := guidance.TrajectoryRequest{
@@ -131,47 +150,81 @@ func (c *SystemCoordinator) UpdateMission(missionID string, currentState guidanc
 func (c *SystemCoordinator) IntegrateWithSilenus(satelliteID string) ([][]float64, error) {
 	log.Printf("Pricilla: Requesting terrain data from Silenus satellite %s", satelliteID)
 
-	// TODO: In production, fetch actual satellite imagery
-	// For now, generate mock terrain
-	terrainMap := make([][]float64, 100)
-	for i := range terrainMap {
-		terrainMap[i] = make([]float64, 100)
-		for j := range terrainMap[i] {
-			// Simulate hills and valleys
-			terrainMap[i][j] = 500 + (100 * float64(i%10)) - (50 * float64(j%5))
-		}
+	if c.silenusClient == nil {
+		return nil, fmt.Errorf("silenus client not configured")
+	}
+	if satelliteID == "" {
+		return nil, fmt.Errorf("satellite ID required")
 	}
 
-	return terrainMap, nil
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	pos, err := c.silenusClient.GetSatellitePosition(ctx, satelliteID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get satellite position: %w", err)
+	}
+
+	terrain, err := c.silenusClient.RequestTerrainMap(ctx, GeoCoord{
+		Latitude:  pos.Latitude,
+		Longitude: pos.Longitude,
+		Altitude:  0,
+	}, 25.0)
+	if err != nil {
+		return nil, fmt.Errorf("failed to request terrain map: %w", err)
+	}
+
+	return terrain.Elevation, nil
 }
 
 // IntegrateWithGiru gets real-time threat intelligence.
-func (c *SystemCoordinator) getActiveThreatLocations() []guidance.ThreatLocation {
-	// TODO: Query Giru for active threats
-	// For now, return mock data
-	return []guidance.ThreatLocation{
-		{
-			Position:     guidance.Vector3D{X: 5000, Y: 5000, Z: 0},
-			ThreatType:   "radar_station",
-			EffectRadius: 10000,
-			Confidence:   0.9,
-			LastUpdated:  time.Now().UTC(),
-		},
-		{
-			Position:     guidance.Vector3D{X: 8000, Y: 3000, Z: 0},
-			ThreatType:   "sam_site",
-			EffectRadius: 15000,
-			Confidence:   0.85,
-			LastUpdated:  time.Now().UTC(),
-		},
+func (c *SystemCoordinator) getActiveThreatLocations(ctx context.Context) ([]guidance.ThreatLocation, error) {
+	if c.giruClient == nil {
+		return nil, nil
 	}
+
+	zones, err := c.giruClient.GetThreatZones(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	threats := make([]guidance.ThreatLocation, 0, len(zones))
+	for _, zone := range zones {
+		if !zone.Active {
+			continue
+		}
+		threats = append(threats, guidance.ThreatLocation{
+			Position: guidance.Vector3D{
+				X: zone.Center.Longitude * 111000,
+				Y: zone.Center.Latitude * 111000,
+				Z: zone.Center.Altitude,
+			},
+			ThreatType:   zone.ThreatType,
+			EffectRadius: zone.RadiusKm * 1000,
+			Confidence:   zone.ThreatLevel,
+			LastUpdated:  time.Now().UTC(),
+		})
+	}
+
+	return threats, nil
 }
 
 // getCurrentPosition queries Nysus for payload location.
-func (c *SystemCoordinator) getCurrentPosition(payloadID string) (guidance.Vector3D, error) {
-	// TODO: Query Nysus database for current position
-	// For now, return mock position
-	return guidance.Vector3D{X: 0, Y: 0, Z: 1000}, nil
+func (c *SystemCoordinator) getCurrentPosition(ctx context.Context, payloadID string) (guidance.Vector3D, error) {
+	if c.satnetClient == nil {
+		return guidance.Vector3D{}, fmt.Errorf("satnet client not configured")
+	}
+
+	telemetry, err := c.satnetClient.GetTelemetry(ctx, payloadID)
+	if err != nil {
+		return guidance.Vector3D{}, err
+	}
+
+	return guidance.Vector3D{
+		X: telemetry.Position.X,
+		Y: telemetry.Position.Y,
+		Z: telemetry.Position.Z,
+	}, nil
 }
 
 // transmitTrajectory sends trajectory to payload via Sat_Net DTN.
