@@ -17,10 +17,20 @@ spec:
         app: hunoid
         component: robotics
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
       containers:
       - name: hunoid
-        image: asgard/hunoid:latest
+        image: asgard/hunoid:v2.0.0
         imagePullPolicy: IfNotPresent
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: ["ALL"]
         args:
         - -id
         - "hunoid-$(POD_NAME)"

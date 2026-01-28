@@ -68,7 +68,9 @@ try {
     # Run PostgreSQL migrations
     Write-Host "Running PostgreSQL migrations..." -ForegroundColor Green
     $env:POSTGRES_PORT = "55432"
-    $env:DATABASE_URL = "postgres://postgres:asgard_secure_2026@127.0.0.1:55432/asgard?sslmode=disable"
+    # Use environment variable for password, fallback to default for local dev only
+    $pgPassword = if ($env:POSTGRES_PASSWORD) { $env:POSTGRES_PASSWORD } else { "asgard_secure_2026" }
+    $env:DATABASE_URL = "postgres://postgres:${pgPassword}@127.0.0.1:55432/asgard?sslmode=disable"
     try {
         & $migrateCmd -path ./migrations/postgres -database $env:DATABASE_URL up
     } catch {
@@ -82,11 +84,13 @@ try {
 
     # Initialize MongoDB collections
     Write-Host "Initializing MongoDB collections..." -ForegroundColor Green
+    # Use environment variable for password, fallback to default for local dev only
+    $mongoPassword = if ($env:MONGO_PASSWORD) { $env:MONGO_PASSWORD } else { "asgard_mongo_2026" }
     if ($mongoshCmd) {
-        & $mongoshCmd "mongodb://admin:asgard_mongo_2026@localhost:27017" --file ./migrations/mongo/001_create_collections.js
+        & $mongoshCmd "mongodb://admin:${mongoPassword}@localhost:27017" --file ./migrations/mongo/001_create_collections.js
     } else {
         Write-Host "Local mongosh not found, using container shell..." -ForegroundColor Yellow
-        & $dockerCmd exec asgard_mongodb mongosh "mongodb://admin:asgard_mongo_2026@localhost:27017" --file /docker-entrypoint-initdb.d/001_create_collections.js
+        & $dockerCmd exec asgard_mongodb mongosh "mongodb://admin:${mongoPassword}@localhost:27017" --file /docker-entrypoint-initdb.d/001_create_collections.js
     }
 
     Write-Host "Database stack initialized successfully!" -ForegroundColor Green

@@ -1,0 +1,34 @@
+{
+  "name": "giru-jarvis",
+  "version": "2.0.0",
+  "description": "GIRU JARVIS - Advanced Multi-Model AI Desktop Assistant",
+  "main": "main.js",
+  "scripts": {
+    "dev": "concurrently -k -n \"Backend,Frontend\" -c \"blue,green\" \"python backend/giru_server.py\" \"electron .\"",
+    "dev:host": "concurrently -k -n \"Backend,Frontend\" -c \"blue,green\" \"python backend/giru_server.py\" \"electron .\"",
+    "dev:win": "concurrently -k -n \"Backend,Frontend\" -c \"blue,green\" \"py -3.13 backend/giru_server.py\" \"electron .\"",
+    "start": "electron .",
+    "backend": "python backend/giru_server.py",
+    "backend:win": "py -3.13 backend/giru_server.py",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f"
+  },
+  "keywords": [
+    "ai",
+    "assistant",
+    "voice",
+    "jarvis",
+    "asgard"
+  ],
+  "author": "ASGARD Platform",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "electron": "^40.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -13,6 +13,8 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/asgard/pandora/internal/platform/db"
@@ -261,29 +263,59 @@ func (s *AuthService) hashPassword(password string) (string, error) {
 // verifyPassword verifies a password against a hash.
 // Only properly hashed Argon2id passwords are accepted in production.
 func (s *AuthService) verifyPassword(hash, password string) bool {
-	// Parse Argon2id hash
-	var version, memory, time, parallelism uint32
-	var salt, hashBytes []byte
-
-	_, err := fmt.Sscanf(hash, "$argon2id$v=%d$m=%d,t=%d,p=%d$%s$%s",
-		&version, &memory, &time, &parallelism, &salt, &hashBytes)
-	if err != nil {
-		// Invalid hash format - reject in production, no plaintext fallback
+	parts := strings.Split(hash, "$")
+	if len(parts) != 6 {
+		return false
+	}
+	if parts[1] != "argon2id" {
+		return false
+	}
+	if !strings.HasPrefix(parts[2], "v=") {
 		return false
 	}
 
-	decodedSalt, err := base64.RawStdEncoding.DecodeString(string(salt))
+	version, err := strconv.Atoi(strings.TrimPrefix(parts[2], "v="))
+	if err != nil || version != argon2.Version {
+		return false
+	}
+
+	var memory uint32
+	var timeCost uint32
+	var parallelism uint32
+	params := strings.Split(parts[3], ",")
+	for _, param := range params {
+		kv := strings.SplitN(param, "=", 2)
+		if len(kv) != 2 {
+			return false
+		}
+		value, err := strconv.Atoi(kv[1])
+		if err != nil {
+			return false
+		}
+		switch kv[0] {
+		case "m":
+			memory = uint32(value)
+		case "t":
+			timeCost = uint32(value)
+		case "p":
+			parallelism = uint32(value)
+		}
+	}
+	if memory == 0 || timeCost == 0 || parallelism == 0 {
+		return false
+	}
+
+	decodedSalt, err := base64.RawStdEncoding.DecodeString(parts[4])
 	if err != nil {
 		return false
 	}
 
-	decodedHash, err := base64.RawStdEncoding.DecodeString(string(hashBytes))
+	decodedHash, err := base64.RawStdEncoding.DecodeString(parts[5])
 	if err != nil {
 		return false
 	}
 
-	computedHash := argon2.IDKey([]byte(password), decodedSalt, time, memory, uint8(parallelism), uint32(len(decodedHash)))
-
+	computedHash := argon2.IDKey([]byte(password), decodedSalt, timeCost, memory, uint8(parallelism), uint32(len(decodedHash)))
 	return subtle.ConstantTimeCompare(decodedHash, computedHash) == 1
 }
 

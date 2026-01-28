@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"math/rand"
 	"net"
 	"net/http"
 	"sync"
@@ -28,7 +27,7 @@ const (
 	AttackTypeDenial         AttackType = "denial_of_service"
 )
 
-// AttackResult holds the outcome of an attack simulation
+// AttackResult holds the outcome of an attack attempt
 type AttackResult struct {
 	ID          string
 	AttackType  AttackType
@@ -260,18 +259,10 @@ func (a *Agent) executeAttack(ctx context.Context, target string, attackType Att
 func (a *Agent) executeRecon(ctx context.Context, result *AttackResult) {
 	result.MITRE = append(result.MITRE, "T1046", "T1018", "T1082")
 
-	// Port scanning simulation
 	commonPorts := []int{22, 80, 443, 3306, 5432, 6379, 8080, 9090}
-	openPorts := make([]int, 0)
-
-	for _, port := range commonPorts {
-		addr := fmt.Sprintf("%s:%d", result.Target, port)
-		conn, err := net.DialTimeout("tcp", addr, 2*time.Second)
-		if err == nil {
-			conn.Close()
-			openPorts = append(openPorts, port)
-			result.Evidence = append(result.Evidence, fmt.Sprintf("Port %d is open", port))
-		}
+	openPorts := a.scanOpenPorts(result.Target, commonPorts, 2*time.Second)
+	for _, port := range openPorts {
+		result.Evidence = append(result.Evidence, fmt.Sprintf("Port %d is open", port))
 	}
 
 	if len(openPorts) > 0 {
@@ -286,11 +277,13 @@ func (a *Agent) executeRecon(ctx context.Context, result *AttackResult) {
 	}
 
 	// HTTP service detection
-	if a.config.SafeMode {
-		resp, err := a.httpClient.Get(fmt.Sprintf("http://%s", result.Target))
-		if err == nil {
-			resp.Body.Close()
-			result.Evidence = append(result.Evidence, fmt.Sprintf("HTTP service detected: %s", resp.Header.Get("Server")))
+	resp, err := a.httpClient.Get(fmt.Sprintf("http://%s", result.Target))
+	if err == nil {
+		resp.Body.Close()
+		if serverHeader := resp.Header.Get("Server"); serverHeader != "" {
+			result.Evidence = append(result.Evidence, fmt.Sprintf("HTTP service detected: %s", serverHeader))
+		} else {
+			result.Evidence = append(result.Evidence, "HTTP service detected")
 		}
 	}
 }
@@ -299,38 +292,37 @@ func (a *Agent) executeExploit(ctx context.Context, result *AttackResult) {
 	result.MITRE = append(result.MITRE, "T1190", "T1210")
 
 	if a.config.SafeMode {
-		// Simulate exploitation checks without actual exploitation
-		result.Evidence = append(result.Evidence, "[SAFE MODE] Exploitation simulation only")
+		result.Evidence = append(result.Evidence, "Safe mode enabled: non-invasive checks only")
+	}
 
-		// Check for common vulnerabilities
-		vulnChecks := []struct {
-			path string
-			vuln string
-		}{
-			{"/.git/config", "Exposed Git Repository"},
-			{"/.env", "Exposed Environment File"},
-			{"/robots.txt", "Robots.txt Information Disclosure"},
-			{"/server-status", "Apache Server Status Exposed"},
-			{"/phpinfo.php", "PHP Info Exposure"},
-		}
+	// Check for common exposures via HTTP
+	vulnChecks := []struct {
+		path string
+		vuln string
+	}{
+		{"/.git/config", "Exposed Git Repository"},
+		{"/.env", "Exposed Environment File"},
+		{"/robots.txt", "Robots.txt Information Disclosure"},
+		{"/server-status", "Apache Server Status Exposed"},
+		{"/phpinfo.php", "PHP Info Exposure"},
+	}
 
-		for _, check := range vulnChecks {
-			url := fmt.Sprintf("http://%s%s", result.Target, check.path)
-			resp, err := a.httpClient.Get(url)
-			if err == nil {
-				if resp.StatusCode == 200 {
-					result.Success = true
-					result.Findings = append(result.Findings, Finding{
-						ID:          uuid.New().String(),
-						Severity:    "high",
-						Title:       check.vuln,
-						Description: fmt.Sprintf("Found vulnerable endpoint: %s", check.path),
-						Remediation: "Restrict access to sensitive files",
-						CVSS:        7.5,
-					})
-				}
-				resp.Body.Close()
+	for _, check := range vulnChecks {
+		url := fmt.Sprintf("http://%s%s", result.Target, check.path)
+		resp, err := a.httpClient.Get(url)
+		if err == nil {
+			if resp.StatusCode == 200 {
+				result.Success = true
+				result.Findings = append(result.Findings, Finding{
+					ID:          uuid.New().String(),
+					Severity:    "high",
+					Title:       check.vuln,
+					Description: fmt.Sprintf("Found accessible endpoint: %s", check.path),
+					Remediation: "Restrict access to sensitive files",
+					CVSS:        7.5,
+				})
 			}
+			resp.Body.Close()
 		}
 	}
 }
@@ -338,52 +330,132 @@ func (a *Agent) executeExploit(ctx context.Context, result *AttackResult) {
 func (a *Agent) executePersistence(ctx context.Context, result *AttackResult) {
 	result.MITRE = append(result.MITRE, "T1136", "T1078", "T1543")
 
-	if a.config.SafeMode {
-		result.Evidence = append(result.Evidence, "[SAFE MODE] Persistence simulation only")
-		// Simulate persistence check - would check for weak SSH keys, cron jobs, etc.
-		result.Findings = append(result.Findings, Finding{
-			ID:          uuid.New().String(),
-			Severity:    "medium",
-			Title:       "Persistence Check",
-			Description: "Checked for common persistence mechanisms",
-			Remediation: "Review scheduled tasks, startup scripts, and user accounts",
-		})
+	ports := []int{22, 3389, 445, 5985, 5986}
+	openPorts := a.scanOpenPorts(result.Target, ports, 2*time.Second)
+	if len(openPorts) == 0 {
+		return
 	}
+
+	for _, port := range openPorts {
+		result.Evidence = append(result.Evidence, fmt.Sprintf("Remote access port open: %d", port))
+	}
+
+	result.Success = true
+	result.Findings = append(result.Findings, Finding{
+		ID:          uuid.New().String(),
+		Severity:    "medium",
+		Title:       "Remote Access Services Exposed",
+		Description: fmt.Sprintf("Detected %d remote access ports open", len(openPorts)),
+		Remediation: "Restrict remote access services to trusted networks and enforce MFA",
+	})
 }
 
 func (a *Agent) executeLateralMove(ctx context.Context, result *AttackResult) {
 	result.MITRE = append(result.MITRE, "T1021", "T1563")
 
-	if a.config.SafeMode {
-		result.Evidence = append(result.Evidence, "[SAFE MODE] Lateral movement simulation only")
-		// Would check for SMB shares, SSH trust relationships, etc.
+	ports := []int{22, 135, 445, 5985, 5986}
+	openPorts := a.scanOpenPorts(result.Target, ports, 2*time.Second)
+	if len(openPorts) == 0 {
+		return
 	}
+
+	for _, port := range openPorts {
+		result.Evidence = append(result.Evidence, fmt.Sprintf("Lateral movement protocol port open: %d", port))
+	}
+
+	result.Success = true
+	result.Findings = append(result.Findings, Finding{
+		ID:          uuid.New().String(),
+		Severity:    "medium",
+		Title:       "Lateral Movement Pathways Available",
+		Description: fmt.Sprintf("Detected %d lateral movement ports open", len(openPorts)),
+		Remediation: "Limit lateral movement protocols with segmentation and least privilege",
+	})
 }
 
 func (a *Agent) executeExfiltration(ctx context.Context, result *AttackResult) {
 	result.MITRE = append(result.MITRE, "T1048", "T1041")
 
-	if a.config.SafeMode {
-		result.Evidence = append(result.Evidence, "[SAFE MODE] Exfiltration simulation only")
-		// Check if DNS exfil is possible, test egress ports
+	ports := []int{53, 80, 443, 8080}
+	openPorts := a.scanOpenPorts(result.Target, ports, 2*time.Second)
+	if len(openPorts) == 0 {
+		return
 	}
+
+	for _, port := range openPorts {
+		result.Evidence = append(result.Evidence, fmt.Sprintf("Egress-friendly port open: %d", port))
+	}
+
+	result.Success = true
+	result.Findings = append(result.Findings, Finding{
+		ID:          uuid.New().String(),
+		Severity:    "low",
+		Title:       "Potential Exfiltration Channels",
+		Description: "Detected exposed services on common egress ports",
+		Remediation: "Monitor outbound traffic and enforce egress filtering",
+	})
 }
 
 func (a *Agent) executePrivEsc(ctx context.Context, result *AttackResult) {
 	result.MITRE = append(result.MITRE, "T1548", "T1068")
 
-	if a.config.SafeMode {
-		result.Evidence = append(result.Evidence, "[SAFE MODE] Privilege escalation simulation only")
-		// Would check for SUID binaries, sudo misconfigs, etc.
+	ports := []int{22, 3389, 5900, 3306, 5432}
+	openPorts := a.scanOpenPorts(result.Target, ports, 2*time.Second)
+	if len(openPorts) == 0 {
+		return
 	}
+
+	for _, port := range openPorts {
+		result.Evidence = append(result.Evidence, fmt.Sprintf("Privileged service port open: %d", port))
+	}
+
+	result.Success = true
+	result.Findings = append(result.Findings, Finding{
+		ID:          uuid.New().String(),
+		Severity:    "low",
+		Title:       "Privileged Services Exposed",
+		Description: "Detected exposed services that often require elevated access",
+		Remediation: "Restrict admin services and enforce strong authentication",
+	})
 }
 
 func (a *Agent) executeDenial(ctx context.Context, result *AttackResult) {
 	result.MITRE = append(result.MITRE, "T1498", "T1499")
 
-	if a.config.SafeMode {
-		result.Evidence = append(result.Evidence, "[SAFE MODE] DoS simulation only")
-		// Test rate limiting, connection limits
+	url := fmt.Sprintf("http://%s", result.Target)
+	limited := 0
+	successful := 0
+	for i := 0; i < 5; i++ {
+		req, err := http.NewRequestWithContext(ctx, "HEAD", url, nil)
+		if err != nil {
+			continue
+		}
+		resp, err := a.httpClient.Do(req)
+		if err != nil {
+			continue
+		}
+		if resp.StatusCode == http.StatusTooManyRequests {
+			limited++
+		} else if resp.StatusCode < 500 {
+			successful++
+		}
+		resp.Body.Close()
+	}
+
+	if limited > 0 {
+		result.Blocked = true
+		result.Evidence = append(result.Evidence, "Rate limiting detected")
+		return
+	}
+	if successful > 0 {
+		result.Success = true
+		result.Findings = append(result.Findings, Finding{
+			ID:          uuid.New().String(),
+			Severity:    "low",
+			Title:       "Rate Limiting Not Detected",
+			Description: "No rate limiting responses observed during safe probe",
+			Remediation: "Enable rate limiting and connection throttling at the edge",
+		})
 	}
 }
 
@@ -476,6 +548,15 @@ func (a *Agent) isInScope(target string) bool {
 }
 
 // Utility for generating realistic but safe test data
-func init() {
-	rand.Seed(time.Now().UnixNano())
+func (a *Agent) scanOpenPorts(target string, ports []int, timeout time.Duration) []int {
+	openPorts := make([]int, 0)
+	for _, port := range ports {
+		addr := fmt.Sprintf("%s:%d", target, port)
+		conn, err := net.DialTimeout("tcp", addr, timeout)
+		if err == nil {
+			conn.Close()
+			openPorts = append(openPorts, port)
+		}
+	}
+	return openPorts
 }

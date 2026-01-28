@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GIRU JARVIS</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <!-- JARVIS Core Visualization -->
+      <div class="core-container">
+        <div id="core" class="arc-reactor idle">
+          <div class="reactor-ring ring-1"></div>
+          <div class="reactor-ring ring-2"></div>
+          <div class="reactor-ring ring-3"></div>
+          <div class="reactor-core"></div>
+          <div class="pulse-ring"></div>
+        </div>
+        <div id="status-text" class="status-text">STANDBY</div>
+        <div id="voice-visualizer" class="voice-visualizer">
+          <div class="bar"></div>
+          <div class="bar"></div>
+          <div class="bar"></div>
+          <div class="bar"></div>
+          <div class="bar"></div>
+          <div class="bar"></div>
+          <div class="bar"></div>
+          <div class="bar"></div>
+          <div class="bar"></div>
+          <div class="bar"></div>
+          <div class="bar"></div>
+          <div class="bar"></div>
+        </div>
+      </div>
+
+      <!-- Header -->
+      <header class="header">
+        <div class="title-section">
+          <h1>GIRU</h1>
+          <p class="subtitle">Just A Rather Very Intelligent System</p>
+        </div>
+        <div class="status-indicators">
+          <span id="connection-pill" class="indicator disconnected">
+            <span class="indicator-dot"></span>
+            <span class="indicator-label">OFFLINE</span>
+          </span>
+        </div>
+      </header>
+
+      <!-- Wake Word Hint -->
+      <div class="wake-hint">
+        <span class="hint-icon">🎤</span>
+        <span id="wake-hint-text">Say <strong>"Hello"</strong>, <strong>"Hello Giru"</strong>, or <strong>"Giru"</strong> to activate</span>
+      </div>
+
+      <!-- Main Content -->
+      <section class="panels">
+        <!-- Conversation Panel -->
+        <div class="panel conversation-panel">
+          <div class="panel-header">
+            <h2>Conversation</h2>
+            <div class="panel-actions">
+              <button id="toggle-text" class="icon-btn" title="Toggle text input">⌨️</button>
+              <button id="clear-chat" class="icon-btn" title="Clear conversation">🗑️</button>
+            </div>
+          </div>
+          <div id="conversation" class="conversation"></div>
+          <form id="text-form" class="text-form hidden">
+            <input
+              id="text-input"
+              type="text"
+              placeholder="Type a command or question..."
+              autocomplete="off"
+            />
+            <button type="submit" class="send-btn">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+              </svg>
+            </button>
+          </form>
+        </div>
+
+        <!-- System Panel -->
+        <div class="panel system-panel">
+          <div class="panel-header">
+            <h2>System Status</h2>
+          </div>
+          
+          <!-- Quick Controls -->
+          <div class="controls-section">
+            <button id="mic-toggle" class="control-btn primary">
+              <span class="btn-icon">🎤</span>
+              <span class="btn-label">Enable Microphone</span>
+            </button>
+            <button id="push-to-talk" class="control-btn ghost">
+              <span class="btn-icon">📢</span>
+              <span class="btn-label">Push To Talk</span>
+            </button>
+            <button id="interrupt-btn" class="control-btn ghost">
+              <span class="btn-icon">⏹️</span>
+              <span class="btn-label">Interrupt</span>
+            </button>
+          </div>
+
+          <!-- ASGARD Systems Status -->
+          <div class="systems-section">
+            <h3>ASGARD Systems</h3>
+            <div class="system-grid">
+              <div class="system-item" id="sys-pricilla">
+                <span class="system-icon">🎯</span>
+                <span class="system-name">Pricilla</span>
+                <span class="system-status">--</span>
+              </div>
+              <div class="system-item" id="sys-nysus">
+                <span class="system-icon">🧠</span>
+                <span class="system-name">Nysus</span>
+                <span class="system-status">--</span>
+              </div>
+              <div class="system-item" id="sys-silenus">
+                <span class="system-icon">🛰️</span>
+                <span class="system-name">Silenus</span>
+                <span class="system-status">--</span>
+              </div>
+              <div class="system-item" id="sys-hunoid">
+                <span class="system-icon">🤖</span>
+                <span class="system-name">Hunoid</span>
+                <span class="system-status">--</span>
+              </div>
+              <div class="system-item" id="sys-security">
+                <span class="system-icon">🛡️</span>
+                <span class="system-name">Security</span>
+                <span class="system-status">--</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- System Log -->
+          <div class="log-section">
+            <h3>Activity Log</h3>
+            <div id="system-log" class="log"></div>
+          </div>
+
+          <!-- Permissions -->
+          <div class="permissions-section">
+            <h3>Permissions</h3>
+            <div class="permission-item">
+              <span>Microphone</span>
+              <span id="mic-state" class="badge off">Off</span>
+            </div>
+            <div class="permission-item">
+              <span>Camera</span>
+              <span id="cam-state" class="badge off">Off</span>
+            </div>
+            <div class="permission-item">
+              <span>Filesystem</span>
+              <span id="filesystem-state" class="badge off">Off</span>
+            </div>
+            <div class="permission-item">
+              <span>Email</span>
+              <span id="email-state" class="badge off">Off</span>
+            </div>
+            <div class="permission-item">
+              <span>Network</span>
+              <span id="network-state" class="badge off">Off</span>
+            </div>
+            <div class="permission-item">
+              <span>Git</span>
+              <span id="git-state" class="badge off">Off</span>
+            </div>
+            <div class="permission-item">
+              <span>System</span>
+              <span id="system-state" class="badge off">Off</span>
+            </div>
+            <div class="permission-actions">
+              <button class="control-btn ghost" data-permission-toggle="camera">
+                <span class="btn-icon">📷</span>
+                <span class="btn-label">Toggle Camera</span>
+              </button>
+              <button class="control-btn ghost" data-permission-toggle="filesystem">
+                <span class="btn-icon">🗂️</span>
+                <span class="btn-label">Toggle Filesystem</span>
+              </button>
+              <button class="control-btn ghost" data-permission-toggle="email">
+                <span class="btn-icon">✉️</span>
+                <span class="btn-label">Toggle Email</span>
+              </button>
+              <button class="control-btn ghost" data-permission-toggle="network">
+                <span class="btn-icon">🌐</span>
+                <span class="btn-label">Toggle Network</span>
+              </button>
+              <button class="control-btn ghost" data-permission-toggle="git">
+                <span class="btn-icon">🧩</span>
+                <span class="btn-label">Toggle Git</span>
+              </button>
+              <button class="control-btn ghost" data-permission-toggle="system">
+                <span class="btn-icon">🛠️</span>
+                <span class="btn-label">Toggle System</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="footer">
+        <span>GIRU JARVIS v2.0</span>
+        <span class="separator">•</span>
+        <span>ASGARD Platform</span>
+        <span class="separator">•</span>
+        <a href="monitor.html" target="_blank" class="monitor-link">📊 Open Monitor</a>
+      </footer>
+    </div>
+
+    <!-- Model Selector Modal -->
+    <div id="model-modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Select AI Model</h3>
+          <button id="close-modal" class="close-btn">✕</button>
+        </div>
+        <div class="modal-body">
+          <div id="model-selector" class="model-selector">
+            <!-- Models populated by JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

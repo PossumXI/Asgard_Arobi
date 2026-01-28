@@ -141,7 +141,6 @@ const (
 	GravityPointMass GravityModel = iota // Simple point mass
 	GravityJ2                            // J2 oblateness
 	GravityJ2J3J4                        // Full zonal harmonics
-	GravityEGM96                         // High-fidelity (placeholder)
 )
 
 // CalculateGravity computes gravitational acceleration at a position
@@ -246,7 +245,6 @@ type AtmosphereModel int
 const (
 	AtmosphereExponential AtmosphereModel = iota // Simple exponential
 	AtmosphereUS76                               // US Standard Atmosphere 1976
-	AtmosphereNRLMSISE                           // High-fidelity (placeholder)
 )
 
 // AtmosphericProperties contains atmospheric state

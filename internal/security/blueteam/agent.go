@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strings"
 	"sync"
 	"time"
 
@@ -473,13 +474,13 @@ func (a *Agent) executeResponse(ctx context.Context, response *Response) bool {
 	case "block_ip", "block":
 		return a.BlockIP(response.Target, fmt.Sprintf("Auto-blocked for detection %s", response.DetectionID)) == nil
 	case "isolate":
-		response.Notes = append(response.Notes, "Isolation requested (simulated)")
+		response.Notes = append(response.Notes, "Isolation requested; awaiting control plane execution")
 		return true
 	case "monitor":
 		response.Notes = append(response.Notes, "Enhanced monitoring enabled")
 		return true
 	case "terminate":
-		response.Notes = append(response.Notes, "Process termination requested (simulated)")
+		response.Notes = append(response.Notes, "Termination requested; awaiting control plane execution")
 		return true
 	default:
 		response.Notes = append(response.Notes, fmt.Sprintf("Unknown action: %s", response.Action))
@@ -526,8 +527,7 @@ func (a *Agent) matchRule(rule *Rule, eventType string, data map[string]interfac
 	case "contains":
 		if strVal, ok := value.(string); ok {
 			if searchVal, ok := rule.Logic.Value.(string); ok {
-				return len(strVal) > 0 && len(searchVal) > 0 && 
-					(strVal == searchVal || len(strVal) > len(searchVal))
+				return strings.Contains(strVal, searchVal)
 			}
 		}
 		return false

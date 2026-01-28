@@ -3,6 +3,7 @@ import { Suspense, lazy } from 'react';
 import { Toaster } from '@/components/ui/Toaster';
 import { ThemeProvider } from '@/providers/ThemeProvider';
 import { AuthProvider } from '@/providers/AuthProvider';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import Layout from '@/components/layout/Layout';
 import LoadingScreen from '@/components/ui/LoadingScreen';
 
@@ -18,28 +19,37 @@ const Dashboard = lazy(() => import('@/pages/dashboard/Dashboard'));
 const GovPortal = lazy(() => import('@/pages/gov/GovPortal'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 
+// Route-level error boundary wrapper for lazy-loaded components
+const withErrorBoundary = (Component: React.ComponentType) => (
+  <ErrorBoundary>
+    <Component />
+  </ErrorBoundary>
+);
+
 export default function App() {
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <Suspense fallback={<LoadingScreen />}>
-          <Routes>
-            <Route path="/" element={<Layout />}>
-              <Route index element={<Landing />} />
-              <Route path="about" element={<About />} />
-              <Route path="features" element={<Features />} />
-              <Route path="pricilla" element={<Pricilla />} />
-              <Route path="pricing" element={<Pricing />} />
-              <Route path="signin" element={<SignIn />} />
-              <Route path="signup" element={<SignUp />} />
-              <Route path="dashboard/*" element={<Dashboard />} />
-              <Route path="gov/*" element={<GovPortal />} />
-              <Route path="*" element={<NotFound />} />
-            </Route>
-          </Routes>
-        </Suspense>
-        <Toaster />
-      </AuthProvider>
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider>
+        <AuthProvider>
+          <Suspense fallback={<LoadingScreen />}>
+            <Routes>
+              <Route path="/" element={<Layout />}>
+                <Route index element={withErrorBoundary(Landing)} />
+                <Route path="about" element={withErrorBoundary(About)} />
+                <Route path="features" element={withErrorBoundary(Features)} />
+                <Route path="pricilla" element={withErrorBoundary(Pricilla)} />
+                <Route path="pricing" element={withErrorBoundary(Pricing)} />
+                <Route path="signin" element={withErrorBoundary(SignIn)} />
+                <Route path="signup" element={withErrorBoundary(SignUp)} />
+                <Route path="dashboard/*" element={withErrorBoundary(Dashboard)} />
+                <Route path="gov/*" element={withErrorBoundary(GovPortal)} />
+                <Route path="*" element={withErrorBoundary(NotFound)} />
+              </Route>
+            </Routes>
+          </Suspense>
+          <Toaster />
+        </AuthProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 }

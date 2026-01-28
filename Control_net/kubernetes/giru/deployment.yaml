@@ -17,19 +17,24 @@ spec:
         app: giru
         component: security
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
       containers:
       - name: giru
-        image: asgard/giru:latest
+        image: asgard/giru:v2.0.0
         imagePullPolicy: IfNotPresent
         args:
         - -interface
         - "eth0"
         securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
           capabilities:
-            add:
-            - NET_ADMIN
-            - NET_RAW
-          privileged: false
+            drop: ["ALL"]
+            add: ["NET_ADMIN", "NET_RAW"]
         resources:
           requests:
             memory: "256Mi"

@@ -1,0 +1,29 @@
+{
+  "targetUpdates": 0,
+  "replanCount": 0,
+  "lastReplanReason": "",
+  "lastReplanAt": "0001-01-01T00:00:00Z",
+  "lastTargetUpdateAt": "0001-01-01T00:00:00Z",
+  "lastTargetPosition": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
+  "lastPayloadPosition": {
+    "x": 5900,
+    "y": 3700,
+    "z": 55
+  },
+  "lastTrajectoryId": "",
+  "lastMissionId": "",
+  "completionDistance": 0,
+  "missionCompletedAt": "0001-01-01T00:00:00Z",
+  "hitProbability": 0,
+  "cep": 0,
+  "terminalGuidanceOn": false,
+  "timeToImpact": 0,
+  "closingVelocity": 0,
+  "crossTrackError": 0,
+  "ecmDetected": false,
+  "weatherImpact": 0.18799999999999997
+}

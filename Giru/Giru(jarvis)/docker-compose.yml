@@ -1,0 +1,42 @@
+services:
+  giru-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "7777:7777"
+      - "7778:7778"
+    environment:
+      # Server ports
+      GIRU_PORT: "7777"
+      GIRU_MONITOR_PORT: "7778"
+      
+      # ASGARD system endpoints
+      PRICILLA_BASE_URL: "http://host.docker.internal:8092"
+      PRICILLA_URL: "http://host.docker.internal:8092"
+      NYSUS_URL: "http://host.docker.internal:8080"
+      SILENUS_URL: "http://host.docker.internal:9093"
+      HUNOID_URL: "http://host.docker.internal:8090"
+      GIRU_SECURITY_URL: "http://host.docker.internal:9090"
+      
+      # Audio settings (disabled in Docker)
+      GIRU_DISABLE_AUDIO: "1"
+      GIRU_DISABLE_TTS: "1"
+      
+      # AI Provider API Keys (pass from host environment)
+      GROQ_API_KEY: "${GROQ_API_KEY:-}"
+      TOGETHER_API_KEY: "${TOGETHER_API_KEY:-}"
+      GOOGLE_API_KEY: "${GOOGLE_API_KEY:-}"
+      GEMINI_API_KEY: "${GEMINI_API_KEY:-}"
+      ANTHROPIC_API_KEY: "${ANTHROPIC_API_KEY:-}"
+      OPENAI_API_KEY: "${OPENAI_API_KEY:-}"
+      OPENROUTER_API_KEY: "${OPENROUTER_API_KEY:-}"
+      
+      # Database path
+      GIRU_DB_PATH: "/app/data/giru.db"
+    volumes:
+      - giru-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  giru-data:

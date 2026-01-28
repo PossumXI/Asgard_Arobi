@@ -4,6 +4,7 @@ package mcp
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -11,6 +12,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/asgard/pandora/internal/platform/db"
+	"github.com/asgard/pandora/internal/repositories"
 	"github.com/google/uuid"
 )
 
@@ -41,6 +44,7 @@ type Server struct {
 	sessions  map[string]*Session
 	addr      string
 	server    *http.Server
+	pgDB      *db.PostgresDB
 }
 
 // Session tracks an MCP client session
@@ -71,6 +75,11 @@ func NewServer(cfg Config) *Server {
 		sessions:  make(map[string]*Session),
 		addr:      cfg.Addr,
 	}
+}
+
+// SetPostgresDB configures the MCP server database handle.
+func (s *Server) SetPostgresDB(pgDB *db.PostgresDB) {
+	s.pgDB = pgDB
 }
 
 // RegisterTool adds a tool to the MCP server
@@ -303,7 +312,15 @@ func (s *Server) handleReadResource(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Return resource content (placeholder - would fetch real data)
+	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
+	defer cancel()
+
+	mimeType, text, err := s.readResource(ctx, uri)
+	if err != nil {
+		s.writeError(w, -32000, err.Error(), nil)
+		return
+	}
+
 	response := MCPResponse{
 		JSONRPC: "2.0",
 		ID:      1,
@@ -311,8 +328,8 @@ func (s *Server) handleReadResource(w http.ResponseWriter, r *http.Request) {
 			"contents": []map[string]interface{}{
 				{
 					"uri":      uri,
-					"mimeType": "application/json",
-					"text":     `{"status": "available"}`,
+					"mimeType": mimeType,
+					"text":     text,
 				},
 			},
 		},
@@ -403,14 +420,7 @@ func (s *Server) RegisterDefaultTools() {
 		Description: "Get the current status of a satellite",
 		InputSchema: json.RawMessage(`{"type":"object","properties":{"satellite_id":{"type":"string"}},"required":["satellite_id"]}`),
 		Handler: func(ctx context.Context, params map[string]interface{}) (interface{}, error) {
-			satID, _ := params["satellite_id"].(string)
-			return map[string]interface{}{
-				"satellite_id": satID,
-				"status":       "operational",
-				"battery":      85.5,
-				"altitude_km":  550.0,
-				"last_contact": time.Now().UTC().Format(time.RFC3339),
-			}, nil
+			return s.handleSatelliteStatus(ctx, params)
 		},
 	})
 
@@ -419,14 +429,7 @@ func (s *Server) RegisterDefaultTools() {
 		Description: "Send a command to a satellite",
 		InputSchema: json.RawMessage(`{"type":"object","properties":{"satellite_id":{"type":"string"},"command":{"type":"string"},"parameters":{"type":"object"}},"required":["satellite_id","command"]}`),
 		Handler: func(ctx context.Context, params map[string]interface{}) (interface{}, error) {
-			satID, _ := params["satellite_id"].(string)
-			cmd, _ := params["command"].(string)
-			return map[string]interface{}{
-				"satellite_id": satID,
-				"command":      cmd,
-				"status":       "queued",
-				"estimated_execution": time.Now().Add(30 * time.Second).UTC().Format(time.RFC3339),
-			}, nil
+			return s.handleSatelliteCommand(ctx, params)
 		},
 	})
 
@@ -436,14 +439,7 @@ func (s *Server) RegisterDefaultTools() {
 		Description: "Get the current status of a Hunoid unit",
 		InputSchema: json.RawMessage(`{"type":"object","properties":{"hunoid_id":{"type":"string"}},"required":["hunoid_id"]}`),
 		Handler: func(ctx context.Context, params map[string]interface{}) (interface{}, error) {
-			hunoidID, _ := params["hunoid_id"].(string)
-			return map[string]interface{}{
-				"hunoid_id":    hunoidID,
-				"status":       "idle",
-				"battery":      92.0,
-				"location":     map[string]float64{"lat": 34.05, "lon": -118.25},
-				"current_mission": nil,
-			}, nil
+			return s.handleHunoidStatus(ctx, params)
 		},
 	})
 
@@ -452,15 +448,7 @@ func (s *Server) RegisterDefaultTools() {
 		Description: "Dispatch a Hunoid unit to execute a mission",
 		InputSchema: json.RawMessage(`{"type":"object","properties":{"hunoid_id":{"type":"string"},"mission_type":{"type":"string"},"target_location":{"type":"object"}},"required":["hunoid_id","mission_type"]}`),
 		Handler: func(ctx context.Context, params map[string]interface{}) (interface{}, error) {
-			hunoidID, _ := params["hunoid_id"].(string)
-			missionType, _ := params["mission_type"].(string)
-			return map[string]interface{}{
-				"hunoid_id":    hunoidID,
-				"mission_type": missionType,
-				"mission_id":   uuid.New().String(),
-				"status":       "dispatched",
-				"estimated_start": time.Now().Add(5 * time.Second).UTC().Format(time.RFC3339),
-			}, nil
+			return s.handleDispatchMission(ctx, params)
 		},
 	})
 
@@ -470,12 +458,7 @@ func (s *Server) RegisterDefaultTools() {
 		Description: "Get current threat landscape from Giru",
 		InputSchema: json.RawMessage(`{"type":"object","properties":{}}`),
 		Handler: func(ctx context.Context, params map[string]interface{}) (interface{}, error) {
-			return map[string]interface{}{
-				"active_threats": 0,
-				"threat_level":   "low",
-				"last_scan":      time.Now().Add(-5 * time.Minute).UTC().Format(time.RFC3339),
-				"zones_monitored": 3,
-			}, nil
+			return s.handleThreatStatus(ctx)
 		},
 	})
 
@@ -484,18 +467,7 @@ func (s *Server) RegisterDefaultTools() {
 		Description: "Start a security scan",
 		InputSchema: json.RawMessage(`{"type":"object","properties":{"target":{"type":"string"},"scan_type":{"type":"string"}},"required":["target"]}`),
 		Handler: func(ctx context.Context, params map[string]interface{}) (interface{}, error) {
-			target, _ := params["target"].(string)
-			scanType, _ := params["scan_type"].(string)
-			if scanType == "" {
-				scanType = "quick"
-			}
-			return map[string]interface{}{
-				"scan_id":   uuid.New().String(),
-				"target":    target,
-				"scan_type": scanType,
-				"status":    "in_progress",
-				"started":   time.Now().UTC().Format(time.RFC3339),
-			}, nil
+			return s.handleInitiateScan(ctx, params)
 		},
 	})
 
@@ -505,14 +477,7 @@ func (s *Server) RegisterDefaultTools() {
 		Description: "Calculate optimal trajectory using Pricilla",
 		InputSchema: json.RawMessage(`{"type":"object","properties":{"start":{"type":"object"},"destination":{"type":"object"},"constraints":{"type":"object"}},"required":["start","destination"]}`),
 		Handler: func(ctx context.Context, params map[string]interface{}) (interface{}, error) {
-			return map[string]interface{}{
-				"trajectory_id": uuid.New().String(),
-				"waypoints":     5,
-				"distance_km":   125.5,
-				"eta_seconds":   3600,
-				"fuel_required": 45.2,
-				"status":        "calculated",
-			}, nil
+			return s.handleCalculateTrajectory(ctx, params)
 		},
 	})
 
@@ -544,4 +509,377 @@ func (s *Server) RegisterDefaultTools() {
 		Description: "Currently active security threats",
 		MimeType:    "application/json",
 	})
+}
+
+func (s *Server) readResource(ctx context.Context, uri string) (string, string, error) {
+	if s.pgDB == nil {
+		return "", "", fmt.Errorf("postgres database not configured")
+	}
+
+	switch uri {
+	case "asgard://satellites/list":
+		repo := repositories.NewSatelliteRepository(s.pgDB)
+		satellites, err := repo.GetAll()
+		if err != nil {
+			return "", "", err
+		}
+		items := make([]map[string]interface{}, 0, len(satellites))
+		for _, sat := range satellites {
+			item := map[string]interface{}{
+				"id":     sat.ID.String(),
+				"name":   sat.Name,
+				"status": sat.Status,
+			}
+			if sat.NoradID.Valid {
+				item["norad_id"] = sat.NoradID.Int32
+			}
+			if sat.CurrentBatteryPercent.Valid {
+				item["battery_percent"] = sat.CurrentBatteryPercent.Float64
+			}
+			if sat.LastTelemetry.Valid {
+				item["last_telemetry"] = sat.LastTelemetry.Time.UTC().Format(time.RFC3339)
+			}
+			if sat.FirmwareVersion.Valid {
+				item["firmware_version"] = sat.FirmwareVersion.String
+			}
+			items = append(items, item)
+		}
+		payload, err := marshalJSON(map[string]interface{}{
+			"generated_at": time.Now().UTC().Format(time.RFC3339),
+			"count":        len(items),
+			"satellites":   items,
+		})
+		if err != nil {
+			return "", "", err
+		}
+		return "application/json", payload, nil
+	case "asgard://hunoids/list":
+		repo := repositories.NewHunoidRepository(s.pgDB)
+		hunoids, err := repo.GetAll()
+		if err != nil {
+			return "", "", err
+		}
+		items := make([]map[string]interface{}, 0, len(hunoids))
+		for _, hunoid := range hunoids {
+			item := map[string]interface{}{
+				"id":     hunoid.ID.String(),
+				"serial": hunoid.SerialNumber,
+				"status": hunoid.Status,
+			}
+			if hunoid.CurrentMissionID.Valid {
+				item["current_mission_id"] = hunoid.CurrentMissionID.String
+			}
+			if hunoid.BatteryPercent.Valid {
+				item["battery_percent"] = hunoid.BatteryPercent.Float64
+			}
+			if hunoid.LastTelemetry.Valid {
+				item["last_telemetry"] = hunoid.LastTelemetry.Time.UTC().Format(time.RFC3339)
+			}
+			items = append(items, item)
+		}
+		payload, err := marshalJSON(map[string]interface{}{
+			"generated_at": time.Now().UTC().Format(time.RFC3339),
+			"count":        len(items),
+			"hunoids":      items,
+		})
+		if err != nil {
+			return "", "", err
+		}
+		return "application/json", payload, nil
+	case "asgard://alerts/recent":
+		repo := repositories.NewAlertRepository(s.pgDB)
+		alerts, err := repo.GetAll()
+		if err != nil {
+			return "", "", err
+		}
+		items := make([]map[string]interface{}, 0, len(alerts))
+		for _, alert := range alerts {
+			item := map[string]interface{}{
+				"id":         alert.ID.String(),
+				"type":       alert.AlertType,
+				"confidence": alert.ConfidenceScore,
+				"status":     alert.Status,
+				"created_at": alert.CreatedAt.UTC().Format(time.RFC3339),
+			}
+			if alert.SatelliteID.Valid {
+				item["satellite_id"] = alert.SatelliteID.String
+			}
+			items = append(items, item)
+		}
+		payload, err := marshalJSON(map[string]interface{}{
+			"generated_at": time.Now().UTC().Format(time.RFC3339),
+			"count":        len(items),
+			"alerts":       items,
+		})
+		if err != nil {
+			return "", "", err
+		}
+		return "application/json", payload, nil
+	case "asgard://threats/active":
+		rows, err := s.pgDB.QueryContext(ctx, `
+			SELECT id, threat_type, severity, source_ip, target_component, status, detected_at
+			FROM threats
+			WHERE status IS NULL OR status <> 'resolved'
+			ORDER BY detected_at DESC
+			LIMIT 100
+		`)
+		if err != nil {
+			return "", "", err
+		}
+		defer rows.Close()
+
+		items := make([]map[string]interface{}, 0)
+		for rows.Next() {
+			var id uuid.UUID
+			var threatType, severity, status string
+			var sourceIP, targetComponent sql.NullString
+			var detectedAt time.Time
+			if err := rows.Scan(&id, &threatType, &severity, &sourceIP, &targetComponent, &status, &detectedAt); err != nil {
+				return "", "", err
+			}
+			item := map[string]interface{}{
+				"id":          id.String(),
+				"type":        threatType,
+				"severity":    severity,
+				"status":      status,
+				"detected_at": detectedAt.UTC().Format(time.RFC3339),
+			}
+			if sourceIP.Valid {
+				item["source_ip"] = sourceIP.String
+			}
+			if targetComponent.Valid {
+				item["target_component"] = targetComponent.String
+			}
+			items = append(items, item)
+		}
+		payload, err := marshalJSON(map[string]interface{}{
+			"generated_at": time.Now().UTC().Format(time.RFC3339),
+			"count":        len(items),
+			"threats":      items,
+		})
+		if err != nil {
+			return "", "", err
+		}
+		return "application/json", payload, nil
+	default:
+		return "", "", fmt.Errorf("resource not found: %s", uri)
+	}
+}
+
+func (s *Server) handleSatelliteStatus(ctx context.Context, params map[string]interface{}) (interface{}, error) {
+	if s.pgDB == nil {
+		return nil, fmt.Errorf("postgres database not configured")
+	}
+
+	satelliteID, _ := params["satellite_id"].(string)
+	if satelliteID == "" {
+		return nil, fmt.Errorf("satellite_id is required")
+	}
+
+	repo := repositories.NewSatelliteRepository(s.pgDB)
+	sat, err := repo.GetByID(satelliteID)
+	if err != nil {
+		return nil, err
+	}
+
+	response := map[string]interface{}{
+		"satellite_id": sat.ID.String(),
+		"name":         sat.Name,
+		"status":       sat.Status,
+	}
+	if sat.NoradID.Valid {
+		response["norad_id"] = sat.NoradID.Int32
+	}
+	if sat.CurrentBatteryPercent.Valid {
+		response["battery_percent"] = sat.CurrentBatteryPercent.Float64
+	}
+	if sat.LastTelemetry.Valid {
+		response["last_telemetry"] = sat.LastTelemetry.Time.UTC().Format(time.RFC3339)
+	}
+	if sat.FirmwareVersion.Valid {
+		response["firmware_version"] = sat.FirmwareVersion.String
+	}
+
+	return response, nil
+}
+
+func (s *Server) handleSatelliteCommand(ctx context.Context, params map[string]interface{}) (interface{}, error) {
+	return s.createControlCommand(ctx, params, "command_satellite", "satellite", "satellite_id")
+}
+
+func (s *Server) handleHunoidStatus(ctx context.Context, params map[string]interface{}) (interface{}, error) {
+	if s.pgDB == nil {
+		return nil, fmt.Errorf("postgres database not configured")
+	}
+
+	hunoidID, _ := params["hunoid_id"].(string)
+	if hunoidID == "" {
+		return nil, fmt.Errorf("hunoid_id is required")
+	}
+
+	repo := repositories.NewHunoidRepository(s.pgDB)
+	hunoid, err := repo.GetByID(hunoidID)
+	if err != nil {
+		return nil, err
+	}
+
+	response := map[string]interface{}{
+		"hunoid_id": hunoid.ID.String(),
+		"serial":    hunoid.SerialNumber,
+		"status":    hunoid.Status,
+	}
+	if hunoid.CurrentMissionID.Valid {
+		response["current_mission_id"] = hunoid.CurrentMissionID.String
+	}
+	if hunoid.BatteryPercent.Valid {
+		response["battery_percent"] = hunoid.BatteryPercent.Float64
+	}
+	if hunoid.LastTelemetry.Valid {
+		response["last_telemetry"] = hunoid.LastTelemetry.Time.UTC().Format(time.RFC3339)
+	}
+
+	location, err := repo.GetLocation(hunoidID)
+	if err == nil && location != nil {
+		response["location"] = map[string]interface{}{
+			"lat": location.Latitude,
+			"lon": location.Longitude,
+			"alt": location.Altitude,
+		}
+	}
+
+	return response, nil
+}
+
+func (s *Server) handleDispatchMission(ctx context.Context, params map[string]interface{}) (interface{}, error) {
+	return s.createControlCommand(ctx, params, "dispatch_mission", "hunoid", "hunoid_id")
+}
+
+func (s *Server) handleThreatStatus(ctx context.Context) (interface{}, error) {
+	if s.pgDB == nil {
+		return nil, fmt.Errorf("postgres database not configured")
+	}
+
+	var activeCount int
+	if err := s.pgDB.QueryRowContext(ctx, `
+		SELECT COUNT(*) FROM threats WHERE status IS NULL OR status <> 'resolved'
+	`).Scan(&activeCount); err != nil {
+		return nil, err
+	}
+
+	var lastDetected sql.NullTime
+	if err := s.pgDB.QueryRowContext(ctx, `
+		SELECT MAX(detected_at) FROM threats
+	`).Scan(&lastDetected); err != nil {
+		return nil, err
+	}
+
+	var severityRank int
+	if err := s.pgDB.QueryRowContext(ctx, `
+		SELECT COALESCE(MAX(CASE severity
+			WHEN 'critical' THEN 4
+			WHEN 'high' THEN 3
+			WHEN 'medium' THEN 2
+			WHEN 'low' THEN 1
+			ELSE 0 END), 0)
+		FROM threats
+		WHERE status IS NULL OR status <> 'resolved'
+	`).Scan(&severityRank); err != nil {
+		return nil, err
+	}
+
+	highestSeverity := "none"
+	switch severityRank {
+	case 4:
+		highestSeverity = "critical"
+	case 3:
+		highestSeverity = "high"
+	case 2:
+		highestSeverity = "medium"
+	case 1:
+		highestSeverity = "low"
+	}
+
+	response := map[string]interface{}{
+		"active_threats":   activeCount,
+		"highest_severity": highestSeverity,
+	}
+	if lastDetected.Valid {
+		response["last_detected_at"] = lastDetected.Time.UTC().Format(time.RFC3339)
+	}
+
+	return response, nil
+}
+
+func (s *Server) handleInitiateScan(ctx context.Context, params map[string]interface{}) (interface{}, error) {
+	return s.createControlCommand(ctx, params, "security_scan", "system", "")
+}
+
+func (s *Server) handleCalculateTrajectory(ctx context.Context, params map[string]interface{}) (interface{}, error) {
+	return s.createControlCommand(ctx, params, "calculate_trajectory", "system", "")
+}
+
+func (s *Server) createControlCommand(
+	ctx context.Context,
+	params map[string]interface{},
+	commandType string,
+	targetType string,
+	targetIDKey string,
+) (interface{}, error) {
+	if s.pgDB == nil {
+		return nil, fmt.Errorf("postgres database not configured")
+	}
+
+	var targetID *uuid.UUID
+	if targetIDKey != "" {
+		rawID, _ := params[targetIDKey].(string)
+		if rawID == "" {
+			return nil, fmt.Errorf("%s is required", targetIDKey)
+		}
+		parsed, err := uuid.Parse(rawID)
+		if err != nil {
+			return nil, fmt.Errorf("invalid %s: %w", targetIDKey, err)
+		}
+		targetID = &parsed
+	}
+
+	payloadBytes, err := json.Marshal(params)
+	if err != nil {
+		return nil, fmt.Errorf("failed to encode payload: %w", err)
+	}
+
+	priority := 5
+	if rawPriority, ok := params["priority"]; ok {
+		if priorityFloat, ok := rawPriority.(float64); ok {
+			priority = int(priorityFloat)
+		}
+	}
+
+	var commandID uuid.UUID
+	err = s.pgDB.QueryRowContext(ctx, `
+		INSERT INTO control_commands (command_type, target_type, target_id, payload, status, priority)
+		VALUES ($1, $2, $3, $4, 'pending', $5)
+		RETURNING id
+	`, commandType, targetType, targetID, payloadBytes, priority).Scan(&commandID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create control command: %w", err)
+	}
+
+	response := map[string]interface{}{
+		"command_id": commandID.String(),
+		"command":    commandType,
+		"status":     "pending",
+		"target_type": targetType,
+	}
+	if targetID != nil {
+		response["target_id"] = targetID.String()
+	}
+	return response, nil
+}
+
+func marshalJSON(value interface{}) (string, error) {
+	payload, err := json.MarshalIndent(value, "", "  ")
+	if err != nil {
+		return "", err
+	}
+	return string(payload), nil
 }

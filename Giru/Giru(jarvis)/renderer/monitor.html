@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GIRU Monitor - Control Station</title>
+  <style>
+    :root {
+      --bg-primary: #0a0e17;
+      --bg-secondary: #0f1525;
+      --bg-panel: rgba(15, 21, 37, 0.9);
+      --bg-card: rgba(20, 28, 48, 0.8);
+      
+      --text-primary: #e7eefc;
+      --text-secondary: #9db1d9;
+      --text-muted: #5a6a8a;
+      
+      --accent-blue: #00d4ff;
+      --accent-green: #00ff88;
+      --accent-orange: #ff9500;
+      --accent-red: #ff4757;
+      --accent-purple: #a855f7;
+      --accent-yellow: #ffd93d;
+      
+      --border-color: rgba(157, 177, 217, 0.15);
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Segoe UI', -apple-system, sans-serif;
+      background: linear-gradient(135deg, #0a0e17 0%, #1a1f35 50%, #0a0e17 100%);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      background: var(--bg-panel);
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .header h1 {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      color: var(--accent-blue);
+    }
+    
+    .header h1 span {
+      color: var(--text-secondary);
+      font-weight: 400;
+    }
+    
+    .connection-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    .connection-status.connected {
+      background: rgba(0, 255, 136, 0.15);
+      color: var(--accent-green);
+    }
+    
+    .connection-status.disconnected {
+      background: rgba(255, 71, 87, 0.15);
+      color: var(--accent-red);
+    }
+    
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    /* Main Layout */
+    .main {
+      display: grid;
+      grid-template-columns: 1fr 350px;
+      gap: 20px;
+      padding: 20px;
+      max-width: 1800px;
+      margin: 0 auto;
+    }
+    
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--accent-blue);
+    }
+    
+    .stat-card.green::before { background: var(--accent-green); }
+    .stat-card.orange::before { background: var(--accent-orange); }
+    .stat-card.purple::before { background: var(--accent-purple); }
+    
+    .stat-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+    
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    
+    .stat-change {
+      font-size: 11px;
+      margin-top: 4px;
+    }
+    
+    .stat-change.positive { color: var(--accent-green); }
+    .stat-change.negative { color: var(--accent-red); }
+    
+    /* Panels */
+    .panel {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-color);
+      background: rgba(0, 0, 0, 0.2);
+    }
+    
+    .panel-header h2 {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+    
+    .panel-content {
+      padding: 16px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    
+    /* Activity Feed */
+    .activity-feed {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .activity-item {
+      display: flex;
+      gap: 12px;
+      padding: 12px;
+      background: var(--bg-card);
+      border-radius: 8px;
+      border-left: 3px solid var(--accent-blue);
+      transition: all 0.2s ease;
+    }
+    
+    .activity-item:hover {
+      background: rgba(0, 212, 255, 0.05);
+    }
+    
+    .activity-item.conversation { border-left-color: var(--accent-blue); }
+    .activity-item.command { border-left-color: var(--accent-green); }
+    .activity-item.email { border-left-color: var(--accent-purple); }
+    .activity-item.terminal { border-left-color: var(--accent-orange); }
+    .activity-item.code { border-left-color: var(--accent-yellow); }
+    .activity-item.asgard_query { border-left-color: #00ffff; }
+    
+    .activity-item.in_progress {
+      animation: activity-pulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes activity-pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(0, 212, 255, 0); }
+      50% { box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.2); }
+    }
+    
+    .activity-icon {
+      font-size: 20px;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 6px;
+    }
+    
+    .activity-content {
+      flex: 1;
+      min-width: 0;
+    }
+    
+    .activity-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .activity-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    
+    .activity-status {
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    
+    .activity-status.in_progress {
+      background: rgba(0, 212, 255, 0.2);
+      color: var(--accent-blue);
+    }
+    
+    .activity-status.completed {
+      background: rgba(0, 255, 136, 0.2);
+      color: var(--accent-green);
+    }
+    
+    .activity-status.failed {
+      background: rgba(255, 71, 87, 0.2);
+      color: var(--accent-red);
+    }
+    
+    /* Progress Bar */
+    .progress-bar {
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: var(--accent-blue);
+      border-radius: 2px;
+      transition: width 0.3s ease;
+    }
+    
+    /* Model Usage */
+    .model-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .model-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px;
+      background: var(--bg-card);
+      border-radius: 8px;
+    }
+    
+    .model-info {
+      flex: 1;
+    }
+    
+    .model-name {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+    
+    .model-stats {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    
+    .model-badge {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      background: rgba(0, 212, 255, 0.2);
+      color: var(--accent-blue);
+    }
+    
+    .model-badge.free {
+      background: rgba(0, 255, 136, 0.2);
+      color: var(--accent-green);
+    }
+    
+    /* Timeline */
+    .timeline {
+      position: relative;
+      padding-left: 24px;
+    }
+    
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 8px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--border-color);
+    }
+    
+    .timeline-item {
+      position: relative;
+      padding-bottom: 16px;
+    }
+    
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -20px;
+      top: 4px;
+      width: 10px;
+      height: 10px;
+      background: var(--accent-blue);
+      border-radius: 50%;
+      box-shadow: 0 0 0 3px var(--bg-primary);
+    }
+    
+    .timeline-time {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+    
+    .timeline-content {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    
+    /* Active Now Section */
+    .active-now {
+      background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(0, 255, 136, 0.05));
+      border: 1px solid rgba(0, 212, 255, 0.3);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+    
+    .active-now-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    
+    .active-indicator {
+      width: 12px;
+      height: 12px;
+      background: var(--accent-green);
+      border-radius: 50%;
+      animation: blink 1s ease-in-out infinite;
+    }
+    
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+    
+    .active-now-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent-blue);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    .active-task {
+      padding: 12px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+    
+    .active-task-type {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    
+    .active-task-desc {
+      font-size: 14px;
+      color: var(--text-primary);
+    }
+    
+    .no-active {
+      text-align: center;
+      padding: 20px;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+    
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: rgba(157, 177, 217, 0.2);
+      border-radius: 3px;
+    }
+    
+    /* Responsive */
+    @media (max-width: 1200px) {
+      .main {
+        grid-template-columns: 1fr;
+      }
+      
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media (max-width: 600px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <h1>GIRU <span>MONITOR</span></h1>
+    <div id="connection-status" class="connection-status disconnected">
+      <span class="status-dot"></span>
+      <span id="status-text">Connecting...</span>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="content-area">
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Activities Today</div>
+          <div class="stat-value" id="stat-activities">0</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-label">Messages</div>
+          <div class="stat-value" id="stat-messages">0</div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-label">Commands Run</div>
+          <div class="stat-value" id="stat-commands">0</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-label">Emails Sent</div>
+          <div class="stat-value" id="stat-emails">0</div>
+        </div>
+      </div>
+
+      <!-- Active Now -->
+      <div class="active-now" id="active-section">
+        <div class="active-now-header">
+          <div class="active-indicator"></div>
+          <span class="active-now-title">Currently Active</span>
+        </div>
+        <div id="active-tasks">
+          <div class="no-active">No active tasks</div>
+        </div>
+      </div>
+
+      <!-- Activity Feed -->
+      <div class="panel">
+        <div class="panel-header">
+          <h2>Activity Feed</h2>
+          <span id="activity-count" style="font-size: 11px; color: var(--text-muted);">0 activities</span>
+        </div>
+        <div class="panel-content">
+          <div class="activity-feed" id="activity-feed">
+            <!-- Activities populated here -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar">
+      <!-- Model Usage -->
+      <div class="panel" style="margin-bottom: 20px;">
+        <div class="panel-header">
+          <h2>AI Model Usage</h2>
+        </div>
+        <div class="panel-content">
+          <div class="model-list" id="model-list">
+            <!-- Models populated here -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Timeline -->
+      <div class="panel">
+        <div class="panel-header">
+          <h2>Recent Events</h2>
+        </div>
+        <div class="panel-content">
+          <div class="timeline" id="timeline">
+            <!-- Timeline populated here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // ==========================================================================
+    // GIRU MONITOR CLIENT
+    // ==========================================================================
+    
+    const MONITOR_PORT = 7778;
+    let socket = null;
+    let reconnectAttempts = 0;
+    
+    // DOM Elements
+    const connectionStatus = document.getElementById('connection-status');
+    const statusText = document.getElementById('status-text');
+    const statActivities = document.getElementById('stat-activities');
+    const statMessages = document.getElementById('stat-messages');
+    const statCommands = document.getElementById('stat-commands');
+    const statEmails = document.getElementById('stat-emails');
+    const activeTasks = document.getElementById('active-tasks');
+    const activityFeed = document.getElementById('activity-feed');
+    const activityCount = document.getElementById('activity-count');
+    const modelList = document.getElementById('model-list');
+    const timeline = document.getElementById('timeline');
+    
+    // Activity type icons
+    const ACTIVITY_ICONS = {
+      conversation: '💬',
+      command: '⚡',
+      email: '📧',
+      file_operation: '📁',
+      terminal: '🖥️',
+      code: '💻',
+      asgard_query: '🛡️',
+      web_search: '🔍',
+      system: '⚙️',
+    };
+    
+    // Connect to monitoring server
+    function connect() {
+      socket = new WebSocket(`ws://127.0.0.1:${MONITOR_PORT}`);
+      
+      socket.onopen = () => {
+        connectionStatus.className = 'connection-status connected';
+        statusText.textContent = 'Connected';
+        reconnectAttempts = 0;
+        console.log('Connected to Giru Monitor');
+      };
+      
+      socket.onclose = () => {
+        connectionStatus.className = 'connection-status disconnected';
+        statusText.textContent = 'Disconnected';
+        
+        // Reconnect with exponential backoff
+        const delay = Math.min(30000, 1000 * Math.pow(2, reconnectAttempts));
+        reconnectAttempts++;
+        setTimeout(connect, delay);
+      };
+      
+      socket.onmessage = (event) => {
+        try {
+          const message = JSON.parse(event.data);
+          handleMessage(message);
+        } catch (error) {
+          console.error('Failed to parse message:', error);
+        }
+      };
+    }
+    
+    // Handle incoming messages
+    function handleMessage(message) {
+      switch (message.event) {
+        case 'dashboard_init':
+        case 'dashboard_update':
+          updateDashboard(message.data);
+          break;
+        
+        case 'activity_started':
+          addActivity(message.data, true);
+          updateActiveTasks();
+          break;
+        
+        case 'activity_updated':
+          updateActivity(message.data);
+          break;
+        
+        case 'activity_completed':
+        case 'activity_failed':
+          updateActivity(message.data);
+          updateActiveTasks();
+          break;
+        
+        case 'activities_list':
+          renderActivityFeed(message.data);
+          break;
+        
+        case 'stats_update':
+          updateStats(message.data);
+          break;
+      }
+    }
+    
+    // Update dashboard with data
+    function updateDashboard(data) {
+      // Update stats
+      if (data.summary && data.summary.today) {
+        statActivities.textContent = data.summary.today.activities || 0;
+        statMessages.textContent = data.summary.today.messages || 0;
+        statCommands.textContent = data.summary.today.commands || 0;
+        statEmails.textContent = data.summary.today.emails || 0;
+      }
+      
+      // Update active tasks
+      if (data.active_activities) {
+        renderActiveTasks(data.active_activities);
+      }
+      
+      // Update activity feed
+      if (data.recent_activities) {
+        renderActivityFeed(data.recent_activities);
+      }
+      
+      // Update model usage
+      if (data.model_usage) {
+        renderModelUsage(data.model_usage);
+      }
+    }
+    
+    // Render active tasks
+    function renderActiveTasks(activities) {
+      if (!activities || activities.length === 0) {
+        activeTasks.innerHTML = '<div class="no-active">No active tasks</div>';
+        return;
+      }
+      
+      activeTasks.innerHTML = activities.map(activity => `
+        <div class="active-task">
+          <div class="active-task-type">${ACTIVITY_ICONS[activity.type] || '⚙️'} ${activity.type}</div>
+          <div class="active-task-desc">${activity.description}</div>
+          ${activity.progress > 0 ? `
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: ${activity.progress * 100}%"></div>
+            </div>
+          ` : ''}
+        </div>
+      `).join('');
+    }
+    
+    // Render activity feed
+    function renderActivityFeed(activities) {
+      if (!activities || activities.length === 0) {
+        activityFeed.innerHTML = '<div class="no-active">No recent activities</div>';
+        activityCount.textContent = '0 activities';
+        return;
+      }
+      
+      activityCount.textContent = `${activities.length} activities`;
+      
+      activityFeed.innerHTML = activities.map(activity => `
+        <div class="activity-item ${activity.type} ${activity.status}">
+          <div class="activity-icon">${ACTIVITY_ICONS[activity.type] || '⚙️'}</div>
+          <div class="activity-content">
+            <div class="activity-title">${activity.description}</div>
+            <div class="activity-meta">
+              <span class="activity-status ${activity.status}">${activity.status}</span>
+              <span>${formatTime(activity.started_at)}</span>
+              ${activity.duration_ms ? `<span>${activity.duration_ms}ms</span>` : ''}
+              ${activity.model_used ? `<span>🤖 ${activity.model_used}</span>` : ''}
+            </div>
+            ${activity.status === 'in_progress' && activity.progress > 0 ? `
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: ${activity.progress * 100}%"></div>
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    // Add a new activity to the feed
+    function addActivity(activity, prepend = true) {
+      const existingItem = document.querySelector(`.activity-item[data-id="${activity.id}"]`);
+      if (existingItem) {
+        updateActivity(activity);
+        return;
+      }
+      
+      const html = `
+        <div class="activity-item ${activity.type} ${activity.status}" data-id="${activity.id}">
+          <div class="activity-icon">${ACTIVITY_ICONS[activity.type] || '⚙️'}</div>
+          <div class="activity-content">
+            <div class="activity-title">${activity.description}</div>
+            <div class="activity-meta">
+              <span class="activity-status ${activity.status}">${activity.status}</span>
+              <span>${formatTime(activity.started_at)}</span>
+              ${activity.model_used ? `<span>🤖 ${activity.model_used}</span>` : ''}
+            </div>
+            ${activity.status === 'in_progress' && activity.progress > 0 ? `
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: ${activity.progress * 100}%"></div>
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      `;
+      
+      if (prepend) {
+        activityFeed.insertAdjacentHTML('afterbegin', html);
+      } else {
+        activityFeed.insertAdjacentHTML('beforeend', html);
+      }
+      
+      // Update count
+      const count = activityFeed.querySelectorAll('.activity-item').length;
+      activityCount.textContent = `${count} activities`;
+    }
+    
+    // Update an existing activity
+    function updateActivity(activity) {
+      const item = document.querySelector(`.activity-item[data-id="${activity.id}"]`);
+      if (!item) return;
+      
+      item.className = `activity-item ${activity.type} ${activity.status}`;
+      
+      const statusEl = item.querySelector('.activity-status');
+      if (statusEl) {
+        statusEl.className = `activity-status ${activity.status}`;
+        statusEl.textContent = activity.status;
+      }
+      
+      const progressBar = item.querySelector('.progress-bar');
+      if (activity.status === 'in_progress' && activity.progress > 0) {
+        if (progressBar) {
+          progressBar.querySelector('.progress-fill').style.width = `${activity.progress * 100}%`;
+        } else {
+          const content = item.querySelector('.activity-content');
+          content.insertAdjacentHTML('beforeend', `
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: ${activity.progress * 100}%"></div>
+            </div>
+          `);
+        }
+      } else if (progressBar) {
+        progressBar.remove();
+      }
+    }
+    
+    // Update active tasks section
+    function updateActiveTasks() {
+      // Request updated dashboard
+      if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({ type: 'get_dashboard' }));
+      }
+    }
+    
+    // Render model usage
+    function renderModelUsage(models) {
+      if (!models || models.length === 0) {
+        modelList.innerHTML = '<div class="no-active">No model usage data</div>';
+        return;
+      }
+      
+      modelList.innerHTML = models.map(model => `
+        <div class="model-item">
+          <div class="model-info">
+            <div class="model-name">${model.model_key || 'Unknown'}</div>
+            <div class="model-stats">
+              ${model.total_requests || 0} requests • 
+              ${Math.round(model.avg_latency || 0)}ms avg
+            </div>
+          </div>
+          <div class="model-badge ${(model.total_input || 0) === 0 ? 'free' : ''}">
+            ${(model.total_input || 0) === 0 ? 'FREE' : `${((model.total_input || 0) / 1000).toFixed(1)}K tokens`}
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    // Format timestamp
+    function formatTime(isoString) {
+      if (!isoString) return '';
+      const date = new Date(isoString);
+      const now = new Date();
+      const diff = now - date;
+      
+      if (diff < 60000) return 'Just now';
+      if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+      if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+      
+      return date.toLocaleDateString();
+    }
+    
+    // Initialize
+    connect();
+    
+    // Request dashboard refresh every 10 seconds
+    setInterval(() => {
+      if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({ type: 'get_dashboard' }));
+      }
+    }, 10000);
+  </script>
+</body>
+</html>

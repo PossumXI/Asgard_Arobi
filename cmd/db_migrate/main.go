@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 	"time"
@@ -49,8 +48,9 @@ func main() {
 	tables := []string{"users", "satellites", "hunoids", "missions", "alerts", "threats", "subscriptions", "audit_logs", "ethical_decisions"}
 	for _, table := range tables {
 		var exists bool
-		query := fmt.Sprintf("SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = '%s')", table)
-		if err := pgDB.QueryRowContext(ctx, query).Scan(&exists); err != nil {
+		// Use parameterized query to prevent SQL injection
+		query := "SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = $1)"
+		if err := pgDB.QueryRowContext(ctx, query, table).Scan(&exists); err != nil {
 			log.Fatalf("Failed to check table %s: %v", table, err)
 		}
 		if !exists {

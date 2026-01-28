@@ -142,6 +142,7 @@ func main() {
 		mcpCfg.Addr = mcpAddr
 	}
 	mcpServer := mcp.NewServer(mcpCfg)
+	mcpServer.SetPostgresDB(pgDB)
 	mcpServer.RegisterDefaultTools()
 	if err := mcpServer.Start(); err != nil {
 		log.Printf("Warning: MCP server failed to start: %v", err)

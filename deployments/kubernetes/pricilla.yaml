@@ -17,10 +17,20 @@ spec:
         app: pricilla
         component: guidance
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
       containers:
       - name: pricilla
-        image: asgard/pricilla:latest
+        image: asgard/pricilla:v2.0.0
         imagePullPolicy: IfNotPresent
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: ["ALL"]
         ports:
         - containerPort: 8089
           name: http

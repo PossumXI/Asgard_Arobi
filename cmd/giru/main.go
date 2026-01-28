@@ -220,7 +220,12 @@ func main() {
 	// Initialize Gaga Chat for secure communication
 	gagaEncKey := os.Getenv("GAGA_ENCRYPTION_KEY")
 	if gagaEncKey == "" {
-		gagaEncKey = "asgard-secure-comms-default-key"
+		if os.Getenv("ASGARD_ENV") == "development" {
+			log.Println("[WARNING] Using default GAGA encryption key - set GAGA_ENCRYPTION_KEY in production!")
+			gagaEncKey = "asgard-dev-encryption-key-32ch"
+		} else {
+			log.Fatal("GAGA_ENCRYPTION_KEY environment variable must be set in production")
+		}
 	}
 	secureChat := gagachat.NewChat(gagaEncKey)
 	log.Println("Gaga Chat initialized - steganographic communication available")

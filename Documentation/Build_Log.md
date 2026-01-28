@@ -1,5 +1,14 @@
 # Build Log
 
+## 2026-01-28 (Audit Hardening & MCP Data Wiring)
+- Replaced MCP placeholder responses with Postgres-backed tools and resources.
+- Queued MCP commands via control plane command table for satellites, missions, scans, trajectories.
+- Red/Blue team checks now run non-invasive real checks and removed simulation wording.
+- Fixed Blue Team rule matching (`contains`) and Argon2 password verification parser.
+- Removed unused placeholder physics model constants.
+- Cleaned unused import in `cmd/db_migrate`.
+- Tests: `go test ./...` (PASS)
+
 ## 2026-01-24 (Pricilla Build + Smoke Run)
 - Built `Pricilla/cmd/percila` to `bin/pricilla.exe` successfully.
 - Smoke run started and initialized services; HTTP/metrics failed to bind on `:8089`/`:9089` (ports already in use).
