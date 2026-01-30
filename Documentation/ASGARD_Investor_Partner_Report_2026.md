@@ -765,7 +765,7 @@ Asgard/
 │   ├── security/          # Shadow stack, red/blue team
 │   └── services/          # Auth, subscription, etc.
 ├── Pricilla/              # Guidance system
-│   ├── cmd/percila/       # Main service
+│   ├── cmd/pricilla/      # Main service
 │   └── internal/          # Guidance, sensors, stealth
 ├── pkg/bundle/            # Bundle Protocol v7
 ├── Websites/              # React frontend

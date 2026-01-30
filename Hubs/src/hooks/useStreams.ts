@@ -288,14 +288,14 @@ export function useStreamChat(streamId: string | null) {
       try {
         await hubsRealtime.connect();
         setIsConnected(true);
-      } catch (err) {
+      } catch {
         setError('Failed to connect to chat service');
       }
 
       try {
         const history = await hubsApi.getStreamChat(streamId);
         setMessages(history);
-      } catch (err) {
+      } catch {
         setError('Failed to load chat history');
       } finally {
         setIsLoading(false);

@@ -24,17 +24,21 @@ if (-not (Test-Path $binary)) {
 
 # Check if databases are running
 Write-Host "`nChecking database connections..." -ForegroundColor Yellow
-$pgRunning = Test-NetConnection -ComputerName localhost -Port 5432 -InformationLevel Quiet -WarningAction SilentlyContinue
-$mongoRunning = Test-NetConnection -ComputerName localhost -Port 27017 -InformationLevel Quiet -WarningAction SilentlyContinue
+$pgRunning = Test-NetConnection -ComputerName localhost -Port 55432 -InformationLevel Quiet -WarningAction SilentlyContinue
+$mongoRunning = Test-NetConnection -ComputerName localhost -Port 27018 -InformationLevel Quiet -WarningAction SilentlyContinue
 
 if (-not $pgRunning) {
-    Write-Host "Warning: PostgreSQL not running on localhost:5432" -ForegroundColor Yellow
-    Write-Host "Start databases with: cd Data && docker-compose up -d" -ForegroundColor Cyan
+    Write-Host "Warning: PostgreSQL not running on localhost:55432" -ForegroundColor Yellow
+    Write-Host "Start databases with: cd Data && docker compose up -d" -ForegroundColor Cyan
 }
 
 if (-not $mongoRunning) {
-    Write-Host "Warning: MongoDB not running on localhost:27017" -ForegroundColor Yellow
-    Write-Host "Start databases with: cd Data && docker-compose up -d" -ForegroundColor Cyan
+    Write-Host "Warning: MongoDB not running on localhost:27018" -ForegroundColor Yellow
+    Write-Host "Start databases with: cd Data && docker compose up -d" -ForegroundColor Cyan
+}
+
+if (-not $env:ASGARD_ENV) {
+    $env:ASGARD_ENV = "development"
 }
 
 # Build command

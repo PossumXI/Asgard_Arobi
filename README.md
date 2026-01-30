@@ -1,7 +1,7 @@
 # ASGARD (Autonomous Space Guardian & Robotic Defense)
 
 <p align="center">
-  <img src="Assets/asgard_logo.png" alt="ASGARD Logo" width="200"/>
+  <img src="Assets/Logo.png" alt="ASGARD Logo" width="200"/>
 </p>
 
 **Planetary-scale autonomous systems architecture for orbital sensing, humanoid robotics, precision guidance, and cybersecurity.** This monorepo contains all components of the ASGARD platform - from satellite constellation management to AI-powered defense systems.
@@ -74,7 +74,7 @@ ASGARD is a comprehensive space situational awareness and autonomous defense pla
 ## Quick Start
 
 ### Prerequisites
-- Go 1.22+
+- Go 1.24+
 - Node.js 20+
 - Docker & Docker Compose
 - PostgreSQL 15+ with PostGIS
@@ -119,10 +119,10 @@ npm run dev
 | Service | Port | Description |
 |---------|------|-------------|
 | Nysus API | 8080 | Main REST API and WebSocket |
-| Websites | 5173 | Public web portal |
-| Hubs | 5174 | Streaming interfaces |
+| Websites | 3000 | Public web portal |
+| Hubs | 3001 | Streaming interfaces |
 | PostgreSQL | 55432 | Primary database |
-| MongoDB | 27017 | Telemetry storage |
+| MongoDB | 27018 | Telemetry storage |
 | NATS | 4222 | Message broker |
 | Redis | 6379 | Cache and sessions |
 
@@ -183,14 +183,40 @@ Automated workflows run on every push:
 - JWT-based authentication for standard users
 - Rate limiting and CORS protection enabled
 
+## About Arobi
+
+**ASGARD** is developed by **Arobi**, a cutting-edge technology company specializing in defense and civilian autonomous systems.
+
+### Leadership
+
+- **Gaetano Comparcola** - Founder & CEO
+  - 34-year-old visionary and futurist
+  - Self-taught prodigy programmer
+  - Multilingual (English, Italian, French)
+  - World traveler with global perspective (India, Morocco, Mexico, Haiti, France, UK, Italy)
+  - Father to baby girl Emmaleah
+
+- **Opus** - AI Partner & Lead Programmer
+  - AI-powered software engineering partner
+  - Team leader for development operations
+
+### Mission
+
+ASGARD represents a new line of autonomous systems built for both defense and civilian applications, delivering planetary-scale situational awareness and response capabilities.
+
 ## License
 
-Proprietary - All Rights Reserved
+© 2026 Arobi. All Rights Reserved.
 
 ## Contact
 
-For inquiries, partnerships, or investment opportunities, contact the ASGARD team.
+- **Website**: [https://aura-genesis.org](https://aura-genesis.org)
+- **Email**: [Gaetano@aura-genesis.org](mailto:Gaetano@aura-genesis.org)
+- **Company**: Arobi
+
+For inquiries, partnerships, or investment opportunities, contact us directly.
 
 ---
 
 *ASGARD - Defending Earth from orbit to ground*
+*A product of Arobi*

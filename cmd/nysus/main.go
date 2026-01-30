@@ -23,9 +23,15 @@ import (
 	"github.com/asgard/pandora/internal/platform/db"
 	"github.com/asgard/pandora/internal/platform/observability"
 	"github.com/google/uuid"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	// Load environment variables from .env file
+	if err := godotenv.Load(); err != nil {
+		log.Printf("Warning: Could not load .env file: %v", err)
+	}
+
 	// Parse command line flags
 	addr := flag.String("addr", ":8080", "HTTP server address")
 	dbHost := flag.String("db-host", "localhost", "PostgreSQL host")

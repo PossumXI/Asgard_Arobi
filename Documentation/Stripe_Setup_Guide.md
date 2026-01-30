@@ -44,7 +44,7 @@ var PlanPriceMap = map[string]string{
 
 1. In Stripe Dashboard → **Developers** → **Webhooks**
 2. Click **Add endpoint**
-3. Enter endpoint URL: `https://yourdomain.com/api/webhooks/stripe`
+3. Enter endpoint URL: `https://aura-genesis.org/api/webhooks/stripe`
 4. Select these events:
    - `checkout.session.completed`
    - `customer.subscription.updated`
@@ -63,9 +63,9 @@ $env:STRIPE_WEBHOOK_SECRET="whsec_YOUR_WEBHOOK_SECRET"
 Set these environment variables for checkout redirects:
 
 ```powershell
-$env:STRIPE_SUCCESS_URL="https://yourdomain.com/dashboard?success=true"
-$env:STRIPE_CANCEL_URL="https://yourdomain.com/pricing"
-$env:STRIPE_PORTAL_RETURN_URL="https://yourdomain.com/dashboard"
+$env:STRIPE_SUCCESS_URL="https://aura-genesis.org/dashboard?success=true"
+$env:STRIPE_CANCEL_URL="https://aura-genesis.org/pricing"
+$env:STRIPE_PORTAL_RETURN_URL="https://aura-genesis.org/dashboard"
 ```
 
 ## Verification

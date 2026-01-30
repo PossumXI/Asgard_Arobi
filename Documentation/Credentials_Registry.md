@@ -291,13 +291,14 @@ VITE_WS_URL=ws://localhost:8080/ws
 
 ### Start All Services
 ```powershell
-cd C:\Users\hp\Desktop\Asgard\Data
-docker-compose up -d
+# Set ASGARD_ROOT to your repo root (e.g., C:\Users\hp\Desktop\Asgard)
+cd "$env:ASGARD_ROOT\Data"
+docker compose up -d
 ```
 
 ### Check Service Status
 ```powershell
-docker-compose ps
+docker compose ps
 ```
 
 ### Connect to PostgreSQL
@@ -354,25 +355,25 @@ docker exec -it asgard_redis redis-cli -a $REDIS_PASSWORD
    # Windows PowerShell
    $env:STRIPE_SECRET_KEY="sk_live_YOUR_KEY_HERE"
    $env:STRIPE_WEBHOOK_SECRET="whsec_YOUR_WEBHOOK_SECRET"
-   $env:STRIPE_SUCCESS_URL="https://yourdomain.com/dashboard?success=true"
-   $env:STRIPE_CANCEL_URL="https://yourdomain.com/pricing"
-   $env:STRIPE_PORTAL_RETURN_URL="https://yourdomain.com/dashboard"
+   $env:STRIPE_SUCCESS_URL="https://aura-genesis.org/dashboard?success=true"
+   $env:STRIPE_CANCEL_URL="https://aura-genesis.org/pricing"
+   $env:STRIPE_PORTAL_RETURN_URL="https://aura-genesis.org/dashboard"
    
    # Linux/Mac
    export STRIPE_SECRET_KEY="sk_live_YOUR_KEY_HERE"
    export STRIPE_WEBHOOK_SECRET="whsec_YOUR_WEBHOOK_SECRET"
-   export STRIPE_SUCCESS_URL="https://yourdomain.com/dashboard?success=true"
-   export STRIPE_CANCEL_URL="https://yourdomain.com/pricing"
-   export STRIPE_PORTAL_RETURN_URL="https://yourdomain.com/dashboard"
+   export STRIPE_SUCCESS_URL="https://aura-genesis.org/dashboard?success=true"
+   export STRIPE_CANCEL_URL="https://aura-genesis.org/pricing"
+   export STRIPE_PORTAL_RETURN_URL="https://aura-genesis.org/dashboard"
    ```
 
 3. **Or use .env file** (ensure it's in .gitignore):
    ```
    STRIPE_SECRET_KEY=sk_live_YOUR_KEY_HERE
    STRIPE_WEBHOOK_SECRET=whsec_YOUR_WEBHOOK_SECRET
-   STRIPE_SUCCESS_URL=https://yourdomain.com/dashboard?success=true
-   STRIPE_CANCEL_URL=https://yourdomain.com/pricing
-   STRIPE_PORTAL_RETURN_URL=https://yourdomain.com/dashboard
+   STRIPE_SUCCESS_URL=https://aura-genesis.org/dashboard?success=true
+   STRIPE_CANCEL_URL=https://aura-genesis.org/pricing
+   STRIPE_PORTAL_RETURN_URL=https://aura-genesis.org/dashboard
    ```
 
 4. **Configure Stripe Price IDs:**
@@ -388,7 +389,7 @@ docker exec -it asgard_redis redis-cli -a $REDIS_PASSWORD
 
 5. **Set up Webhooks:**
    - In Stripe Dashboard → Developers → Webhooks
-   - Add endpoint: `https://yourdomain.com/api/webhooks/stripe`
+   - Add endpoint: `https://aura-genesis.org/api/webhooks/stripe`
    - Select events:
      - `checkout.session.completed`
      - `customer.subscription.updated`

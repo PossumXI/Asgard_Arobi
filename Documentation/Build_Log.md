@@ -1,5 +1,18 @@
 # Build Log
 
+## 2026-01-30 (Docs, Lint, Demo Updates)
+- Aligned READMEs with Go 1.24+, frontend ports (3000/3001), and MongoDB port 27018.
+- Added ESLint configs for Websites and Hubs; lint now passes in both apps.
+- Added ASGARD demo catalog and a full system Playwright demo spec.
+- Updated Pricilla demo ports to 8092 in Playwright specs and demo runners.
+- Docker status check: no containers running.
+- Tests:
+  - `go test ./...` (PASS)
+  - `npm run lint` in `Hubs/` (PASS)
+  - `npm run lint` in `Websites/` (PASS)
+  - `npm test` in `Websites/` (PASS, no test files)
+  - `npm test` in `test/e2e` (FAIL: Pricilla/Giru services offline)
+
 ## 2026-01-28 (Audit Hardening & MCP Data Wiring)
 - Replaced MCP placeholder responses with Postgres-backed tools and resources.
 - Queued MCP commands via control plane command table for satellites, missions, scans, trajectories.
@@ -10,7 +23,7 @@
 - Tests: `go test ./...` (PASS)
 
 ## 2026-01-24 (Pricilla Build + Smoke Run)
-- Built `Pricilla/cmd/percila` to `bin/pricilla.exe` successfully.
+- Built `Pricilla/cmd/pricilla` to `bin/pricilla.exe` successfully.
 - Smoke run started and initialized services; HTTP/metrics failed to bind on `:8089`/`:9089` (ports already in use).
 - Assigned Pricilla ports: HTTP `8092`, Metrics `9092` (see `Documentation/Port_Allocations.md`).
 - Reassigned HTTP from `8091` to `8092` after detecting `8091` in use.
@@ -305,8 +318,8 @@ The frontend is production-ready and waiting for backend implementation.
 
 | Service | Host | Port | Username | Password |
 |---------|------|------|----------|----------|
-| PostgreSQL | localhost | 5432 | postgres | ${POSTGRES_PASSWORD} |
-| MongoDB | localhost | 27017 | admin | ${MONGO_PASSWORD} |
+| PostgreSQL | localhost | 55432 | postgres | ${POSTGRES_PASSWORD} |
+| MongoDB | localhost | 27018 | admin | ${MONGO_PASSWORD} |
 | NATS | localhost | 4222 | N/A | N/A |
 | Redis | localhost | 6379 | N/A | N/A |
 

@@ -9,7 +9,11 @@ param(
 )
 
 $ErrorActionPreference = "Continue"
-$AsgardRoot = "C:\Users\hp\Desktop\Asgard"
+$AsgardRoot = if ($env:ASGARD_ROOT) {
+    $env:ASGARD_ROOT
+} else {
+    Resolve-Path (Join-Path $PSScriptRoot "..")
+}
 $DockerLogPath = "$AsgardRoot\Documentation\Docker_Logs.md"
 $ComposeFile = "$AsgardRoot\Data\docker-compose.yml"
 
@@ -112,8 +116,8 @@ It tracks container status, errors, and warnings across all ASGARD services.
 
 | Container | Service | Port(s) |
 |-----------|---------|---------|
-| asgard_postgres | PostgreSQL/PostGIS | 5432 |
-| asgard_mongodb | MongoDB | 27017 |
+| asgard_postgres | PostgreSQL/PostGIS | 55432 -> 5432 |
+| asgard_mongodb | MongoDB | 27018 -> 27017 |
 | asgard_nats | NATS JetStream | 4222, 8222, 6222 |
 | asgard_redis | Redis | 6379 |
 

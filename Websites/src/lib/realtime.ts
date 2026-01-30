@@ -200,7 +200,7 @@ export function useRealtime(): RealtimeConnection {
 }
 
 // React hook for subscribing to events
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 export function useRealtimeEvent<T = unknown>(
   eventType: RealtimeEventType | '*'
@@ -225,6 +225,7 @@ export function useRealtimeEvents<T = unknown>(
   eventTypes: RealtimeEventType[]
 ): Map<RealtimeEventType, T> {
   const [events, setEvents] = useState<Map<RealtimeEventType, T>>(new Map());
+  const eventTypesKey = useMemo(() => eventTypes.join(','), [eventTypes]);
 
   useEffect(() => {
     const realtime = getRealtime();
@@ -239,7 +240,7 @@ export function useRealtimeEvents<T = unknown>(
     return () => {
       unsubscribers.forEach((unsub) => unsub());
     };
-  }, [eventTypes.join(',')]);
+  }, [eventTypes, eventTypesKey]);
 
   return events;
 }

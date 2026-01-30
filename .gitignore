@@ -96,7 +96,9 @@ __pycache__/
 *$py.class
 .Python
 venv/
+.venv/
 ENV/
+.env/
 
 # Test artifacts
 test-results/

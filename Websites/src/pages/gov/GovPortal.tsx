@@ -292,14 +292,14 @@ function GovLanding() {
               <Card className="bg-asgard-900 border-asgard-800">
                 <CardContent className="p-6">
                   <h3 className="text-title text-white mb-2">US Government</h3>
-                  <p className="text-sm text-asgard-400 mb-1">govrelations@asgard.gov</p>
+                  <p className="text-sm text-asgard-400 mb-1">Gaetano@aura-genesis.org</p>
                   <p className="text-sm text-asgard-400">CAGE Code: XXXX1</p>
                 </CardContent>
               </Card>
               <Card className="bg-asgard-900 border-asgard-800">
                 <CardContent className="p-6">
                   <h3 className="text-title text-white mb-2">International</h3>
-                  <p className="text-sm text-asgard-400 mb-1">international@asgard.dev</p>
+                  <p className="text-sm text-asgard-400 mb-1">Gaetano@aura-genesis.org</p>
                   <p className="text-sm text-asgard-400">NATO Stock Number available</p>
                 </CardContent>
               </Card>

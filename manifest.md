@@ -4559,7 +4559,7 @@ WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
-RUN CGO_ENABLED=0 go build -o /pricilla cmd/percila/main.go
+RUN CGO_ENABLED=0 go build -o /pricilla cmd/pricilla/main.go
 
 FROM alpine:latest
 RUN apk --no-cache add ca-certificates
@@ -5280,7 +5280,7 @@ func listenForMissionCommands(ctx context.Context, coord *integration.SystemCoor
 cd C:\Users\hp\Desktop\Asgard
 
 # Build Pricilla service
-go build -o bin/pricilla.exe cmd/percila/main.go
+go build -o bin/pricilla.exe ./Pricilla/cmd/pricilla/main.go
 
 # Test run
 .\bin\pricilla.exe -id pricilla001

@@ -1,0 +1,29 @@
+{
+  "name": "asgard-demo-recorder",
+  "version": "1.0.0",
+  "description": "Playwright-based demo recorder for ASGARD systems",
+  "main": "demo-recorder.ts",
+  "scripts": {
+    "install:playwright": "npx playwright install chromium",
+    "demo": "npx ts-node demo-recorder.ts",
+    "demo:website": "npx ts-node demo-recorder.ts --website-only",
+    "demo:valkyrie": "npx ts-node demo-recorder.ts --valkyrie-only",
+    "demo:pricilla": "npx ts-node demo-recorder.ts --pricilla-only",
+    "demo:giru": "npx ts-node demo-recorder.ts --giru-only",
+    "demo:all": "npx ts-node demo-recorder.ts --all",
+    "clean": "rimraf demo-output"
+  },
+  "dependencies": {
+    "@playwright/test": "^1.41.0",
+    "playwright": "^1.41.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "rimraf": "^5.0.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

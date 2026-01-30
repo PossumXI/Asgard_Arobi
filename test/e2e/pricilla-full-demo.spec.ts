@@ -19,7 +19,7 @@ import * as path from 'path';
  * - Real-time targeting metrics
  */
 
-const PRICILLA_URL = 'http://localhost:8089';
+const PRICILLA_URL = 'http://localhost:8092';
 
 test.describe('Pricilla Full Demo', () => {
   test('Complete Pricilla Capabilities Showcase', async ({ page, request }) => {

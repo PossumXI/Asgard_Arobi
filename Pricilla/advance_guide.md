@@ -913,7 +913,7 @@ curl http://localhost:8092/api/v1/feeds \
 ```powershell
 # Build executable
 cd C:\Users\hp\Desktop\Asgard
-go build -o bin/pricilla.exe ./Pricilla/cmd/percila/main.go
+go build -o bin/pricilla.exe ./Pricilla/cmd/pricilla/main.go
 
 # Verify build
 .\bin\pricilla.exe --help
@@ -942,7 +942,7 @@ go build -o bin/pricilla.exe ./Pricilla/cmd/percila/main.go
 FROM golang:1.21-alpine AS builder
 WORKDIR /app
 COPY . .
-RUN go build -o pricilla ./Pricilla/cmd/percila/main.go
+RUN go build -o pricilla ./Pricilla/cmd/pricilla/main.go
 
 FROM alpine:latest
 RUN apk --no-cache add ca-certificates

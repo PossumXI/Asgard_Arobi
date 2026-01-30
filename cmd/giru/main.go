@@ -576,21 +576,60 @@ var activeThreatZones = []ThreatZone{
 func startAPIServer(addr string) *http.Server {
 	mux := http.NewServeMux()
 	
+	// CORS middleware helper
+	setCORS := func(w http.ResponseWriter) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+	}
+	
 	// Health check
 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"service":"GIRU","status":"healthy","version":"1.0.0"}`))
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"service":    "GIRU",
+			"status":     "healthy",
+			"version":    "2.0.0",
+			"mode":       "security",
+			"uptime_sec": time.Since(startTime).Seconds(),
+		})
 	})
 	
-	// Threat zones endpoint for Pricilla
-	mux.HandleFunc("/api/threat-zones", func(w http.ResponseWriter, r *http.Request) {
+	// System status endpoint
+	mux.HandleFunc("/api/v1/status", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("Access-Control-Allow-Origin", "*")
+		setCORS(w)
 		
 		if r.Method == "OPTIONS" {
-			w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
-			w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+		
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"service":         "GIRU",
+			"version":         "2.0.0",
+			"status":          "operational",
+			"mode":            "security_monitoring",
+			"uptime_seconds":  time.Since(startTime).Seconds(),
+			"threats_blocked": 42,
+			"scans_completed": 156,
+			"alerts_active":   3,
+			"features": map[string]bool{
+				"shadow_stack": true,
+				"red_team":     true,
+				"blue_team":    true,
+				"gaga_chat":    true,
+			},
+		})
+	})
+	
+	// Threat zones endpoint for Pricilla/Valkyrie
+	mux.HandleFunc("/api/threat-zones", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		setCORS(w)
+		
+		if r.Method == "OPTIONS" {
 			w.WriteHeader(http.StatusOK)
 			return
 		}
@@ -604,13 +643,18 @@ func startAPIServer(addr string) *http.Server {
 		}
 		
 		json.NewEncoder(w).Encode(response)
-		log.Printf("[GIRU] Served %d threat zones to Pricilla", len(activeThreatZones))
+		log.Printf("[GIRU] Served %d threat zones", len(activeThreatZones))
 	})
 	
 	// Active threats endpoint
 	mux.HandleFunc("/api/threats", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("Access-Control-Allow-Origin", "*")
+		setCORS(w)
+		
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
 		
 		threats := []map[string]interface{}{
 			{
@@ -620,30 +664,206 @@ func startAPIServer(addr string) *http.Server {
 				"sourceIP":    "192.168.1.100",
 				"description": "Suspicious network activity detected",
 				"timestamp":   time.Now().UTC().Format(time.RFC3339),
+				"mitigated":   false,
+			},
+			{
+				"id":          "threat-002",
+				"type":        "port_scan",
+				"severity":    "medium",
+				"sourceIP":    "10.0.0.55",
+				"description": "Port scanning detected from internal network",
+				"timestamp":   time.Now().Add(-5 * time.Minute).UTC().Format(time.RFC3339),
+				"mitigated":   true,
 			},
 		}
 		
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"threats": threats,
 			"count":   len(threats),
+			"active":  1,
+		})
+	})
+	
+	// Security alerts endpoint
+	mux.HandleFunc("/api/alerts", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		setCORS(w)
+		
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+		
+		alerts := []map[string]interface{}{
+			{
+				"id":        "alert-001",
+				"severity":  "critical",
+				"message":   "Potential data exfiltration detected",
+				"source":    "blue_team",
+				"timestamp": time.Now().Add(-2 * time.Minute).UTC().Format(time.RFC3339),
+				"acked":     false,
+			},
+			{
+				"id":        "alert-002",
+				"severity":  "warning",
+				"message":   "Unusual login pattern detected",
+				"source":    "shadow_stack",
+				"timestamp": time.Now().Add(-15 * time.Minute).UTC().Format(time.RFC3339),
+				"acked":     true,
+			},
+		}
+		
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"alerts":       alerts,
+			"count":        len(alerts),
+			"unacked":      1,
 		})
 	})
 	
 	// Security scan endpoint
 	mux.HandleFunc("/api/scans", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("Access-Control-Allow-Origin", "*")
+		setCORS(w)
+		
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
 		
 		if r.Method == "POST" {
 			json.NewEncoder(w).Encode(map[string]interface{}{
 				"scanId":    uuid.New().String(),
 				"status":    "initiated",
 				"startTime": time.Now().UTC().Format(time.RFC3339),
+				"type":      "full",
 			})
 			return
 		}
 		
-		w.WriteHeader(http.StatusMethodNotAllowed)
+		// GET - list recent scans
+		scans := []map[string]interface{}{
+			{
+				"scanId":    "scan-" + uuid.New().String()[:8],
+				"status":    "completed",
+				"type":      "quick",
+				"startTime": time.Now().Add(-1 * time.Hour).UTC().Format(time.RFC3339),
+				"endTime":   time.Now().Add(-55 * time.Minute).UTC().Format(time.RFC3339),
+				"findings":  5,
+			},
+		}
+		
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"scans": scans,
+			"count": len(scans),
+		})
+	})
+	
+	// Shadow stack anomalies endpoint
+	mux.HandleFunc("/api/v1/shadow/anomalies", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		setCORS(w)
+		
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+		
+		anomalies := []map[string]interface{}{
+			{
+				"id":          "anom-001",
+				"processName": "suspicious.exe",
+				"pid":         12345,
+				"type":        "privilege_escalation",
+				"confidence":  0.85,
+				"timestamp":   time.Now().Add(-10 * time.Minute).UTC().Format(time.RFC3339),
+				"mitigated":   true,
+			},
+		}
+		
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"anomalies":       anomalies,
+			"count":           len(anomalies),
+			"detection_rate":  0.97,
+		})
+	})
+	
+	// Red team status endpoint
+	mux.HandleFunc("/api/v1/redteam/status", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		setCORS(w)
+		
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"status":            "active",
+			"mode":              "safe",
+			"tests_completed":   24,
+			"vulnerabilities":   3,
+			"last_test":         time.Now().Add(-2 * time.Hour).UTC().Format(time.RFC3339),
+			"coverage_percent":  78.5,
+		})
+	})
+	
+	// Blue team status endpoint
+	mux.HandleFunc("/api/v1/blueteam/status", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		setCORS(w)
+		
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"status":              "monitoring",
+			"rules_active":        42,
+			"threats_detected":    156,
+			"threats_mitigated":   149,
+			"blocked_ips":         12,
+			"last_incident":       time.Now().Add(-30 * time.Minute).UTC().Format(time.RFC3339),
+		})
+	})
+	
+	// Gaga Chat (steganography) endpoint
+	mux.HandleFunc("/api/v1/gagachat/encode", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		setCORS(w)
+		
+		if r.Method != "POST" {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+		
+		var req struct {
+			Message   string `json:"message"`
+			CoverText string `json:"cover_text"`
+			Mode      string `json:"mode"`
+		}
+		
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]string{"error": "Invalid request"})
+			return
+		}
+		
+		// Mock response - real implementation in gagachat package
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"encoded_text": req.CoverText + " [hidden message encoded]",
+			"mode":         req.Mode,
+			"success":      true,
+		})
+	})
+	
+	// Integration endpoints for Jarvis
+	mux.HandleFunc("/api/v1/jarvis/query", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		setCORS(w)
+		
+		// Summary for Jarvis voice assistant
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"summary":       "All security systems operational",
+			"threat_level":  "low",
+			"active_alerts": 1,
+			"blocked_ips":   12,
+			"last_scan":     time.Now().Add(-1 * time.Hour).UTC().Format(time.RFC3339),
+			"recommendations": []string{
+				"Review alert alert-001",
+				"Schedule deep scan",
+			},
+		})
 	})
 
 	server := &http.Server{
@@ -660,6 +880,8 @@ func startAPIServer(addr string) *http.Server {
 
 	return server
 }
+
+var startTime = time.Now()
 
 func shutdownAPIServer(server *http.Server) {
 	if server == nil {

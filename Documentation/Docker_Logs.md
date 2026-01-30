@@ -7,8 +7,8 @@ It tracks container status, errors, and warnings across all ASGARD services.
 
 | Container | Service | Port(s) | Purpose |
 |-----------|---------|---------|---------|
-| asgard_postgres | PostgreSQL/PostGIS 15 | 5432 | Primary relational database with geospatial support |
-| asgard_mongodb | MongoDB 7 | 27017 | Document store for telemetry and unstructured data |
+| asgard_postgres | PostgreSQL/PostGIS 15 | 55432 -> 5432 | Primary relational database with geospatial support |
+| asgard_mongodb | MongoDB 7 | 27018 -> 27017 | Document store for telemetry and unstructured data |
 | asgard_nats | NATS JetStream | 4222, 8222, 6222 | Message broker for event-driven architecture |
 | asgard_redis | Redis 7 | 6379 | Cache and session storage |
 
@@ -16,7 +16,8 @@ It tracks container status, errors, and warnings across all ASGARD services.
 
 ### Start All Services
 ```powershell
-cd C:\Users\hp\Desktop\Asgard\Data
+# Set ASGARD_ROOT to your repo root (e.g., C:\Users\hp\Desktop\Asgard)
+cd "$env:ASGARD_ROOT\Data"
 docker compose up -d
 ```
 
@@ -88,6 +89,31 @@ redis:
 ---
 
 ## Activity Log
+
+[2026-01-30 15:20:00] [INFO] Manual container status check
+
+---
+
+## Status Report: 2026-01-30 15:20:00 (Manual Check)
+
+### Container Health
+
+| Container | Status | Health | Notes |
+|-----------|--------|--------|-------|
+| asgard_postgres | not running | - | No containers active |
+| asgard_mongodb | not running | - | No containers active |
+| asgard_nats | not running | - | No containers active |
+| asgard_redis | not running | - | No containers active |
+
+### Status: Not Running
+
+No Docker containers were running during this check. Start services via:
+```powershell
+cd C:\Users\hp\Desktop\Asgard\Data
+docker compose up -d
+```
+
+---
 
 [2026-01-21 04:45:00] [INFO] Docker log monitoring initialized
 [2026-01-21 04:45:00] [INFO] Monitoring 4 ASGARD containers

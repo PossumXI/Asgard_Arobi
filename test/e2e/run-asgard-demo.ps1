@@ -16,7 +16,7 @@ Start-Sleep -Seconds 1
 Write-Host "Building services..." -ForegroundColor Yellow
 Push-Location $AsgardRoot
 try {
-    go build -o bin/pricilla.exe ./Pricilla/cmd/percila
+    go build -o bin/pricilla.exe ./Pricilla/cmd/pricilla
     go build -o bin/giru.exe ./cmd/giru
     go build -o bin/nysus.exe ./cmd/nysus
     Write-Host "  All services built successfully" -ForegroundColor Green
@@ -38,13 +38,13 @@ Start-Sleep -Seconds 1
 
 # Start Pricilla
 Write-Host "Starting PRICILLA (Guidance)..." -ForegroundColor Yellow
-Start-Process -FilePath "$AsgardRoot\bin\pricilla.exe" -ArgumentList "-http-port","8089","-giru","http://localhost:9090","-nysus","http://localhost:8080" -WindowStyle Hidden
+Start-Process -FilePath "$AsgardRoot\bin\pricilla.exe" -ArgumentList "-http-port","8092","-giru","http://localhost:9090","-nysus","http://localhost:8080" -WindowStyle Hidden
 Start-Sleep -Seconds 2
 
 # Verify services are running
 Write-Host "`nVerifying services..." -ForegroundColor Yellow
 $services = @(
-    @{ Name = "PRICILLA"; Port = 8089 },
+    @{ Name = "PRICILLA"; Port = 8092 },
     @{ Name = "GIRU"; Port = 9090 },
     @{ Name = "NYSUS"; Port = 8080 }
 )

@@ -8,7 +8,11 @@ param(
 )
 
 $ErrorActionPreference = "Continue"
-$AsgardRoot = "C:\Users\hp\Desktop\Asgard"
+$AsgardRoot = if ($env:ASGARD_ROOT) {
+    $env:ASGARD_ROOT
+} else {
+    Resolve-Path (Join-Path $PSScriptRoot "..")
+}
 $AuditLogPath = "$AsgardRoot\Documentation\Audit_Activity.md"
 $StateFilePath = "$AsgardRoot\Documentation\.audit_state.json"
 

@@ -1,0 +1,187 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: asgard
+  labels:
+    name: asgard
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: valkyrie
+  namespace: asgard
+  labels:
+    app: valkyrie
+    component: autonomous-flight
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: valkyrie
+  template:
+    metadata:
+      labels:
+        app: valkyrie
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9093"
+    spec:
+      containers:
+      - name: valkyrie
+        image: asgard/valkyrie:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8093
+          name: http
+        - containerPort: 9093
+          name: metrics
+        args:
+        - "-sim"
+        - "-ai"
+        - "-security"
+        - "-failsafe"
+        - "-livefeed"
+        env:
+        - name: NYSUS_ENDPOINT
+          value: "http://nysus-service:8080"
+        - name: SILENUS_ENDPOINT
+          value: "http://silenus-service:9093"
+        - name: SATNET_ENDPOINT
+          value: "http://satnet-service:8081"
+        - name: GIRU_ENDPOINT
+          value: "http://giru-service:9090"
+        - name: HUNOID_ENDPOINT
+          value: "http://hunoid-service:8090"
+        - name: LOG_LEVEL
+          value: "info"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "2000m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8093
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8093
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+        volumeMounts:
+        - name: config
+          mountPath: /app/configs
+          readOnly: true
+        - name: logs
+          mountPath: /app/logs
+      volumes:
+      - name: config
+        configMap:
+          name: valkyrie-config
+      - name: logs
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: valkyrie-service
+  namespace: asgard
+  labels:
+    app: valkyrie
+spec:
+  selector:
+    app: valkyrie
+  ports:
+  - name: http
+    port: 8093
+    targetPort: 8093
+  - name: metrics
+    port: 9093
+    targetPort: 9093
+  type: ClusterIP
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: valkyrie-config
+  namespace: asgard
+data:
+  config.yaml: |
+    http_port: 8093
+    metrics_port: 9093
+    
+    asgard:
+      nysus: http://nysus-service:8080
+      silenus: http://silenus-service:9093
+      satnet: http://satnet-service:8081
+      giru: http://giru-service:9090
+      hunoid: http://hunoid-service:8090
+    
+    fusion:
+      update_rate: 100.0
+      min_sensors: 2
+      outlier_threshold: 3.0
+      enable_adaptive: true
+    
+    ai:
+      enabled: true
+      decision_rate: 50.0
+      safety_priority: 0.9
+      efficiency_priority: 0.7
+      stealth_priority: 0.5
+    
+    security:
+      enabled: true
+      scan_interval: 100ms
+      anomaly_threshold: 0.7
+      response_mode: alert
+    
+    failsafe:
+      enabled: true
+      enable_auto_rtb: true
+      enable_auto_land: true
+      min_safe_altitude_agl: 50.0
+      min_safe_fuel: 0.15
+      min_safe_battery: 0.20
+    
+    livefeed:
+      enabled: true
+      telemetry_rate: 10.0
+    
+    logging:
+      level: info
+      output: stdout
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: valkyrie-hpa
+  namespace: asgard
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: valkyrie
+  minReplicas: 1
+  maxReplicas: 3
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80

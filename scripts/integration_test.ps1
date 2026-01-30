@@ -3,6 +3,10 @@
 
 Write-Host "=== ASGARD Integration Testing ===" -ForegroundColor Cyan
 
+if (-not $env:ASGARD_ENV) {
+    $env:ASGARD_ENV = "development"
+}
+
 $testResults = @()
 $allPassed = $true
 

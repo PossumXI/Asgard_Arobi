@@ -40,7 +40,7 @@ PRICILLA is the most advanced AI-controlled guidance, navigation, and delivery s
 
 ```powershell
 cd C:\Users\hp\Desktop\Asgard\Pricilla
-go build -o bin\pricilla.exe cmd\percila\main.go
+go build -o bin\pricilla.exe cmd\pricilla\main.go
 ```
 
 ### Run PRICILLA
@@ -151,12 +151,31 @@ Pricilla/
 go build ./...
 
 # Build main service
-go build -o bin\pricilla.exe cmd\percila\main.go
+go build -o bin\pricilla.exe cmd\pricilla\main.go
 
 # Run tests
 go test ./...
 ```
 
+## About Arobi
+
+**PRICILLA** is part of the **ASGARD** platform, developed by **Arobi** - a cutting-edge technology company specializing in defense and civilian autonomous systems.
+
+### Leadership
+
+- **Gaetano Comparcola** - Founder & CEO
+  - Self-taught prodigy programmer and futurist
+  - Multilingual (English, Italian, French)
+  
+- **Opus** - AI Partner & Lead Programmer
+  - AI-powered software engineering partner
+
 ## License
 
-Part of the ASGARD (PANDORA) project.
+© 2026 Arobi. All Rights Reserved.
+
+## Contact
+
+- **Website**: [https://aura-genesis.org](https://aura-genesis.org)
+- **Email**: [Gaetano@aura-genesis.org](mailto:Gaetano@aura-genesis.org)
+- **Company**: Arobi

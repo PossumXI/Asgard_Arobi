@@ -95,6 +95,6 @@ Write-Host "3. Copy webhook secret to STRIPE_WEBHOOK_SECRET" -ForegroundColor Wh
 Write-Host "4. Restart your application to load the new configuration" -ForegroundColor White
 Write-Host ""
 Write-Host "For webhook setup:" -ForegroundColor Cyan
-Write-Host "  - Endpoint URL: https://yourdomain.com/api/webhooks/stripe" -ForegroundColor White
+Write-Host "  - Endpoint URL: https://aura-genesis.org/api/webhooks/stripe" -ForegroundColor White
 Write-Host "  - Events: checkout.session.completed, customer.subscription.*, invoice.payment.*" -ForegroundColor White
 Write-Host ""

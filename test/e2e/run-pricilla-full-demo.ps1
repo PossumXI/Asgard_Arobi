@@ -12,22 +12,22 @@ Set-Location $PSScriptRoot
 # Check if Pricilla is running
 $pricillaRunning = $false
 try {
-    $response = Invoke-WebRequest -Uri "http://localhost:8089/health" -TimeoutSec 3 -UseBasicParsing -ErrorAction SilentlyContinue
+    $response = Invoke-WebRequest -Uri "http://localhost:8092/health" -TimeoutSec 3 -UseBasicParsing -ErrorAction SilentlyContinue
     if ($response.StatusCode -eq 200) { $pricillaRunning = $true }
 } catch {}
 
 Write-Host "Pre-flight Check:" -ForegroundColor Yellow
-Write-Host "  - Pricilla Service (8089): $(if ($pricillaRunning) { 'RUNNING' } else { 'NOT RUNNING' })" -ForegroundColor $(if ($pricillaRunning) { 'Green' } else { 'Red' })
+Write-Host "  - Pricilla Service (8092): $(if ($pricillaRunning) { 'RUNNING' } else { 'NOT RUNNING' })" -ForegroundColor $(if ($pricillaRunning) { 'Green' } else { 'Red' })
 Write-Host ""
 
 if (-not $pricillaRunning) {
     Write-Host "WARNING: Pricilla service is not running!" -ForegroundColor Yellow
     Write-Host ""
     Write-Host "Please start Pricilla first:" -ForegroundColor Yellow
-    Write-Host "  cd Pricilla && go run cmd/percila/main.go" -ForegroundColor Gray
+    Write-Host "  cd Pricilla && go run cmd/pricilla/main.go" -ForegroundColor Gray
     Write-Host ""
     Write-Host "Or build and run:" -ForegroundColor Yellow
-    Write-Host "  cd Pricilla && go build -o bin/pricilla.exe ./cmd/percila/main.go" -ForegroundColor Gray
+    Write-Host "  cd Pricilla && go build -o bin/pricilla.exe ./cmd/pricilla/main.go" -ForegroundColor Gray
     Write-Host "  ./Pricilla/bin/pricilla.exe" -ForegroundColor Gray
     Write-Host ""
     
@@ -39,7 +39,7 @@ if (-not $pricillaRunning) {
         # Build Pricilla first
         Push-Location "..\..\Pricilla"
         Write-Host "Building Pricilla..." -ForegroundColor Gray
-        go build -o bin/pricilla.exe ./cmd/percila/main.go
+        go build -o bin/pricilla.exe ./cmd/pricilla/main.go
         
         # Start Pricilla in background
         Start-Process -FilePath ".\bin\pricilla.exe" -WindowStyle Minimized
@@ -50,7 +50,7 @@ if (-not $pricillaRunning) {
         
         # Check again
         try {
-            $response = Invoke-WebRequest -Uri "http://localhost:8089/health" -TimeoutSec 3 -UseBasicParsing -ErrorAction SilentlyContinue
+            $response = Invoke-WebRequest -Uri "http://localhost:8092/health" -TimeoutSec 3 -UseBasicParsing -ErrorAction SilentlyContinue
             if ($response.StatusCode -eq 200) { 
                 $pricillaRunning = $true 
                 Write-Host "Pricilla started successfully!" -ForegroundColor Green

@@ -23,7 +23,7 @@ import * as path from 'path';
  * - Multi-Robot Coordination (Swarm formations)
  */
 
-const PRICILLA_URL = 'http://localhost:8089';
+const PRICILLA_URL = 'http://localhost:8092';
 const GIRU_URL = 'http://localhost:9090';
 const NYSUS_URL = 'http://localhost:8080';
 

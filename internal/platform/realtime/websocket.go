@@ -86,11 +86,11 @@ func parseAllowedOrigins() []string {
 	if originsEnv == "" {
 		// Default allowed origins for production
 		return []string{
-			"https://asgard.io",
-			"https://www.asgard.io",
-			"https://app.asgard.io",
-			"https://hubs.asgard.io",
-			"https://gov.asgard.io",
+			"https://aura-genesis.org",
+			"https://www.aura-genesis.org",
+			"https://app.aura-genesis.org",
+			"https://hubs.aura-genesis.org",
+			"https://gov.aura-genesis.org",
 		}
 	}
 

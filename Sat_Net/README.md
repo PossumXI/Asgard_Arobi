@@ -23,6 +23,29 @@ Sat_Net/
 Phase 3 - Pending development
 
 ## Dependencies
-- Go 1.21+
+- Go 1.24+
 - dtn7-go (base DTN library)
 - ONNX Runtime (for RL inference)
+
+## About Arobi
+
+**Sat_Net** is part of the **ASGARD** platform, developed by **Arobi** - a cutting-edge technology company specializing in defense and civilian autonomous systems.
+
+### Leadership
+
+- **Gaetano Comparcola** - Founder & CEO
+  - Self-taught prodigy programmer and futurist
+  - Multilingual (English, Italian, French)
+  
+- **Opus** - AI Partner & Lead Programmer
+  - AI-powered software engineering partner
+
+## License
+
+© 2026 Arobi. All Rights Reserved.
+
+## Contact
+
+- **Website**: [https://aura-genesis.org](https://aura-genesis.org)
+- **Email**: [Gaetano@aura-genesis.org](mailto:Gaetano@aura-genesis.org)
+- **Company**: Arobi

@@ -31,19 +31,19 @@ Set-Location $PSScriptRoot
 $pricillaRunning = $false
 if (-not $SkipPreflightCheck) {
     try {
-        $response = Invoke-WebRequest -Uri "http://localhost:8089/health" -TimeoutSec 3 -UseBasicParsing -ErrorAction SilentlyContinue
+        $response = Invoke-WebRequest -Uri "http://localhost:8092/health" -TimeoutSec 3 -UseBasicParsing -ErrorAction SilentlyContinue
         if ($response.StatusCode -eq 200) { $pricillaRunning = $true }
     } catch {}
 
     Write-Host "Pre-flight Check:" -ForegroundColor Yellow
-    Write-Host "  - Pricilla Service (8089): $(if ($pricillaRunning) { 'RUNNING' } else { 'NOT RUNNING' })" -ForegroundColor $(if ($pricillaRunning) { 'Green' } else { 'Red' })
+    Write-Host "  - Pricilla Service (8092): $(if ($pricillaRunning) { 'RUNNING' } else { 'NOT RUNNING' })" -ForegroundColor $(if ($pricillaRunning) { 'Green' } else { 'Red' })
     Write-Host ""
 
     if (-not $pricillaRunning) {
         Write-Host "WARNING: Pricilla service is not running!" -ForegroundColor Yellow
         Write-Host ""
         Write-Host "Please start Pricilla first:" -ForegroundColor Yellow
-        Write-Host "  cd Pricilla && go run cmd/percila/main.go" -ForegroundColor Gray
+        Write-Host "  cd Pricilla && go run cmd/pricilla/main.go" -ForegroundColor Gray
         Write-Host ""
         
         if ($AutoStartPricilla) {
@@ -59,7 +59,7 @@ if (-not $SkipPreflightCheck) {
             # Build Pricilla first
             Push-Location "..\..\Pricilla"
             Write-Host "Building Pricilla..." -ForegroundColor Gray
-            go build -o bin/pricilla.exe ./cmd/percila/main.go
+            go build -o bin/pricilla.exe ./cmd/pricilla/main.go
             
             if ($LASTEXITCODE -ne 0) {
                 Write-Host "Failed to build Pricilla. Please check for errors." -ForegroundColor Red
@@ -77,7 +77,7 @@ if (-not $SkipPreflightCheck) {
             # Check again
             for ($i = 0; $i -lt 5; $i++) {
                 try {
-                    $response = Invoke-WebRequest -Uri "http://localhost:8089/health" -TimeoutSec 3 -UseBasicParsing -ErrorAction SilentlyContinue
+                    $response = Invoke-WebRequest -Uri "http://localhost:8092/health" -TimeoutSec 3 -UseBasicParsing -ErrorAction SilentlyContinue
                     if ($response.StatusCode -eq 200) { 
                         $pricillaRunning = $true 
                         break

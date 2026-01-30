@@ -1,0 +1,4 @@
+# Ignore all demo output files
+*
+!.gitignore
+!README.md

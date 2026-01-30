@@ -929,14 +929,16 @@ function DashboardSettings() {
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-4">
-            {[
-              { value: 'light', label: 'Light', icon: Sun },
-              { value: 'dark', label: 'Dark', icon: Moon },
-              { value: 'system', label: 'System', icon: Settings },
-            ].map((option) => (
+            {(
+              [
+                { value: 'light', label: 'Light', icon: Sun },
+                { value: 'dark', label: 'Dark', icon: Moon },
+                { value: 'system', label: 'System', icon: Settings },
+              ] as const
+            ).map((option) => (
               <button
                 key={option.value}
-                onClick={() => setTheme(option.value as any)}
+                onClick={() => setTheme(option.value)}
                 className={cn(
                   'flex-1 p-4 rounded-xl border-2 transition-all',
                   theme === option.value

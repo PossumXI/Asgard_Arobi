@@ -151,7 +151,7 @@ ASGARD/
 │       └── serialization.go    # Marshal/unmarshal
 │
 ├── Pricilla/                    # PRICILLA guidance system
-│   ├── cmd/percila/main.go     # Entry point
+│   ├── cmd/pricilla/main.go    # Entry point
 │   └── internal/
 │       ├── guidance/           # AI trajectory planning
 │       │   ├── ai_engine.go    # MARL + PINN

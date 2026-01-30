@@ -1,23 +1,47 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, ChevronDown, Sun, Moon, User, LogOut } from 'lucide-react';
+import { Menu, X, ChevronDown, Sun, Moon, User, LogOut, Plane, Crosshair, Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/Button';
 import { useTheme } from '@/providers/ThemeProvider';
 import { useAuth } from '@/providers/AuthProvider';
 
-const navLinks = [
-  { href: '/about', label: 'About' },
-  { href: '/features', label: 'Features' },
-  { href: '/pricilla', label: 'Pricilla' },
-  { href: '/pricing', label: 'Pricing' },
+interface ProductLink {
+  href: string;
+  label: string;
+  description: string;
+  icon: React.ReactNode;
+}
+
+const productLinks: ProductLink[] = [
+  {
+    href: '/valkyrie',
+    label: 'Valkyrie',
+    description: 'Autonomous Flight',
+    icon: <Plane className="w-5 h-5" />,
+  },
+  {
+    href: '/pricilla',
+    label: 'Pricilla',
+    description: 'Precision Guidance',
+    icon: <Crosshair className="w-5 h-5" />,
+  },
+  {
+    href: '/giru',
+    label: 'Giru',
+    description: 'AI Security',
+    icon: <Shield className="w-5 h-5" />,
+  },
 ];
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isProductsOpen, setIsProductsOpen] = useState(false);
+  const [isMobileProductsOpen, setIsMobileProductsOpen] = useState(false);
+  const productsRef = useRef<HTMLDivElement>(null);
   const { setTheme, resolvedTheme } = useTheme();
   const { user, isAuthenticated, signOut } = useAuth();
   const location = useLocation();
@@ -34,7 +58,30 @@ export default function Header() {
   useEffect(() => {
     setIsMobileMenuOpen(false);
     setIsUserMenuOpen(false);
+    setIsProductsOpen(false);
+    setIsMobileProductsOpen(false);
   }, [location.pathname]);
+
+  // Close products dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (productsRef.current && !productsRef.current.contains(event.target as Node)) {
+        setIsProductsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const isActiveLink = (href: string) => {
+    if (href === '/') {
+      return location.pathname === '/';
+    }
+    return location.pathname.startsWith(href);
+  };
+
+  const isProductActive = productLinks.some((link) => location.pathname === link.href);
 
   return (
     <header
@@ -48,7 +95,7 @@ export default function Header() {
       <div className="container-wide">
         <nav className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group">
+          <Link to="/" className="flex items-center gap-3 group">
             <div className="relative w-9 h-9">
               <svg
                 viewBox="0 0 36 36"
@@ -61,27 +108,154 @@ export default function Header() {
                 <circle cx="18" cy="28" r="3" fill="currentColor" />
               </svg>
             </div>
-            <span className="font-semibold text-lg text-asgard-900 dark:text-white">
-              ASGARD
-            </span>
+            <div className="flex flex-col">
+              <span className="font-bold text-lg text-asgard-900 dark:text-white leading-tight">
+                ASGARD
+              </span>
+              <span className="text-[10px] text-asgard-500 dark:text-asgard-400 leading-tight">
+                by Arobi
+              </span>
+            </div>
           </Link>
 
+          {/* Company Tagline - Desktop only */}
+          <div className="hidden lg:flex items-center">
+            <span className="text-xs text-asgard-500 dark:text-asgard-400 italic">
+              Aerospace Intelligence & Defense Systems
+            </span>
+          </div>
+
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                to={link.href}
+          <div className="hidden md:flex items-center gap-6">
+            {/* Home Link */}
+            <Link
+              to="/"
+              className={cn(
+                'text-sm font-medium transition-colors',
+                isActiveLink('/')
+                  ? 'text-primary'
+                  : 'text-asgard-600 hover:text-asgard-900 dark:text-asgard-400 dark:hover:text-white'
+              )}
+            >
+              Home
+            </Link>
+
+            {/* Features Link */}
+            <Link
+              to="/features"
+              className={cn(
+                'text-sm font-medium transition-colors',
+                isActiveLink('/features')
+                  ? 'text-primary'
+                  : 'text-asgard-600 hover:text-asgard-900 dark:text-asgard-400 dark:hover:text-white'
+              )}
+            >
+              Features
+            </Link>
+
+            {/* Products Dropdown */}
+            <div ref={productsRef} className="relative">
+              <button
+                onClick={() => setIsProductsOpen(!isProductsOpen)}
                 className={cn(
-                  'text-sm font-medium transition-colors',
-                  location.pathname === link.href
+                  'flex items-center gap-1 text-sm font-medium transition-colors',
+                  isProductActive
                     ? 'text-primary'
                     : 'text-asgard-600 hover:text-asgard-900 dark:text-asgard-400 dark:hover:text-white'
                 )}
               >
-                {link.label}
-              </Link>
-            ))}
+                Products
+                <ChevronDown
+                  className={cn(
+                    'w-4 h-4 transition-transform',
+                    isProductsOpen && 'rotate-180'
+                  )}
+                />
+              </button>
+
+              <AnimatePresence>
+                {isProductsOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute left-0 mt-3 w-64 rounded-xl bg-white dark:bg-asgard-900 border border-asgard-100 dark:border-asgard-800 shadow-medium overflow-hidden"
+                  >
+                    <div className="p-2">
+                      {productLinks.map((product) => (
+                        <Link
+                          key={product.href}
+                          to={product.href}
+                          className={cn(
+                            'flex items-start gap-3 px-3 py-3 rounded-lg transition-colors',
+                            location.pathname === product.href
+                              ? 'bg-primary/5 text-primary'
+                              : 'text-asgard-700 dark:text-asgard-300 hover:bg-asgard-50 dark:hover:bg-asgard-800'
+                          )}
+                        >
+                          <div
+                            className={cn(
+                              'p-2 rounded-lg',
+                              location.pathname === product.href
+                                ? 'bg-primary/10 text-primary'
+                                : 'bg-asgard-100 dark:bg-asgard-800 text-asgard-600 dark:text-asgard-400'
+                            )}
+                          >
+                            {product.icon}
+                          </div>
+                          <div>
+                            <div className="font-medium text-sm">{product.label}</div>
+                            <div className="text-xs text-asgard-500 dark:text-asgard-400">
+                              {product.description}
+                            </div>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Pricing Link */}
+            <Link
+              to="/pricing"
+              className={cn(
+                'text-sm font-medium transition-colors',
+                isActiveLink('/pricing')
+                  ? 'text-primary'
+                  : 'text-asgard-600 hover:text-asgard-900 dark:text-asgard-400 dark:hover:text-white'
+              )}
+            >
+              Pricing
+            </Link>
+
+            {/* About Link */}
+            <Link
+              to="/about"
+              className={cn(
+                'text-sm font-medium transition-colors',
+                isActiveLink('/about')
+                  ? 'text-primary'
+                  : 'text-asgard-600 hover:text-asgard-900 dark:text-asgard-400 dark:hover:text-white'
+              )}
+            >
+              About
+            </Link>
+
+            {/* Contact Link */}
+            <Link
+              to="/contact"
+              className={cn(
+                'text-sm font-medium transition-colors',
+                isActiveLink('/contact')
+                  ? 'text-primary'
+                  : 'text-asgard-600 hover:text-asgard-900 dark:text-asgard-400 dark:hover:text-white'
+              )}
+            >
+              Contact
+            </Link>
           </div>
 
           {/* Right Actions */}
@@ -190,23 +364,146 @@ export default function Header() {
             exit={{ opacity: 0, height: 0 }}
             className="md:hidden bg-white dark:bg-asgard-950 border-b border-asgard-100 dark:border-asgard-800 overflow-hidden"
           >
-            <div className="container-wide py-4 space-y-3">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  to={link.href}
+            <div className="container-wide py-4 space-y-1">
+              {/* Company Tagline - Mobile */}
+              <div className="pb-3 mb-3 border-b border-asgard-100 dark:border-asgard-800">
+                <span className="text-xs text-asgard-500 dark:text-asgard-400 italic">
+                  Aerospace Intelligence & Defense Systems
+                </span>
+              </div>
+
+              {/* Home Link */}
+              <Link
+                to="/"
+                className={cn(
+                  'block py-2 px-3 rounded-lg text-base font-medium transition-colors',
+                  isActiveLink('/')
+                    ? 'text-primary bg-primary/5'
+                    : 'text-asgard-600 dark:text-asgard-400 hover:bg-asgard-50 dark:hover:bg-asgard-900'
+                )}
+              >
+                Home
+              </Link>
+
+              {/* Features Link */}
+              <Link
+                to="/features"
+                className={cn(
+                  'block py-2 px-3 rounded-lg text-base font-medium transition-colors',
+                  isActiveLink('/features')
+                    ? 'text-primary bg-primary/5'
+                    : 'text-asgard-600 dark:text-asgard-400 hover:bg-asgard-50 dark:hover:bg-asgard-900'
+                )}
+              >
+                Features
+              </Link>
+
+              {/* Products Accordion */}
+              <div>
+                <button
+                  onClick={() => setIsMobileProductsOpen(!isMobileProductsOpen)}
                   className={cn(
-                    'block py-2 text-base font-medium transition-colors',
-                    location.pathname === link.href
-                      ? 'text-primary'
-                      : 'text-asgard-600 dark:text-asgard-400'
+                    'w-full flex items-center justify-between py-2 px-3 rounded-lg text-base font-medium transition-colors',
+                    isProductActive
+                      ? 'text-primary bg-primary/5'
+                      : 'text-asgard-600 dark:text-asgard-400 hover:bg-asgard-50 dark:hover:bg-asgard-900'
                   )}
                 >
-                  {link.label}
-                </Link>
-              ))}
+                  Products
+                  <ChevronDown
+                    className={cn(
+                      'w-4 h-4 transition-transform',
+                      isMobileProductsOpen && 'rotate-180'
+                    )}
+                  />
+                </button>
+
+                <AnimatePresence>
+                  {isMobileProductsOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="pl-4 py-2 space-y-1">
+                        {productLinks.map((product) => (
+                          <Link
+                            key={product.href}
+                            to={product.href}
+                            className={cn(
+                              'flex items-center gap-3 py-2 px-3 rounded-lg transition-colors',
+                              location.pathname === product.href
+                                ? 'text-primary bg-primary/5'
+                                : 'text-asgard-600 dark:text-asgard-400 hover:bg-asgard-50 dark:hover:bg-asgard-900'
+                            )}
+                          >
+                            <div
+                              className={cn(
+                                'p-1.5 rounded-md',
+                                location.pathname === product.href
+                                  ? 'bg-primary/10 text-primary'
+                                  : 'bg-asgard-100 dark:bg-asgard-800 text-asgard-500'
+                              )}
+                            >
+                              {product.icon}
+                            </div>
+                            <div>
+                              <div className="font-medium text-sm">{product.label}</div>
+                              <div className="text-xs text-asgard-500">
+                                {product.description}
+                              </div>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* Pricing Link */}
+              <Link
+                to="/pricing"
+                className={cn(
+                  'block py-2 px-3 rounded-lg text-base font-medium transition-colors',
+                  isActiveLink('/pricing')
+                    ? 'text-primary bg-primary/5'
+                    : 'text-asgard-600 dark:text-asgard-400 hover:bg-asgard-50 dark:hover:bg-asgard-900'
+                )}
+              >
+                Pricing
+              </Link>
+
+              {/* About Link */}
+              <Link
+                to="/about"
+                className={cn(
+                  'block py-2 px-3 rounded-lg text-base font-medium transition-colors',
+                  isActiveLink('/about')
+                    ? 'text-primary bg-primary/5'
+                    : 'text-asgard-600 dark:text-asgard-400 hover:bg-asgard-50 dark:hover:bg-asgard-900'
+                )}
+              >
+                About
+              </Link>
+
+              {/* Contact Link */}
+              <Link
+                to="/contact"
+                className={cn(
+                  'block py-2 px-3 rounded-lg text-base font-medium transition-colors',
+                  isActiveLink('/contact')
+                    ? 'text-primary bg-primary/5'
+                    : 'text-asgard-600 dark:text-asgard-400 hover:bg-asgard-50 dark:hover:bg-asgard-900'
+                )}
+              >
+                Contact
+              </Link>
+
+              {/* Auth Buttons for Mobile */}
               {!isAuthenticated && (
-                <div className="pt-3 flex flex-col gap-2 border-t border-asgard-100 dark:border-asgard-800">
+                <div className="pt-4 mt-4 flex flex-col gap-2 border-t border-asgard-100 dark:border-asgard-800">
                   <Link to="/signin">
                     <Button variant="outline" className="w-full">
                       Sign In

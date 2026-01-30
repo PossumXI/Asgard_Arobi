@@ -13,6 +13,9 @@ const About = lazy(() => import('@/pages/About'));
 const Features = lazy(() => import('@/pages/Features'));
 const Pricing = lazy(() => import('@/pages/Pricing'));
 const Pricilla = lazy(() => import('@/pages/Pricilla'));
+const Valkyrie = lazy(() => import('@/pages/Valkyrie'));
+const Contact = lazy(() => import('@/pages/Contact'));
+const Giru = lazy(() => import('@/pages/Giru'));
 const SignIn = lazy(() => import('@/pages/auth/SignIn'));
 const SignUp = lazy(() => import('@/pages/auth/SignUp'));
 const Dashboard = lazy(() => import('@/pages/dashboard/Dashboard'));
@@ -38,6 +41,9 @@ export default function App() {
                 <Route path="about" element={withErrorBoundary(About)} />
                 <Route path="features" element={withErrorBoundary(Features)} />
                 <Route path="pricilla" element={withErrorBoundary(Pricilla)} />
+                <Route path="valkyrie" element={withErrorBoundary(Valkyrie)} />
+                <Route path="contact" element={withErrorBoundary(Contact)} />
+                <Route path="giru" element={withErrorBoundary(Giru)} />
                 <Route path="pricing" element={withErrorBoundary(Pricing)} />
                 <Route path="signin" element={withErrorBoundary(SignIn)} />
                 <Route path="signup" element={withErrorBoundary(SignUp)} />

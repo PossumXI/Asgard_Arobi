@@ -1,0 +1,69 @@
+# Binaries
+bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+valkyrie
+
+# Test coverage
+*.out
+coverage.html
+coverage.txt
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs/
+
+# Build artifacts
+vendor/
+dist/
+
+# Models (large files)
+models/*.weights
+models/*.onnx
+models/*.tflite
+!models/.gitkeep
+
+# Data
+data/
+*.csv
+*.json.bak
+
+# Temp files
+tmp/
+temp/
+*.tmp
+
+# Go specific
+__debug_bin
+debug
+
+# Docker
+.docker/
+
+# Kubernetes
+*.kubeconfig
+
+# Certificates
+*.pem
+*.key
+*.crt
+!configs/*.example

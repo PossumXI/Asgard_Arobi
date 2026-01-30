@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GIRU Settings</title>
+  <style>
+    :root {
+      --bg-primary: #0a0e17;
+      --bg-secondary: #0f1525;
+      --bg-panel: rgba(15, 21, 37, 0.95);
+      --bg-input: #111827;
+      
+      --text-primary: #e7eefc;
+      --text-secondary: #9db1d9;
+      --text-muted: #5a6a8a;
+      
+      --accent-blue: #00d4ff;
+      --accent-green: #00ff88;
+      --accent-orange: #ff9500;
+      --accent-red: #ff4757;
+      
+      --border-color: rgba(157, 177, 217, 0.15);
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Segoe UI', -apple-system, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+    
+    .app {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .header h1 {
+      font-size: 24px;
+      color: var(--accent-blue);
+    }
+    
+    .back-btn {
+      padding: 8px 16px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      text-decoration: none;
+    }
+    
+    .back-btn:hover {
+      border-color: var(--accent-blue);
+      color: var(--text-primary);
+    }
+    
+    .section {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    
+    .section-header {
+      padding: 16px 20px;
+      background: rgba(0, 0, 0, 0.2);
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .section-header h2 {
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-secondary);
+    }
+    
+    .section-content {
+      padding: 20px;
+    }
+    
+    .setting-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .setting-row:last-child {
+      border-bottom: none;
+    }
+    
+    .setting-info {
+      flex: 1;
+    }
+    
+    .setting-label {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    
+    .setting-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    
+    .setting-control {
+      margin-left: 20px;
+    }
+    
+    input[type="text"],
+    input[type="password"] {
+      width: 300px;
+      padding: 10px 14px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 13px;
+    }
+    
+    input:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+    }
+    
+    input::placeholder {
+      color: var(--text-muted);
+    }
+    
+    select {
+      padding: 10px 14px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 13px;
+      min-width: 200px;
+    }
+    
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .btn-primary {
+      background: var(--accent-blue);
+      color: #000;
+    }
+    
+    .btn-primary:hover {
+      background: #00b8db;
+    }
+    
+    .btn-success {
+      background: var(--accent-green);
+      color: #000;
+    }
+    
+    .btn-danger {
+      background: var(--accent-red);
+      color: #fff;
+    }
+    
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+    }
+    
+    .btn-ghost:hover {
+      border-color: var(--accent-blue);
+      color: var(--text-primary);
+    }
+    
+    .api-key-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    
+    .api-key-input {
+      flex: 1;
+    }
+    
+    .status-badge {
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    
+    .status-badge.configured {
+      background: rgba(0, 255, 136, 0.2);
+      color: var(--accent-green);
+    }
+    
+    .status-badge.missing {
+      background: rgba(255, 71, 87, 0.2);
+      color: var(--accent-red);
+    }
+    
+    .get-key-link {
+      font-size: 12px;
+      color: var(--accent-blue);
+      text-decoration: none;
+      margin-left: 8px;
+    }
+    
+    .get-key-link:hover {
+      text-decoration: underline;
+    }
+    
+    .info-box {
+      padding: 12px 16px;
+      background: rgba(0, 212, 255, 0.1);
+      border: 1px solid rgba(0, 212, 255, 0.3);
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
+    
+    .info-box.success {
+      background: rgba(0, 255, 136, 0.1);
+      border-color: rgba(0, 255, 136, 0.3);
+    }
+    
+    .info-box p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+    
+    .info-box strong {
+      color: var(--accent-blue);
+    }
+    
+    .toggle-switch {
+      position: relative;
+      width: 48px;
+      height: 26px;
+    }
+    
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 26px;
+      transition: 0.3s;
+    }
+    
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background: var(--text-muted);
+      border-radius: 50%;
+      transition: 0.3s;
+    }
+    
+    input:checked + .toggle-slider {
+      background: rgba(0, 255, 136, 0.2);
+      border-color: var(--accent-green);
+    }
+    
+    input:checked + .toggle-slider:before {
+      transform: translateX(22px);
+      background: var(--accent-green);
+    }
+    
+    .footer {
+      text-align: center;
+      padding: 20px;
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+    
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 12px 20px;
+      background: var(--accent-green);
+      color: #000;
+      border-radius: 8px;
+      font-weight: 500;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s;
+    }
+    
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .toast.error {
+      background: var(--accent-red);
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <h1>⚙️ GIRU Settings</h1>
+      <a href="index.html" class="back-btn">← Back to GIRU</a>
+    </header>
+
+    <!-- API Keys Section -->
+    <section class="section">
+      <div class="section-header">
+        <h2>🔑 API Keys</h2>
+      </div>
+      <div class="section-content">
+        <div class="info-box">
+          <p><strong>Tip:</strong> Start with Groq - it's completely free and very fast! Get your API key in seconds.</p>
+        </div>
+
+        <!-- Groq -->
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">
+              Groq API Key
+              <span id="groq-status" class="status-badge missing">Not Set</span>
+              <a href="https://console.groq.com" target="_blank" class="get-key-link">Get Free Key →</a>
+            </div>
+            <div class="setting-desc">Free, ultra-fast AI inference (Llama 3.3, Mixtral)</div>
+          </div>
+          <div class="setting-control api-key-row">
+            <input type="password" id="groq-key" placeholder="gsk_..." class="api-key-input">
+            <button class="btn btn-primary" onclick="saveApiKey('GROQ_API_KEY', 'groq-key')">Save</button>
+          </div>
+        </div>
+
+        <!-- ElevenLabs -->
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">
+              ElevenLabs API Key
+              <span id="elevenlabs-status" class="status-badge missing">Not Set</span>
+              <a href="https://elevenlabs.io" target="_blank" class="get-key-link">Get Key →</a>
+            </div>
+            <div class="setting-desc">High-quality voice synthesis (optional, uses pyttsx3 as fallback)</div>
+          </div>
+          <div class="setting-control api-key-row">
+            <input type="password" id="elevenlabs-key" placeholder="sk_..." class="api-key-input">
+            <button class="btn btn-primary" onclick="saveApiKey('ELEVENLABS_API_KEY', 'elevenlabs-key')">Save</button>
+          </div>
+        </div>
+
+        <!-- Picovoice -->
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">
+              Picovoice Access Key
+              <span id="picovoice-status" class="status-badge missing">Not Set</span>
+              <a href="https://console.picovoice.ai" target="_blank" class="get-key-link">Get Free Key →</a>
+            </div>
+            <div class="setting-desc">Offline wake word detection (optional, improves reliability)</div>
+          </div>
+          <div class="setting-control api-key-row">
+            <input type="password" id="picovoice-key" placeholder="..." class="api-key-input">
+            <button class="btn btn-primary" onclick="saveApiKey('PICOVOICE_ACCESS_KEY', 'picovoice-key')">Save</button>
+          </div>
+        </div>
+
+        <!-- Together AI -->
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">
+              Together AI API Key
+              <span id="together-status" class="status-badge missing">Not Set</span>
+              <a href="https://api.together.xyz" target="_blank" class="get-key-link">Get Key →</a>
+            </div>
+            <div class="setting-desc">Alternative free AI provider (Llama, Qwen models)</div>
+          </div>
+          <div class="setting-control api-key-row">
+            <input type="password" id="together-key" placeholder="..." class="api-key-input">
+            <button class="btn btn-primary" onclick="saveApiKey('TOGETHER_API_KEY', 'together-key')">Save</button>
+          </div>
+        </div>
+
+        <!-- Google -->
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">
+              Google AI API Key
+              <span id="google-status" class="status-badge missing">Not Set</span>
+              <a href="https://makersuite.google.com/app/apikey" target="_blank" class="get-key-link">Get Free Key →</a>
+            </div>
+            <div class="setting-desc">Google Gemini models (free tier available)</div>
+          </div>
+          <div class="setting-control api-key-row">
+            <input type="password" id="google-key" placeholder="AIza..." class="api-key-input">
+            <button class="btn btn-primary" onclick="saveApiKey('GOOGLE_API_KEY', 'google-key')">Save</button>
+          </div>
+        </div>
+
+        <!-- OpenAI -->
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">
+              OpenAI API Key
+              <span id="openai-status" class="status-badge missing">Not Set</span>
+              <a href="https://platform.openai.com" target="_blank" class="get-key-link">Get Key →</a>
+            </div>
+            <div class="setting-desc">GPT-4o, GPT-4 Turbo (paid)</div>
+          </div>
+          <div class="setting-control api-key-row">
+            <input type="password" id="openai-key" placeholder="sk-..." class="api-key-input">
+            <button class="btn btn-primary" onclick="saveApiKey('OPENAI_API_KEY', 'openai-key')">Save</button>
+          </div>
+        </div>
+
+        <!-- Anthropic -->
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">
+              Anthropic API Key
+              <span id="anthropic-status" class="status-badge missing">Not Set</span>
+              <a href="https://console.anthropic.com" target="_blank" class="get-key-link">Get Key →</a>
+            </div>
+            <div class="setting-desc">Claude Opus, Sonnet, Haiku (paid)</div>
+          </div>
+          <div class="setting-control api-key-row">
+            <input type="password" id="anthropic-key" placeholder="sk-ant-..." class="api-key-input">
+            <button class="btn btn-primary" onclick="saveApiKey('ANTHROPIC_API_KEY', 'anthropic-key')">Save</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- AI Settings -->
+    <section class="section">
+      <div class="section-header">
+        <h2>🤖 AI Settings</h2>
+      </div>
+      <div class="section-content">
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">Default AI Model</div>
+            <div class="setting-desc">Model used for general conversations</div>
+          </div>
+          <div class="setting-control">
+            <select id="default-model">
+              <option value="groq-llama-3.3-70b">Llama 3.3 70B (Groq) - FREE</option>
+              <option value="groq-mixtral-8x7b">Mixtral 8x7B (Groq) - FREE</option>
+              <option value="groq-llama-3.1-8b">Llama 3.1 8B (Groq) - FREE, Fast</option>
+              <option value="gemini-2.0-flash">Gemini 2.0 Flash - FREE</option>
+              <option value="together-llama-3.3-70b">Llama 3.3 70B (Together)</option>
+              <option value="gpt-4o-mini">GPT-4o Mini</option>
+              <option value="gpt-4o">GPT-4o</option>
+              <option value="claude-haiku-3.5">Claude Haiku 3.5</option>
+              <option value="claude-sonnet-4">Claude Sonnet 4</option>
+              <option value="claude-opus-4">Claude Opus 4</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">Fallback to Free Models</div>
+            <div class="setting-desc">Automatically use free models if paid model fails</div>
+          </div>
+          <div class="setting-control">
+            <label class="toggle-switch">
+              <input type="checkbox" id="fallback-free" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Voice Settings -->
+    <section class="section">
+      <div class="section-header">
+        <h2>🎤 Voice Settings</h2>
+      </div>
+      <div class="section-content">
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">TTS Provider</div>
+            <div class="setting-desc">Voice synthesis method</div>
+          </div>
+          <div class="setting-control">
+            <select id="tts-provider">
+              <option value="pyttsx3">pyttsx3 (Offline, Free)</option>
+              <option value="elevenlabs">ElevenLabs (Natural Voice)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">ElevenLabs Voice</div>
+            <div class="setting-desc">Voice to use for speech synthesis</div>
+          </div>
+          <div class="setting-control">
+            <select id="elevenlabs-voice">
+              <option value="21m00Tcm4TlvDq8ikWAM">Rachel (Female)</option>
+              <option value="29vD33N1CtxCmqQRPOHJ">Drew (Male)</option>
+              <option value="EXAVITQu4vr4xnSDxMaL">Bella (Female)</option>
+              <option value="ErXwobaYiN019PkySvjV">Antoni (Male)</option>
+              <option value="MF3mGyEYCl7XYWbV9V6O">Elli (Female)</option>
+              <option value="TxGEqnHWrfWFTfGW9XjX">Josh (Male)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">Use Picovoice Wake Word</div>
+            <div class="setting-desc">Offline wake word detection (requires Picovoice key)</div>
+          </div>
+          <div class="setting-control">
+            <label class="toggle-switch">
+              <input type="checkbox" id="use-picovoice">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Save Button -->
+    <div style="text-align: center; margin: 24px 0;">
+      <button class="btn btn-success" onclick="saveAllSettings()" style="padding: 12px 32px; font-size: 15px;">
+        💾 Save All Settings
+      </button>
+    </div>
+
+    <footer class="footer">
+      GIRU JARVIS v2.0 • Settings are saved locally
+    </footer>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    const BACKEND_URL = 'ws://127.0.0.1:7777';
+    let socket = null;
+
+    // Show toast notification
+    function showToast(message, isError = false) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.toggle('error', isError);
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // Connect to backend
+    function connectBackend() {
+      socket = new WebSocket(BACKEND_URL);
+      
+      socket.onopen = () => {
+        socket.send(JSON.stringify({ type: 'get_settings' }));
+      };
+      
+      socket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.type === 'settings') {
+          loadSettings(data.settings);
+        } else if (data.type === 'api_keys') {
+          updateApiKeyStatuses(data.keys);
+        } else if (data.type === 'settings_saved') {
+          showToast('Settings saved successfully!');
+        } else if (data.type === 'error') {
+          showToast(data.message, true);
+        }
+      };
+      
+      socket.onerror = () => {
+        // Backend not running, use localStorage
+        loadFromLocalStorage();
+      };
+    }
+
+    // Load settings from backend or localStorage
+    function loadSettings(settings) {
+      if (settings.default_model) {
+        document.getElementById('default-model').value = settings.default_model;
+      }
+      if (settings.fallback_to_free !== undefined) {
+        document.getElementById('fallback-free').checked = settings.fallback_to_free;
+      }
+      if (settings.tts_provider) {
+        document.getElementById('tts-provider').value = settings.tts_provider;
+      }
+      if (settings.elevenlabs_voice_id) {
+        document.getElementById('elevenlabs-voice').value = settings.elevenlabs_voice_id;
+      }
+      if (settings.use_picovoice !== undefined) {
+        document.getElementById('use-picovoice').checked = settings.use_picovoice;
+      }
+    }
+
+    function loadFromLocalStorage() {
+      const settings = JSON.parse(localStorage.getItem('giru_settings') || '{}');
+      loadSettings(settings);
+      
+      // Load API key statuses
+      const keys = JSON.parse(localStorage.getItem('giru_api_keys') || '{}');
+      updateApiKeyStatuses(keys);
+    }
+
+    function updateApiKeyStatuses(keys) {
+      const keyMap = {
+        'GROQ_API_KEY': 'groq-status',
+        'ELEVENLABS_API_KEY': 'elevenlabs-status',
+        'PICOVOICE_ACCESS_KEY': 'picovoice-status',
+        'TOGETHER_API_KEY': 'together-status',
+        'GOOGLE_API_KEY': 'google-status',
+        'OPENAI_API_KEY': 'openai-status',
+        'ANTHROPIC_API_KEY': 'anthropic-status',
+      };
+      
+      for (const [key, statusId] of Object.entries(keyMap)) {
+        const el = document.getElementById(statusId);
+        if (el) {
+          const hasKey = keys[key] && keys[key] !== null;
+          el.textContent = hasKey ? 'Configured' : 'Not Set';
+          el.className = `status-badge ${hasKey ? 'configured' : 'missing'}`;
+        }
+      }
+    }
+
+    // Save API key
+    function saveApiKey(keyName, inputId) {
+      const input = document.getElementById(inputId);
+      const value = input.value.trim();
+      
+      if (!value) {
+        showToast('Please enter an API key', true);
+        return;
+      }
+      
+      // Save to localStorage
+      const keys = JSON.parse(localStorage.getItem('giru_api_keys') || '{}');
+      keys[keyName] = value;
+      localStorage.setItem('giru_api_keys', JSON.stringify(keys));
+      
+      // Send to backend if connected
+      if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({
+          type: 'set_api_key',
+          key: keyName,
+          value: value
+        }));
+      }
+      
+      // Update status
+      updateApiKeyStatuses(keys);
+      showToast(`${keyName} saved!`);
+      input.value = '';
+    }
+
+    // Save all settings
+    function saveAllSettings() {
+      const settings = {
+        default_model: document.getElementById('default-model').value,
+        fallback_to_free: document.getElementById('fallback-free').checked,
+        tts_provider: document.getElementById('tts-provider').value,
+        elevenlabs_voice_id: document.getElementById('elevenlabs-voice').value,
+        use_picovoice: document.getElementById('use-picovoice').checked,
+      };
+      
+      // Save to localStorage
+      localStorage.setItem('giru_settings', JSON.stringify(settings));
+      
+      // Send to backend if connected
+      if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({
+          type: 'save_settings',
+          settings: settings
+        }));
+      } else {
+        showToast('Settings saved locally! Restart GIRU to apply.');
+      }
+    }
+
+    // Initialize
+    connectBackend();
+  </script>
+</body>
+</html>

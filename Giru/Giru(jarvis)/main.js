@@ -3,6 +3,7 @@ const path = require("path");
 
 let mainWindow;
 let monitorWindow;
+let settingsWindow;
 
 const createWindow = () => {
   mainWindow = new BrowserWindow({
@@ -23,6 +24,11 @@ const createWindow = () => {
     {
       label: "File",
       submenu: [
+        {
+          label: "Settings",
+          accelerator: "CmdOrCtrl+,",
+          click: () => openSettingsWindow(),
+        },
         {
           label: "Open Monitor Dashboard",
           accelerator: "CmdOrCtrl+M",
@@ -143,6 +149,30 @@ const openMonitorWindow = () => {
   });
 };
 
+const openSettingsWindow = () => {
+  if (settingsWindow) {
+    settingsWindow.focus();
+    return;
+  }
+  
+  settingsWindow = new BrowserWindow({
+    width: 900,
+    height: 800,
+    backgroundColor: "#0a0e17",
+    title: "GIRU Settings",
+    webPreferences: {
+      contextIsolation: true,
+      nodeIntegration: false,
+    },
+  });
+  
+  settingsWindow.loadFile(path.join(__dirname, "renderer", "settings.html"));
+  
+  settingsWindow.on("closed", () => {
+    settingsWindow = null;
+  });
+};
+
 app.whenReady().then(() => {
   createWindow();
 
@@ -175,4 +205,9 @@ ipcMain.handle("dialog:confirm", async (_event, message) => {
 // Handle opening monitor from renderer
 ipcMain.on("open-monitor", () => {
   openMonitorWindow();
+});
+
+// Handle opening settings from renderer
+ipcMain.on("open-settings", () => {
+  openSettingsWindow();
 });

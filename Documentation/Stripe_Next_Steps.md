@@ -35,7 +35,7 @@ var PlanPriceMap = map[string]string{
 
 1. In Stripe Dashboard → **Developers** → **Webhooks**
 2. Click **Add endpoint**
-3. Enter your webhook URL: `https://yourdomain.com/api/webhooks/stripe`
+3. Enter your webhook URL: `https://aura-genesis.org/api/webhooks/stripe`
    - For local testing, use a tool like [ngrok](https://ngrok.com) to expose your local server
 4. Select these events:
    - ✅ `checkout.session.completed`
@@ -54,9 +54,9 @@ var PlanPriceMap = map[string]string{
 Add these to your `.env` file (adjust URLs for your domain):
 
 ```
-STRIPE_SUCCESS_URL=https://yourdomain.com/dashboard?success=true
-STRIPE_CANCEL_URL=https://yourdomain.com/pricing
-STRIPE_PORTAL_RETURN_URL=https://yourdomain.com/dashboard
+STRIPE_SUCCESS_URL=https://aura-genesis.org/dashboard?success=true
+STRIPE_CANCEL_URL=https://aura-genesis.org/pricing
+STRIPE_PORTAL_RETURN_URL=https://aura-genesis.org/dashboard
 ```
 
 For local development:

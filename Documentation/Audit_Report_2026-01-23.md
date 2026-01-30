@@ -7,7 +7,7 @@
 
 ### What is real, working, and demonstratable
 - **Backend services (Go)** compile and run with real dependencies when configured.
-  - Entry points: `cmd/nysus`, `cmd/silenus`, `cmd/hunoid`, `cmd/giru`, `cmd/satnet_router`, `cmd/satellite_tracker`, `cmd/satnet_verify`, `Pricilla/cmd/percila`.
+  - Entry points: `cmd/nysus`, `cmd/silenus`, `cmd/hunoid`, `cmd/giru`, `cmd/satnet_router`, `cmd/satellite_tracker`, `cmd/satnet_verify`, `Pricilla/cmd/pricilla`.
 - **Database integration**: Postgres + MongoDB configuration is real (`internal/platform/db`) and wired in `cmd/nysus/main.go`.
 - **Observability**: Prometheus metrics + OpenTelemetry tracing are implemented in `internal/platform/observability`.
 - **Orbital hardware abstraction**: Camera and orbital position are real implementations (`internal/orbital/hal`).

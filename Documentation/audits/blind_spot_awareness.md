@@ -421,8 +421,8 @@ func TestWebSocketOriginValidation(t *testing.T) {
         env         string
         expectAllow bool
     }{
-        {"production_allowed", "https://asgard.com", "https://asgard.com,https://app.asgard.com", "production", true},
-        {"production_denied", "https://evil.com", "https://asgard.com", "production", false},
+        {"production_allowed", "https://aura-genesis.org", "https://aura-genesis.org,https://app.aura-genesis.org", "production", true},
+        {"production_denied", "https://evil.com", "https://aura-genesis.org", "production", false},
         {"dev_localhost", "http://localhost:5173", "", "development", true},
         {"dev_any", "http://evil.com", "", "development", false}, // still deny non-localhost in dev
     }
@@ -464,7 +464,7 @@ TASK: Implement secure WebSocket origin validation
    - Include in observability metrics: ws_origin_rejected_total counter
 
 4. Update .env.example:
-   ALLOWED_ORIGINS=https://asgard.com,https://app.asgard.com,https://hubs.asgard.com
+   ALLOWED_ORIGINS=https://aura-genesis.org,https://app.aura-genesis.org,https://hubs.aura-genesis.org
 
 5. Add integration test that verifies cross-origin requests are rejected
 ```

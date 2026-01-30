@@ -91,7 +91,7 @@ go run ./cmd/silenus/main.go -id sat001 -vision-backend simple
 | `DTN_STORAGE_BACKEND` | Bundle storage: memory, postgres |
 
 ## Dependencies
-- Go 1.21+
+- Go 1.24+
 - TensorFlow Lite (optional, for tflite backend)
 - N2YO API key (for real orbital position)
 - Sat_Net gateway for bundle forwarding
@@ -100,3 +100,26 @@ go run ./cmd/silenus/main.go -id sat001 -vision-backend simple
 - **Nysus**: Receives alerts and telemetry via Sat_Net bundles
 - **Pricilla**: Can use satellite imagery for targeting
 - **Giru**: Provides threat zone data to satellites
+
+## About Arobi
+
+**Silenus** is part of the **ASGARD** platform, developed by **Arobi** - a cutting-edge technology company specializing in defense and civilian autonomous systems.
+
+### Leadership
+
+- **Gaetano Comparcola** - Founder & CEO
+  - Self-taught prodigy programmer and futurist
+  - Multilingual (English, Italian, French)
+  
+- **Opus** - AI Partner & Lead Programmer
+  - AI-powered software engineering partner
+
+## License
+
+© 2026 Arobi. All Rights Reserved.
+
+## Contact
+
+- **Website**: [https://aura-genesis.org](https://aura-genesis.org)
+- **Email**: [Gaetano@aura-genesis.org](mailto:Gaetano@aura-genesis.org)
+- **Company**: Arobi

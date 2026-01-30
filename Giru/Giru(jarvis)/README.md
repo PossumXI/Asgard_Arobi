@@ -147,16 +147,104 @@ Open the monitor dashboard to see Giru's activities in real-time:
 | "Use Claude" | Switches to Claude model |
 | "Use Groq" | Switches to Groq (free) |
 
-### System Queries
+### ASGARD System Queries
 
 | Say This | Giru Does This |
 |----------|----------------|
-| "Giru, what's the target status?" | Queries Pricilla |
+| "Giru, what's the target status?" | Queries Pricilla missions |
 | "How long until target?" | Gets ETA from Pricilla |
 | "System status" | ASGARD health check |
 | "Any alerts?" | Check for alerts |
 | "Satellite coverage" | Silenus orbital status |
 | "Security threats?" | Giru Security scan |
+| "Hunoid status" | Robot unit status |
+
+### Valkyrie Flight Control (NEW)
+
+| Say This | Giru Does This |
+|----------|----------------|
+| "Valkyrie status" | Get flight system status |
+| "Valkyrie position" | Current position/coordinates |
+| "Arm aircraft" / "Arm Valkyrie" | Arm flight controller |
+| "Disarm aircraft" | Disarm flight controller |
+| "Set mode auto" | Change flight mode |
+| "Current flight mode" | Query flight mode |
+| "Mission status" | Get mission progress |
+| "Start mission" | Begin autonomous mission |
+| "Pause mission" | Hold current position |
+| "Return to base" / "RTB" | Emergency return home |
+| "Emergency land" | Land immediately |
+| "AI status" | Decision engine status |
+| "Sensor status" | Sensor fusion health |
+
+### Weather & News (NEW)
+
+| Say This | Giru Does This |
+|----------|----------------|
+| "What's the weather?" | Current conditions |
+| "Weather in London" | Weather for specific city |
+| "Forecast for Paris" | 3-day forecast |
+| "Latest news" | Top headlines |
+| "Tech news" | Technology headlines |
+| "News about SpaceX" | Search specific topic |
+
+### Reminders & Tasks (NEW)
+
+| Say This | Giru Does This |
+|----------|----------------|
+| "Remind me to call John in 30 minutes" | Set reminder |
+| "Show my reminders" | List active reminders |
+| "Add task: Review code, priority high" | Create task |
+| "My tasks" / "Pending tasks" | List tasks |
+| "Complete task review" | Mark task done |
+
+### Smart Home Control (NEW)
+
+| Say This | Giru Does This |
+|----------|----------------|
+| "Turn on living room lights" | Control lights |
+| "Turn off bedroom lights" | Control lights |
+| "Dim lights to 50" | Adjust brightness |
+| "Set thermostat to 22" | Temperature control |
+| "Arm security" | Arm security system |
+| "Disarm security" | Disarm security |
+| "Lock front door" | Lock control |
+| "Home status" | All device status |
+
+### Planning & Orchestration (NEW)
+
+| Say This | Giru Does This |
+|----------|----------------|
+| "Create plan: Deploy app, steps: build, test, deploy" | Multi-step plan |
+| "My plans" | List active plans |
+| "Plan status deploy" | Check plan progress |
+| "Next step for deploy" | Execute next step |
+
+### Code & Development (NEW)
+
+| Say This | Giru Does This |
+|----------|----------------|
+| "Analyze file main.py" | Code analysis |
+| "Check code server.go" | Run linter |
+| "Git status" | Repository status |
+| "Analyze project" | Project structure |
+
+### Research & Calculations (NEW)
+
+| Say This | Giru Does This |
+|----------|----------------|
+| "Calculate 25 * 4 + 10" | Math calculation |
+| "Convert 100 km to miles" | Unit conversion |
+| "Wikipedia quantum computing" | Research lookup |
+
+### System Administration (NEW)
+
+| Say This | Giru Does This |
+|----------|----------------|
+| "System info" | CPU, memory, disk usage |
+| "Network info" | Network statistics |
+| "Kill process chrome" | Terminate process |
+| "List running apps" | Running applications |
 
 ### Productivity
 
@@ -249,13 +337,21 @@ Giru stores all activity in a local SQLite database:
 
 ### ASGARD Endpoints
 
-| Variable | Default |
-|----------|---------|
-| `PRICILLA_URL` | http://localhost:8092 |
-| `NYSUS_URL` | http://localhost:8080 |
-| `SILENUS_URL` | http://localhost:9093 |
-| `HUNOID_URL` | http://localhost:8090 |
-| `GIRU_SECURITY_URL` | http://localhost:9090 |
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `PRICILLA_URL` | http://localhost:8089 | Precision Guidance |
+| `NYSUS_URL` | http://localhost:8080 | Central Command |
+| `SILENUS_URL` | http://localhost:9093 | Orbital Satellite |
+| `HUNOID_URL` | http://localhost:8090 | Robotics Control |
+| `GIRU_SECURITY_URL` | http://localhost:9090 | Security System |
+| `VALKYRIE_URL` | http://localhost:8093 | Autonomous Flight |
+
+### External APIs (Optional)
+
+| Variable | Description |
+|----------|-------------|
+| `OPENWEATHER_API_KEY` | Weather data |
+| `NEWS_API_KEY` | News headlines |
 
 ## Tips for Best Results
 
@@ -297,6 +393,25 @@ npm start
 npm run dev
 ```
 
+## About Arobi
+
+**GIRU JARVIS** is part of the **ASGARD** platform, developed by **Arobi** - a cutting-edge technology company specializing in defense and civilian autonomous systems.
+
+### Leadership
+
+- **Gaetano Comparcola** - Founder & CEO
+  - Self-taught prodigy programmer and futurist
+  - Multilingual (English, Italian, French)
+  
+- **Opus** - AI Partner & Lead Programmer
+  - AI-powered software engineering partner
+
 ## License
 
-Part of the ASGARD (PANDORA) project.
+© 2026 Arobi. All Rights Reserved.
+
+## Contact
+
+- **Website**: [https://aura-genesis.org](https://aura-genesis.org)
+- **Email**: [Gaetano@aura-genesis.org](mailto:Gaetano@aura-genesis.org)
+- **Company**: Arobi

@@ -44,6 +44,22 @@ from ai_providers import get_ai_manager, MODELS, ModelTier
 from database import get_database, ActivityType, ActivityStatus
 from monitor import get_monitor, get_monitoring_server
 
+# Import skills and integrations
+try:
+    from skills import (
+        WeatherSkill, NewsSkill, SchedulingSkill, SmartHomeSkill,
+        CodeAssistantSkill, ResearchSkill, SysAdminSkill, PlanningSkill
+    )
+    SKILLS_AVAILABLE = True
+except ImportError:
+    SKILLS_AVAILABLE = False
+
+try:
+    from valkyrie_client import get_valkyrie_client, handle_valkyrie_command
+    VALKYRIE_AVAILABLE = True
+except ImportError:
+    VALKYRIE_AVAILABLE = False
+
 
 # =============================================================================
 # CONFIGURATION
@@ -251,51 +267,121 @@ def is_conversation_active() -> bool:
 # TEXT-TO-SPEECH
 # =============================================================================
 
-def play_elevenlabs(text: str) -> None:
+def play_elevenlabs(text: str) -> bool:
+    """
+    Play text using ElevenLabs API.
+    Returns True if successful, False otherwise.
+    """
     if not ELEVENLABS_API_KEY:
         raise RuntimeError("ELEVENLABS_API_KEY is not set.")
     
-    url = f"https://api.elevenlabs.io/v1/text-to-speech/{ELEVENLABS_VOICE_ID}/stream"
+    # Use MP3 format for better compatibility
+    url = f"https://api.elevenlabs.io/v1/text-to-speech/{ELEVENLABS_VOICE_ID}"
+    
     headers = {
         "xi-api-key": ELEVENLABS_API_KEY,
-        "Accept": "audio/pcm",
         "Content-Type": "application/json",
+        "Accept": "audio/mpeg",
     }
+    
     payload = {
         "text": text,
         "model_id": ELEVENLABS_MODEL_ID,
-        "voice_settings": {"stability": 0.5, "similarity_boost": 0.75},
+        "voice_settings": {
+            "stability": 0.5,
+            "similarity_boost": 0.75,
+            "style": 0.0,
+            "use_speaker_boost": True
+        }
     }
-    params = {
-        "output_format": ELEVENLABS_OUTPUT_FORMAT,
-        "optimize_streaming_latency": 3,
-    }
-    
-    response = requests.post(url, headers=headers, params=params, json=payload, stream=True, timeout=30)
-    response.raise_for_status()
-
-    audio = pyaudio.PyAudio()
-    stream = audio.open(format=pyaudio.paInt16, channels=1, rate=44100, output=True)
     
     try:
-        for chunk in response.iter_content(chunk_size=4096):
-            if TTS_INTERRUPT.is_set():
-                TTS_INTERRUPT.clear()
-                break
-            if chunk:
-                stream.write(chunk)
-    finally:
-        stream.stop_stream()
-        stream.close()
-        audio.terminate()
+        response = requests.post(
+            url,
+            headers=headers,
+            json=payload,
+            timeout=30
+        )
+        
+        # Handle specific errors
+        if response.status_code == 401:
+            log_sync("ElevenLabs API key is invalid or expired.", "error")
+            return False
+        elif response.status_code == 422:
+            error_detail = response.json().get("detail", {})
+            log_sync(f"ElevenLabs error: {error_detail}", "error")
+            return False
+        elif response.status_code != 200:
+            log_sync(f"ElevenLabs HTTP {response.status_code}: {response.text[:200]}", "error")
+            return False
+        
+        # Play MP3 audio using pygame
+        try:
+            import pygame
+            import io
+            
+            pygame.mixer.init(frequency=44100)
+            audio_data = io.BytesIO(response.content)
+            pygame.mixer.music.load(audio_data)
+            pygame.mixer.music.play()
+            
+            while pygame.mixer.music.get_busy():
+                if TTS_INTERRUPT.is_set():
+                    TTS_INTERRUPT.clear()
+                    pygame.mixer.music.stop()
+                    return False
+                time.sleep(0.1)
+            
+            return True
+            
+        except ImportError:
+            # Fallback: save to temp file and use playsound
+            import tempfile
+            try:
+                from playsound import playsound
+                with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as f:
+                    f.write(response.content)
+                    temp_path = f.name
+                playsound(temp_path)
+                os.unlink(temp_path)
+                return True
+            except ImportError:
+                log_sync("No audio library available. Install pygame: pip install pygame", "error")
+                return False
+        
+    except requests.exceptions.Timeout:
+        log_sync("ElevenLabs request timed out.", "error")
+        return False
+    except requests.exceptions.ConnectionError:
+        log_sync("Could not connect to ElevenLabs API.", "error")
+        return False
+    except Exception as e:
+        log_sync(f"ElevenLabs error: {str(e)}", "error")
+        return False
 
 
 def tts_worker(tts_queue: "queue.Queue[str]") -> None:
-    engine = None
+    """TTS worker thread with automatic fallback."""
+    pyttsx3_engine = None
+    elevenlabs_failed = False
+    
+    # Always initialize pyttsx3 as fallback
+    try:
+        pyttsx3_engine = pyttsx3.init()
+        pyttsx3_engine.setProperty("rate", 175)
+        # Try to find a better voice
+        voices = pyttsx3_engine.getProperty("voices")
+        for voice in voices:
+            if "zira" in voice.name.lower() or "female" in voice.name.lower():
+                pyttsx3_engine.setProperty("voice", voice.id)
+                break
+    except Exception as e:
+        log_sync(f"pyttsx3 init failed: {e}", "error")
+    
     if not ELEVENLABS_API_KEY:
-        engine = pyttsx3.init()
-        engine.setProperty("rate", 175)
-        log_sync("ElevenLabs not configured; using pyttsx3 fallback.", "warn")
+        log_sync("ElevenLabs not configured. Using pyttsx3 for voice.", "warn")
+    else:
+        log_sync("ElevenLabs configured. High-quality voice enabled.", "info")
 
     while True:
         text = tts_queue.get()
@@ -306,12 +392,22 @@ def tts_worker(tts_queue: "queue.Queue[str]") -> None:
         if EVENT_LOOP:
             asyncio.run_coroutine_threadsafe(set_status("speaking"), EVENT_LOOP)
         
+        success = False
+        
         try:
-            if ELEVENLABS_API_KEY:
-                play_elevenlabs(text)
-            else:
-                engine.say(text)
-                engine.runAndWait()
+            # Try ElevenLabs first if configured and not previously failed
+            if ELEVENLABS_API_KEY and not elevenlabs_failed:
+                success = play_elevenlabs(text)
+                if not success:
+                    elevenlabs_failed = True
+                    log_sync("Falling back to pyttsx3 for this session.", "warn")
+            
+            # Fallback to pyttsx3
+            if not success and pyttsx3_engine:
+                pyttsx3_engine.say(text)
+                pyttsx3_engine.runAndWait()
+                success = True
+                
         except Exception as exc:
             log_sync(f"TTS error: {exc}", "error")
         finally:
@@ -1013,6 +1109,215 @@ async def handle_command(text: str) -> str:
         return await giru_security_get_threats()
     
     # =========================================================================
+    # VALKYRIE FLIGHT CONTROL
+    # =========================================================================
+    
+    if VALKYRIE_AVAILABLE and any(phrase in lower for phrase in [
+        "valkyrie", "flight", "aircraft", "drone", "arm", "disarm", 
+        "rtb", "return to base", "emergency land", "mission"
+    ]):
+        # Exclude generic "mission" that might be for Pricilla
+        if "valkyrie" in lower or "flight" in lower or "aircraft" in lower or "arm" in lower or "disarm" in lower or "rtb" in lower:
+            return await handle_valkyrie_command(text)
+    
+    # =========================================================================
+    # WEATHER & FORECAST
+    # =========================================================================
+    
+    if SKILLS_AVAILABLE and any(phrase in lower for phrase in ["weather", "temperature", "forecast", "rain", "sunny"]):
+        # Extract city if mentioned
+        city_match = re.search(r"(?:in|for|at)\s+([A-Za-z\s]+?)(?:\?|$|\.)", text, re.IGNORECASE)
+        city = city_match.group(1).strip() if city_match else "New York"
+        
+        if "forecast" in lower:
+            return await WeatherSkill.get_forecast(city)
+        return await WeatherSkill.get_current_weather(city)
+    
+    # =========================================================================
+    # NEWS & HEADLINES
+    # =========================================================================
+    
+    if SKILLS_AVAILABLE and any(phrase in lower for phrase in ["news", "headlines", "what's happening", "current events"]):
+        if "tech" in lower:
+            return await NewsSkill.get_headlines("technology")
+        if "business" in lower:
+            return await NewsSkill.get_headlines("business")
+        if "sports" in lower:
+            return await NewsSkill.get_headlines("sports")
+        if "science" in lower:
+            return await NewsSkill.get_headlines("science")
+        
+        # Search for specific topic
+        if "about" in lower:
+            topic_match = re.search(r"about\s+(.+?)(?:\?|$|\.)", text, re.IGNORECASE)
+            if topic_match:
+                return await NewsSkill.search_news(topic_match.group(1).strip())
+        
+        return await NewsSkill.get_headlines()
+    
+    # =========================================================================
+    # REMINDERS & TASKS
+    # =========================================================================
+    
+    if SKILLS_AVAILABLE:
+        # Reminders
+        if any(phrase in lower for phrase in ["remind me", "set reminder", "reminder"]):
+            if "list" in lower or "show" in lower:
+                return SchedulingSkill.list_reminders()
+            
+            # Parse reminder
+            time_match = re.search(r"in\s+(\d+)\s+(minute|hour|min|hr)", lower)
+            if time_match:
+                amount = int(time_match.group(1))
+                unit = time_match.group(2)
+                minutes = amount if "min" in unit else amount * 60
+                
+                # Extract message
+                msg_match = re.search(r"(?:to|about|that)\s+(.+?)(?:\s+in\s+\d+|$)", text, re.IGNORECASE)
+                message = msg_match.group(1) if msg_match else text
+                
+                return SchedulingSkill.add_reminder(message, minutes)
+            
+            return "Please specify when you'd like to be reminded. For example: 'remind me to call John in 30 minutes'."
+        
+        # Tasks
+        if any(phrase in lower for phrase in ["add task", "new task", "create task"]):
+            # Extract task title
+            task_match = re.search(r"(?:task|to do)[:\s]+(.+?)(?:priority|$|\.)", text, re.IGNORECASE)
+            if task_match:
+                title = task_match.group(1).strip()
+                priority = "high" if "high" in lower else "critical" if "critical" in lower else "low" if "low" in lower else "medium"
+                return SchedulingSkill.add_task(title, priority)
+            return "Please specify the task. For example: 'add task: Review code, priority high'."
+        
+        if any(phrase in lower for phrase in ["my tasks", "list tasks", "show tasks", "pending tasks"]):
+            return SchedulingSkill.list_tasks("pending")
+        
+        if "complete task" in lower or "finish task" in lower or "done with" in lower:
+            task_match = re.search(r"(?:complete|finish|done with)\s+(?:task\s+)?(.+?)(?:$|\.)", text, re.IGNORECASE)
+            if task_match:
+                return SchedulingSkill.complete_task(task_match.group(1).strip())
+    
+    # =========================================================================
+    # SMART HOME CONTROL
+    # =========================================================================
+    
+    if SKILLS_AVAILABLE and any(phrase in lower for phrase in [
+        "turn on", "turn off", "lights", "thermostat", "temperature set",
+        "lock", "unlock", "arm security", "disarm security", "home status"
+    ]):
+        if "home status" in lower or "house status" in lower:
+            return SmartHomeSkill.get_status()
+        
+        # Lights
+        if "light" in lower:
+            if "turn on" in lower:
+                room = "living_room" if "living" in lower else "bedroom" if "bedroom" in lower else "living_room"
+                return SmartHomeSkill.control_device(f"{room}_lights", "on")
+            if "turn off" in lower:
+                room = "living_room" if "living" in lower else "bedroom" if "bedroom" in lower else "living_room"
+                return SmartHomeSkill.control_device(f"{room}_lights", "off")
+            if "dim" in lower:
+                brightness_match = re.search(r"(\d+)", text)
+                if brightness_match:
+                    return SmartHomeSkill.control_device("living_room_lights", "dim", brightness_match.group(1))
+        
+        # Thermostat
+        if "thermostat" in lower or "temperature" in lower:
+            temp_match = re.search(r"(\d+)", text)
+            if temp_match:
+                return SmartHomeSkill.control_device("thermostat", "set", temp_match.group(1))
+        
+        # Security
+        if "security" in lower:
+            if "arm" in lower:
+                return SmartHomeSkill.control_device("security_system", "arm")
+            if "disarm" in lower:
+                return SmartHomeSkill.control_device("security_system", "disarm")
+        
+        # Locks
+        if "door" in lower or "lock" in lower:
+            if "lock" in lower and "unlock" not in lower:
+                return SmartHomeSkill.control_device("front_door", "lock")
+            if "unlock" in lower:
+                return SmartHomeSkill.control_device("front_door", "unlock")
+    
+    # =========================================================================
+    # CODE ASSISTANT
+    # =========================================================================
+    
+    if SKILLS_AVAILABLE and any(phrase in lower for phrase in ["analyze file", "analyze code", "lint", "check code"]):
+        file_match = re.search(r"(?:file|code)\s+[\"']?([^\s\"']+)[\"']?", text, re.IGNORECASE)
+        if file_match:
+            filepath = file_match.group(1)
+            if "lint" in lower or "check" in lower:
+                return await CodeAssistantSkill.run_linter(filepath)
+            return await CodeAssistantSkill.analyze_file(filepath)
+        return "Please specify a file path to analyze."
+    
+    # =========================================================================
+    # RESEARCH & CALCULATIONS
+    # =========================================================================
+    
+    if SKILLS_AVAILABLE:
+        # Calculations
+        if any(phrase in lower for phrase in ["calculate", "what is", "compute"]) and any(c in text for c in "+-*/"):
+            expr_match = re.search(r"(?:calculate|compute|what is)\s+(.+?)(?:\?|$)", text, re.IGNORECASE)
+            if expr_match:
+                return await ResearchSkill.calculate(expr_match.group(1))
+        
+        # Unit conversion
+        if "convert" in lower:
+            conv_match = re.search(r"(\d+(?:\.\d+)?)\s*(\w+)\s+to\s+(\w+)", text, re.IGNORECASE)
+            if conv_match:
+                value = float(conv_match.group(1))
+                from_unit = conv_match.group(2)
+                to_unit = conv_match.group(3)
+                return await ResearchSkill.unit_convert(value, from_unit, to_unit)
+    
+    # =========================================================================
+    # SYSTEM ADMINISTRATION
+    # =========================================================================
+    
+    if SKILLS_AVAILABLE and any(phrase in lower for phrase in ["system info", "cpu", "memory", "disk", "network info"]):
+        if "network" in lower:
+            return await SysAdminSkill.get_network_info()
+        return await SysAdminSkill.get_system_info()
+    
+    if SKILLS_AVAILABLE and any(phrase in lower for phrase in ["kill process", "stop process", "terminate"]):
+        proc_match = re.search(r"(?:kill|stop|terminate)\s+(?:process\s+)?(.+?)(?:$|\.)", text, re.IGNORECASE)
+        if proc_match:
+            return await SysAdminSkill.kill_process(proc_match.group(1).strip())
+    
+    # =========================================================================
+    # PLANNING & ORCHESTRATION
+    # =========================================================================
+    
+    if SKILLS_AVAILABLE and any(phrase in lower for phrase in ["create plan", "make plan", "new plan"]):
+        # Extract plan details
+        plan_match = re.search(r"plan[:\s]+(.+?)(?:steps|$)", text, re.IGNORECASE)
+        if plan_match:
+            name = plan_match.group(1).strip()
+            steps_match = re.search(r"steps[:\s]+(.+?)$", text, re.IGNORECASE)
+            if steps_match:
+                steps = [s.strip() for s in steps_match.group(1).split(',')]
+                return PlanningSkill.create_plan(name, "", steps)
+        return "Please specify a plan name and steps. Example: 'create plan: Deploy app, steps: build, test, deploy'."
+    
+    if SKILLS_AVAILABLE and any(phrase in lower for phrase in ["list plans", "my plans", "show plans"]):
+        return PlanningSkill.list_plans()
+    
+    if SKILLS_AVAILABLE and any(phrase in lower for phrase in ["plan status", "progress on"]):
+        plan_match = re.search(r"(?:status|progress)\s+(?:on|of)\s+(.+?)(?:$|\.|\?)", text, re.IGNORECASE)
+        if plan_match:
+            return PlanningSkill.get_plan_status(plan_match.group(1).strip())
+    
+    if SKILLS_AVAILABLE and any(phrase in lower for phrase in ["next step", "execute step", "continue plan"]):
+        plan_match = re.search(r"(?:step|continue)\s+(?:on|for|in)\s+(.+?)(?:$|\.)", text, re.IGNORECASE)
+        if plan_match:
+            return PlanningSkill.execute_next_step(plan_match.group(1).strip())
+    
+    # =========================================================================
     # EMAIL
     # =========================================================================
     
@@ -1319,26 +1624,26 @@ async def main() -> None:
     monitor_port = int(os.getenv("GIRU_MONITOR_PORT", "7778"))
     
     print(f"""
-╔══════════════════════════════════════════════════════════════════════════╗
-║                        GIRU JARVIS v2.0                                 ║
-║              Advanced Multi-Model AI Assistant                          ║
-║                     ASGARD Platform                                     ║
-╠══════════════════════════════════════════════════════════════════════════╣
-║  Wake Words: "Giru", "Hey Giru", "Hello Giru"                           ║
-║  Backend:    ws://127.0.0.1:{port:<5}                                      ║
-║  Monitor:    ws://127.0.0.1:{monitor_port:<5} | file:///.../monitor.html       ║
-╠══════════════════════════════════════════════════════════════════════════╣
-║  AI Models Available:                                                    ║
-║    Free:  {len(free_models):>2} models (Groq, Together AI, Gemini Free Tier)           ║
-║    Paid:  {len(paid_models):>2} models (Claude, GPT-4, Gemini Pro)                     ║
-╠══════════════════════════════════════════════════════════════════════════╣
-║  ASGARD Integrations:                                                    ║
-║    • Pricilla (Targeting): {PRICILLA_URL:<40} ║
-║    • Nysus (Command):      {NYSUS_URL:<40} ║
-║    • Silenus (Orbital):    {SILENUS_URL:<40} ║
-║    • Hunoid (Robots):      {HUNOID_URL:<40} ║
-╚══════════════════════════════════════════════════════════════════════════╝
-    """)
++--------------------------------------------------------------------------+
+|                        GIRU JARVIS v2.0                                  |
+|              Advanced Multi-Model AI Assistant                           |
+|                     ASGARD Platform                                      |
++--------------------------------------------------------------------------+
+|  Wake Words: "Giru", "Hey Giru", "Hello Giru"                            |
+|  Backend:    ws://127.0.0.1:{port:<5}                                     |
+|  Monitor:    ws://127.0.0.1:{monitor_port:<5} | file:///.../monitor.html      |
++--------------------------------------------------------------------------+
+|  AI Models Available:                                                    |
+|    Free:  {len(free_models):>2} models (Groq, Together AI, Gemini Free Tier)          |
+|    Paid:  {len(paid_models):>2} models (Claude, GPT-4, Gemini Pro)                    |
++--------------------------------------------------------------------------+
+|  ASGARD Integrations:                                                    |
+|    - Pricilla (Targeting): {PRICILLA_URL:<40}|
+|    - Nysus (Command):      {NYSUS_URL:<40}|
+|    - Silenus (Orbital):    {SILENUS_URL:<40}|
+|    - Hunoid (Robots):      {HUNOID_URL:<40}|
++--------------------------------------------------------------------------+
+""")
     
     # Start monitoring server in background
     monitoring_server = get_monitoring_server(monitor_port)

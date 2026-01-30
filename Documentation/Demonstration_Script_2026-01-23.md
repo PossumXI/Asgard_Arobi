@@ -34,7 +34,7 @@ cd C:\Users\hp\Desktop\Asgard
 go build -o bin/nysus.exe ./cmd/nysus
 go build -o bin/silenus.exe ./cmd/silenus
 go build -o bin/hunoid.exe ./cmd/hunoid
-go build -o bin/pricilla.exe ./Pricilla/cmd/percila
+go build -o bin/pricilla.exe ./Pricilla/cmd/pricilla
 go build -o bin/giru.exe ./cmd/giru
 ```
 

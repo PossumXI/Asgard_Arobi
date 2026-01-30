@@ -1,0 +1,123 @@
+# VALKYRIE Configuration
+# Autonomous Flight System
+
+# Server Ports
+http_port: 8093
+metrics_port: 9093
+
+# ASGARD Endpoints
+asgard:
+  nysus: http://localhost:8080
+  silenus: http://localhost:9093
+  satnet: http://localhost:8081
+  giru: http://localhost:9090
+  hunoid: http://localhost:8090
+
+# Sensor Fusion Configuration
+fusion:
+  update_rate: 100.0  # Hz
+  min_sensors: 2
+  outlier_threshold: 3.0
+  enable_adaptive: true
+  
+  # Sensor weights (0.0 to 1.0)
+  sensor_weights:
+    gps: 1.0
+    ins: 0.9
+    radar: 0.7
+    lidar: 0.8
+    barometer: 0.6
+    pitot: 0.5
+
+# AI Decision Engine
+ai:
+  enabled: true
+  decision_rate: 50.0  # Hz
+  
+  # Priorities (0.0 to 1.0)
+  safety_priority: 0.9
+  efficiency_priority: 0.7
+  stealth_priority: 0.5
+  
+  # Flight envelope constraints
+  max_roll_angle: 0.785     # 45 degrees in radians
+  max_pitch_angle: 0.524    # 30 degrees
+  max_yaw_rate: 0.349       # 20 deg/s
+  min_safe_altitude: 100.0  # meters AGL
+  max_vertical_speed: 10.0  # m/s
+  
+  # Features
+  enable_autoland: true
+  enable_threat_avoid: true
+  enable_weather_avoid: true
+
+# Security Monitoring
+security:
+  enabled: true
+  scan_interval: 100ms
+  
+  # What to monitor
+  monitor_flight_controller: true
+  monitor_sensor_drivers: true
+  monitor_navigation: true
+  monitor_communication: true
+  
+  # Detection settings
+  anomaly_threshold: 0.7
+  
+  # Response mode: log, alert, quarantine, kill
+  response_mode: alert
+
+# Fail-Safe System
+failsafe:
+  enabled: true
+  check_interval: 100ms
+  
+  # Auto-responses
+  enable_auto_rtb: true
+  enable_auto_land: true
+  enable_parachute: false
+  
+  # Safety thresholds
+  min_safe_altitude_agl: 50.0   # meters
+  min_safe_fuel: 0.15           # 15%
+  min_safe_battery: 0.20        # 20%
+  max_time_without_comms: 300   # seconds (5 minutes)
+  
+  # RTB location (x, y, z in meters)
+  rtb_location: [0, 0, 500]
+
+# LiveFeed Streaming
+livefeed:
+  enabled: true
+  telemetry_rate: 10.0  # Hz
+  
+  # Access levels
+  clearance_levels:
+    public: 0
+    basic: 1
+    operator: 2
+    commander: 3
+    admin: 4
+
+# MAVLink Configuration
+mavlink:
+  port: COM3
+  baud_rate: 921600
+  system_id: 1
+  component_id: 1
+  heartbeat_hz: 1.0
+  command_hz: 50.0
+
+# Logging
+logging:
+  level: info  # debug, info, warn, error
+  output: stdout
+  file: logs/valkyrie.log
+  format: json
+
+# Development Mode
+development:
+  simulation_mode: false
+  mock_sensors: false
+  verbose_logging: false

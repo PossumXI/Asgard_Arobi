@@ -21,7 +21,7 @@ import * as path from 'path';
  * - Accuracy Reports & Test Results
  */
 
-const PRICILLA_URL = 'http://localhost:8089';
+const PRICILLA_URL = 'http://localhost:8092';
 
 // Payload type definitions
 const PAYLOAD_TYPES = ['uav', 'missile', 'hunoid', 'spacecraft', 'drone', 'rocket'] as const;

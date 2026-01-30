@@ -10,7 +10,7 @@
 ## Base URL
 
 ```
-Production: https://api.asgard.io
+Production: https://api.aura-genesis.org
 Development: http://localhost:8080
 ```
 
@@ -156,7 +156,7 @@ Start FIDO2/WebAuthn registration (for government users).
   "data": {
     "publicKey": {
       "challenge": "base64-encoded-challenge",
-      "rp": { "name": "ASGARD Portal", "id": "asgard.io" },
+      "rp": { "name": "ASGARD Portal", "id": "aura-genesis.org" },
       "user": { "id": "...", "name": "user@example.com" },
       "pubKeyCredParams": [...]
     }
@@ -431,9 +431,9 @@ Create WebRTC session for stream viewing.
   "success": true,
   "data": {
     "session_id": "sess_xyz789",
-    "signaling_url": "wss://api.asgard.io/ws/signaling",
+    "signaling_url": "wss://api.aura-genesis.org/ws/signaling",
     "ice_servers": [
-      { "urls": "stun:stun.asgard.io:3478" }
+      { "urls": "stun:stun.aura-genesis.org:3478" }
     ]
   }
 }
@@ -702,7 +702,7 @@ All errors follow this format:
 import { AsgardClient } from '@asgard/sdk';
 
 const client = new AsgardClient({
-  baseUrl: 'https://api.asgard.io',
+  baseUrl: 'https://api.aura-genesis.org',
   token: 'your-jwt-token'
 });
 
@@ -720,7 +720,7 @@ client.realtime.connect('civilian', (event) => {
 ```go
 import "github.com/asgard/pandora/pkg/client"
 
-client := client.New("https://api.asgard.io", "your-jwt-token")
+client := client.New("https://api.aura-genesis.org", "your-jwt-token")
 
 alerts, err := client.Alerts.List(ctx, client.AlertFilter{
     Severity: "high",
@@ -731,15 +731,15 @@ alerts, err := client.Alerts.List(ctx, client.AlertFilter{
 
 ```bash
 # Get health
-curl https://api.asgard.io/health
+curl https://api.aura-genesis.org/health
 
 # Authenticate
-curl -X POST https://api.asgard.io/api/auth/signin \
+curl -X POST https://api.aura-genesis.org/api/auth/signin \
   -H "Content-Type: application/json" \
   -d '{"email":"user@example.com","password":"..."}'
 
 # Get alerts (authenticated)
-curl https://api.asgard.io/api/alerts \
+curl https://api.aura-genesis.org/api/alerts \
   -H "Authorization: Bearer <token>"
 ```
 

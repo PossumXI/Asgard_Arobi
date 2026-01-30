@@ -25,7 +25,7 @@ cd pandora
 # Build all binaries
 go build -o bin/nysus.exe ./cmd/nysus
 go build -o bin/giru.exe ./cmd/giru
-go build -o bin/pricilla.exe ./Pricilla/cmd/percila
+go build -o bin/pricilla.exe ./Pricilla/cmd/pricilla
 go build -o bin/db_migrate.exe ./cmd/db_migrate
 
 # Verify builds
@@ -131,7 +131,7 @@ Get-NetAdapter | ForEach-Object {
 | PRICILLA API | 8092 | HTTP |
 | PRICILLA Metrics | 9092 | HTTP |
 | PostgreSQL | 55432 | TCP |
-| MongoDB | 27017 | TCP |
+| MongoDB | 27018 | TCP |
 | NATS | 4222 | TCP |
 | Redis | 6379 | TCP |
 
@@ -145,7 +145,7 @@ Stop-Process -Name nysus,giru,pricilla -Force -ErrorAction SilentlyContinue
 
 # Stop databases
 cd Data
-docker-compose down
+docker compose down
 ```
 
 ---

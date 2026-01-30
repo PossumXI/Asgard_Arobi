@@ -40,7 +40,7 @@ services:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:?MONGO_PASSWORD environment variable is required}
     ports:
-      - "127.0.0.1:27017:27017"  # Bind to localhost only
+      - "127.0.0.1:27018:27017"  # Use port 27018 to avoid conflict
     volumes:
       - mongo_data:/data/db
       - ./migrations/mongo:/docker-entrypoint-initdb.d

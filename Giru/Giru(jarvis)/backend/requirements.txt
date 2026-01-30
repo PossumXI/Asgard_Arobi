@@ -1,22 +1,25 @@
 # GIRU JARVIS Backend Dependencies v2.0
 # ======================================
 
-# Core async networking
-websockets>=14.0
-aiohttp>=3.11.0
+# Core
+websockets>=12.0
+aiohttp>=3.9.0
 
 # Speech Recognition & TTS
-SpeechRecognition>=3.12.0
-pyttsx3>=2.98
+SpeechRecognition>=3.10.0
+pyttsx3>=2.90
 pyaudio>=0.2.14
 
 # Web & Search
 pywhatkit>=5.4
 wikipedia>=1.4.0
-requests>=2.32.0
+requests>=2.31.0
 
 # System Utilities
-psutil>=6.1.0
+psutil>=5.9.0
+
+# Audio playback (for ElevenLabs MP3)
+pygame>=2.5.0
 
 # Database (built-in sqlite3, no extra deps needed)
 
@@ -24,36 +27,39 @@ psutil>=6.1.0
 # OPTIONAL DEPENDENCIES
 # ======================================
 
-# Optional: ElevenLabs for high-quality TTS
-# Set ELEVENLABS_API_KEY environment variable to enable
-# pip install elevenlabs>=1.0.0
+# Picovoice Wake Word (offline, free tier)
+# pip install pvporcupine
+# Get free access key: https://console.picovoice.ai/
 
-# Optional: Picovoice Porcupine for offline wake word detection
-# Set PICOVOICE_ACCESS_KEY environment variable to enable
-# pip install pvporcupine>=3.0.0
+# ElevenLabs Python SDK (alternative to requests)
+# pip install elevenlabs
 
 # ======================================
-# API KEYS NEEDED FOR AI MODELS:
+# API KEYS CONFIGURATION
 # ======================================
 # 
-# FREE Models (Recommended to start):
-#   - GROQ_API_KEY: Get free at https://console.groq.com
-#   - TOGETHER_API_KEY: Get free at https://api.together.xyz
-#   - GOOGLE_API_KEY: Get free at https://makersuite.google.com/app/apikey
+# FREE Models (Recommended):
+#   GROQ_API_KEY         - https://console.groq.com (FREE, fast)
+#   TOGETHER_API_KEY     - https://api.together.xyz (FREE tier)
+#   GOOGLE_API_KEY       - https://makersuite.google.com/app/apikey (FREE)
 #
-# Paid Models (Optional, for advanced features):
-#   - ANTHROPIC_API_KEY: https://console.anthropic.com
-#   - OPENAI_API_KEY: https://platform.openai.com
-#   - OPENROUTER_API_KEY: https://openrouter.ai
+# Voice:
+#   ELEVENLABS_API_KEY   - https://elevenlabs.io (natural voice)
+#   PICOVOICE_ACCESS_KEY - https://console.picovoice.ai (offline wake word)
+#
+# Premium AI (Optional):
+#   ANTHROPIC_API_KEY    - https://console.anthropic.com
+#   OPENAI_API_KEY       - https://platform.openai.com
+#   OPENROUTER_API_KEY   - https://openrouter.ai
 #
 # ======================================
-# PLATFORM-SPECIFIC NOTES:
+# INSTALLATION NOTES
 # ======================================
 #
 # pyaudio may require additional system dependencies:
 # - Windows: pip install pipwin && pipwin install pyaudio
-# - macOS: brew install portaudio && pip install pyaudio  
+# - macOS: brew install portaudio && pip install pyaudio
 # - Linux: sudo apt-get install portaudio19-dev && pip install pyaudio
 #
-# pyttsx3 on Linux requires:
-# - sudo apt-get install espeak
+# pygame for audio playback:
+# - Windows/Mac/Linux: pip install pygame

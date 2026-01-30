@@ -297,16 +297,16 @@ ASGARD_ENV=production
 ASGARD_JWT_SECRET=<minimum 32 character secret>
 
 # WebAuthn/FIDO2 (REQUIRED for government portal)
-ASGARD_WEBAUTHN_RP_ORIGIN=https://gov.asgard.defense
+ASGARD_WEBAUTHN_RP_ORIGIN=https://gov.aura-genesis.org
 ASGARD_WEBAUTHN_RP_NAME=ASGARD Government Portal
-ASGARD_WEBAUTHN_RP_ID=gov.asgard.defense
+ASGARD_WEBAUTHN_RP_ID=gov.aura-genesis.org
 
 # Email (REQUIRED)
 SMTP_HOST=smtp.provider.com
 SMTP_PORT=587
 SMTP_USER=<smtp_username>
 SMTP_PASSWORD=<smtp_password>
-FRONTEND_URL=https://asgard.defense
+FRONTEND_URL=https://aura-genesis.org
 
 # Databases
 POSTGRES_HOST=localhost

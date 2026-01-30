@@ -4616,7 +4616,7 @@ New-Item -ItemType Directory -Path "C:\Users\hp\Desktop\Asgard\Pricilla\cmd\perc
 ```powershell
 # Build PRICILLA executable
 cd C:\Users\hp\Desktop\Asgard
-go build -o bin/pricilla.exe ./Pricilla/cmd/percila/main.go
+go build -o bin/pricilla.exe ./Pricilla/cmd/pricilla/main.go
 
 # Run PRICILLA
 .\bin\pricilla.exe -http-port 8092 -stealth=true -prediction=true

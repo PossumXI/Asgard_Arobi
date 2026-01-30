@@ -26,7 +26,7 @@ func NewEmailService() *EmailService {
 		smtpPort:     getEnvOrDefaultShared("SMTP_PORT", "587"),
 		smtpUser:     os.Getenv("SMTP_USER"),
 		smtpPassword: os.Getenv("SMTP_PASSWORD"),
-		fromEmail:    getEnvOrDefaultShared("SMTP_FROM_EMAIL", "noreply@asgard.io"),
+		fromEmail:    getEnvOrDefaultShared("SMTP_FROM_EMAIL", "Gaetano@aura-genesis.org"),
 		fromName:     getEnvOrDefaultShared("SMTP_FROM_NAME", "ASGARD"),
 	}
 }

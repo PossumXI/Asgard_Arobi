@@ -100,6 +100,8 @@ Specialized agents for automated operations:
 $env:POSTGRES_HOST = "localhost"
 $env:POSTGRES_PORT = "55432"
 $env:POSTGRES_PASSWORD = "your-password"
+$env:MONGO_HOST = "localhost"
+$env:MONGO_PORT = "27018"
 
 go run ./cmd/nysus/main.go -addr :8080
 ```
@@ -124,9 +126,9 @@ go run ./cmd/nysus/main.go -addr :8080
 | `ASGARD_ALLOW_NO_DB` | Allow running without database |
 
 ## Dependencies
-- Go 1.21+
+- Go 1.24+
 - PostgreSQL 14+
-- MongoDB 6+ (optional)
+- MongoDB 6+ (optional, default local port 27018)
 - NATS JetStream (optional, for control plane)
 
 ## Integration Points
@@ -136,3 +138,26 @@ go run ./cmd/nysus/main.go -addr :8080
 - **Pricilla**: Guidance system coordination
 - **Hubs (Frontend)**: WebSocket connections for real-time UI
 - **LLMs**: MCP tools for AI-assisted operations
+
+## About Arobi
+
+**Nysus** is part of the **ASGARD** platform, developed by **Arobi** - a cutting-edge technology company specializing in defense and civilian autonomous systems.
+
+### Leadership
+
+- **Gaetano Comparcola** - Founder & CEO
+  - Self-taught prodigy programmer and futurist
+  - Multilingual (English, Italian, French)
+  
+- **Opus** - AI Partner & Lead Programmer
+  - AI-powered software engineering partner
+
+## License
+
+© 2026 Arobi. All Rights Reserved.
+
+## Contact
+
+- **Website**: [https://aura-genesis.org](https://aura-genesis.org)
+- **Email**: [Gaetano@aura-genesis.org](mailto:Gaetano@aura-genesis.org)
+- **Company**: Arobi

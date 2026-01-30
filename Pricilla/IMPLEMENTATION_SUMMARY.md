@@ -28,7 +28,7 @@ PRICILLA (Precision Engagement & Routing Control with Integrated Learning Archit
    - Giru integration for threat intelligence
    - Hunoid integration for robot control
 
-4. **✅ Main Service** (`cmd/percila/`)
+4. **✅ Main Service** (`cmd/pricilla/`)
    - Command-line interface
    - Real-time mission monitoring
    - Telemetry feedback loops

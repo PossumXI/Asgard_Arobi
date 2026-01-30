@@ -1,48 +1,40 @@
 import { Link } from 'react-router-dom';
-import { Github, Twitter, Linkedin, Mail } from 'lucide-react';
+import { Github, Twitter, Linkedin, Mail, Globe } from 'lucide-react';
 
 const footerLinks = {
-  product: [
-    { label: 'Features', href: '/features' },
+  products: [
+    { label: 'Valkyrie', href: '/valkyrie' },
     { label: 'Pricilla', href: '/pricilla' },
-    { label: 'Pricing', href: '/pricing' },
-    { label: 'Security', href: '/security' },
-    { label: 'Documentation', href: '/docs' },
+    { label: 'Giru', href: '/giru' },
+    { label: 'Silenus', href: '/silenus' },
+    { label: 'Hunoid', href: '/hunoid' },
   ],
   company: [
     { label: 'About', href: '/about' },
+    { label: 'Contact', href: '/contact' },
     { label: 'Careers', href: '/careers' },
     { label: 'Press', href: '/press' },
-    { label: 'Contact', href: '/contact' },
-  ],
-  resources: [
-    { label: 'Blog', href: '/blog' },
-    { label: 'Community', href: '/community' },
-    { label: 'Support', href: '/support' },
-    { label: 'Status', href: '/status' },
   ],
   legal: [
-    { label: 'Privacy', href: '/privacy' },
-    { label: 'Terms', href: '/terms' },
-    { label: 'Cookies', href: '/cookies' },
+    { label: 'Privacy Policy', href: '/privacy' },
+    { label: 'Terms of Service', href: '/terms' },
+    { label: 'Security', href: '/security' },
   ],
 };
 
 const socialLinks = [
-  { icon: Twitter, href: 'https://twitter.com/asgard', label: 'Twitter' },
-  { icon: Github, href: 'https://github.com/asgard', label: 'GitHub' },
-  { icon: Linkedin, href: 'https://linkedin.com/company/asgard', label: 'LinkedIn' },
-  { icon: Mail, href: 'mailto:contact@asgard.dev', label: 'Email' },
+  { icon: Twitter, href: 'https://twitter.com/auragenesis', label: 'Twitter' },
+  { icon: Github, href: 'https://github.com/aura-genesis', label: 'GitHub' },
+  { icon: Linkedin, href: 'https://linkedin.com/company/aura-genesis', label: 'LinkedIn' },
+  { icon: Mail, href: 'mailto:Gaetano@aura-genesis.org', label: 'Email' },
 ];
 
 export default function Footer() {
-  const currentYear = new Date().getFullYear();
-
   return (
     <footer className="bg-asgard-50 dark:bg-asgard-900/50 border-t border-asgard-100 dark:border-asgard-800">
       <div className="container-wide py-16">
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-8">
-          {/* Brand */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
+          {/* Company Info */}
           <div className="col-span-2">
             <Link to="/" className="flex items-center gap-2 mb-4">
               <svg
@@ -56,36 +48,34 @@ export default function Footer() {
                 <circle cx="18" cy="28" r="3" fill="currentColor" />
               </svg>
               <span className="font-semibold text-lg text-asgard-900 dark:text-white">
-                ASGARD
+                ASGARD by Arobi
               </span>
             </Link>
-            <p className="text-sm text-asgard-500 dark:text-asgard-400 mb-6 max-w-xs">
+            <p className="text-sm text-asgard-500 dark:text-asgard-400 mb-4 max-w-xs">
               Planetary-scale autonomous defense and humanitarian aid system. 
               Protecting humanity through intelligent technology.
             </p>
-            <div className="flex items-center gap-3">
-              {socialLinks.map((social) => (
-                <a
-                  key={social.label}
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-2 rounded-lg text-asgard-400 hover:text-asgard-900 hover:bg-asgard-100 dark:hover:text-white dark:hover:bg-asgard-800 transition-colors"
-                  aria-label={social.label}
-                >
-                  <social.icon className="w-5 h-5" />
-                </a>
-              ))}
-            </div>
+            <p className="text-sm text-asgard-500 dark:text-asgard-400 mb-2">
+              © 2026 Arobi. All Rights Reserved.
+            </p>
+            <a 
+              href="https://aura-genesis.org" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-sm text-primary hover:text-primary/80 transition-colors"
+            >
+              <Globe className="w-4 h-4" />
+              aura-genesis.org
+            </a>
           </div>
 
-          {/* Links */}
+          {/* Products */}
           <div>
             <h4 className="font-semibold text-sm text-asgard-900 dark:text-white mb-4">
-              Product
+              Products
             </h4>
             <ul className="space-y-3">
-              {footerLinks.product.map((link) => (
+              {footerLinks.products.map((link) => (
                 <li key={link.href}>
                   <Link
                     to={link.href}
@@ -98,6 +88,7 @@ export default function Footer() {
             </ul>
           </div>
 
+          {/* Company */}
           <div>
             <h4 className="font-semibold text-sm text-asgard-900 dark:text-white mb-4">
               Company
@@ -116,24 +107,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          <div>
-            <h4 className="font-semibold text-sm text-asgard-900 dark:text-white mb-4">
-              Resources
-            </h4>
-            <ul className="space-y-3">
-              {footerLinks.resources.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    to={link.href}
-                    className="text-sm text-asgard-500 hover:text-asgard-900 dark:text-asgard-400 dark:hover:text-white transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
+          {/* Legal */}
           <div>
             <h4 className="font-semibold text-sm text-asgard-900 dark:text-white mb-4">
               Legal
@@ -153,17 +127,41 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="mt-12 pt-8 border-t border-asgard-200 dark:border-asgard-800 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-asgard-500 dark:text-asgard-400">
-            &copy; {currentYear} ASGARD Defense Systems. All rights reserved.
-          </p>
-          <div className="flex items-center gap-4">
+        {/* Social Links */}
+        <div className="mt-10 pt-8 border-t border-asgard-200 dark:border-asgard-800">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-3">
+              {socialLinks.map((social) => (
+                <a
+                  key={social.label}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2 rounded-lg text-asgard-400 hover:text-asgard-900 hover:bg-asgard-100 dark:hover:text-white dark:hover:bg-asgard-800 transition-colors"
+                  aria-label={social.label}
+                >
+                  <social.icon className="w-5 h-5" />
+                </a>
+              ))}
+            </div>
             <span className="flex items-center gap-1.5 text-xs text-asgard-400">
               <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
               All systems operational
             </span>
           </div>
+        </div>
+
+        {/* Bottom Bar */}
+        <div className="mt-8 pt-8 border-t border-asgard-200 dark:border-asgard-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-sm text-asgard-500 dark:text-asgard-400">
+            Founded by <span className="font-medium text-asgard-700 dark:text-asgard-300">Gaetano Comparcola</span>
+          </p>
+          <a 
+            href="mailto:Gaetano@aura-genesis.org"
+            className="text-sm text-asgard-500 hover:text-primary dark:text-asgard-400 dark:hover:text-primary transition-colors"
+          >
+            Contact: Gaetano@aura-genesis.org
+          </a>
         </div>
       </div>
     </footer>

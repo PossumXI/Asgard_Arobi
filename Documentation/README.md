@@ -19,6 +19,7 @@ generated specifications belong here.
 | `Hunoid_Demo_Scenarios.md` | Demo-ready Hunoid scenarios |
 | `Runbooks.md` | Operational incident response playbooks |
 | `Release_Procedure.md` | Staged release and rollback procedure |
+| `ASGARD_Demo_Catalog.md` | Demo-ready capabilities and scenarios |
 
 ## Automation Scripts
 
@@ -58,3 +59,26 @@ Monitors file changes across the codebase.
 - Keep human-written docs concise and cross-link to generated outputs.
 - Append build events to `Documentation/Build_Log.md`.
 - Docker status is automatically updated in `Docker_Logs.md`.
+
+## About Arobi
+
+This documentation is part of the **ASGARD** platform, developed by **Arobi** - a cutting-edge technology company specializing in defense and civilian autonomous systems.
+
+### Leadership
+
+- **Gaetano Comparcola** - Founder & CEO
+  - Self-taught prodigy programmer and futurist
+  - Multilingual (English, Italian, French)
+  
+- **Opus** - AI Partner & Lead Programmer
+  - AI-powered software engineering partner
+
+## License
+
+© 2026 Arobi. All Rights Reserved.
+
+## Contact
+
+- **Website**: [https://aura-genesis.org](https://aura-genesis.org)
+- **Email**: [Gaetano@aura-genesis.org](mailto:Gaetano@aura-genesis.org)
+- **Company**: Arobi
