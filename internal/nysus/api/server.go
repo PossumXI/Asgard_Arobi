@@ -37,6 +37,8 @@ type Server struct {
 	sfu             *webrtc.SFU
 	streamService   *services.StreamService
 	chatStore       *chatStore
+	accessCodeService *services.AccessCodeService
+	accessCodeCancel  context.CancelFunc
 }
 
 // Config holds server configuration.
@@ -86,10 +88,17 @@ func NewServer(cfg Config, pgDB *db.PostgresDB, mongoDB *db.MongoDB, eventBus *e
 	log.Println("[Nysus] WebRTC SFU initialized")
 
 	var streamService *services.StreamService
+	var accessCodeService *services.AccessCodeService
 	if pgDB != nil {
 		streamRepo := repositories.NewStreamRepository(pgDB, mongoDB)
 		streamService = services.NewStreamService(streamRepo)
 		streamService.SetSFU(sfu)
+
+		userRepo := repositories.NewUserRepository(pgDB)
+		accessCodeRepo := repositories.NewAccessCodeRepository(pgDB)
+		accessCodeService = services.NewAccessCodeService(accessCodeRepo, userRepo, services.NewEmailService())
+
+		bootstrapAdminUser(pgDB)
 	}
 
 	// Initialize signaling server with the SFU and optional stream service.
@@ -108,6 +117,7 @@ func NewServer(cfg Config, pgDB *db.PostgresDB, mongoDB *db.MongoDB, eventBus *e
 		sfu:             sfu,
 		streamService:   streamService,
 		chatStore:       newChatStore(pgDB),
+		accessCodeService: accessCodeService,
 	}
 
 	mux := http.NewServeMux()
@@ -184,6 +194,13 @@ func (s *Server) Start() error {
 		}
 	}
 
+	if s.accessCodeService != nil {
+		rotationCtx, cancel := context.WithCancel(context.Background())
+		s.accessCodeCancel = cancel
+		go s.accessCodeService.StartRotationLoop(rotationCtx)
+		log.Println("[AccessCode] rotation loop started")
+	}
+
 	log.Printf("[API] Server starting on %s", s.httpServer.Addr)
 	return s.httpServer.ListenAndServe()
 }
@@ -200,6 +217,10 @@ func (s *Server) Stop(ctx context.Context) error {
 		s.wsManager.Stop()
 	}
 
+	if s.accessCodeCancel != nil {
+		s.accessCodeCancel()
+	}
+
 	return s.httpServer.Shutdown(ctx)
 }
 
@@ -213,6 +234,7 @@ func (s *Server) registerRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/api/auth/signup", s.handleSignUp)
 	mux.HandleFunc("/api/auth/signout", s.handleSignOut)
 	mux.HandleFunc("/api/auth/refresh", s.handleRefreshToken)
+	mux.HandleFunc("/api/access-codes/validate", s.handleAccessCodeValidate)
 
 	// User endpoints
 	mux.HandleFunc("/api/user/profile", s.handleUserProfile)
@@ -246,6 +268,9 @@ func (s *Server) registerRoutes(mux *http.ServeMux) {
 	// Admin endpoints
 	mux.HandleFunc("/api/admin/users", s.handleAdminUsers)
 	mux.HandleFunc("/api/admin/users/", s.handleAdminUser)
+	mux.HandleFunc("/api/admin/access-codes", s.handleAdminAccessCodes)
+	mux.HandleFunc("/api/admin/access-codes/rotate", s.handleAdminAccessCodesRotate)
+	mux.HandleFunc("/api/admin/access-codes/", s.handleAdminAccessCode)
 
 	// Pricilla endpoints
 	mux.HandleFunc("/api/pricilla/missions", s.handlePricillaMissions)

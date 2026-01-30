@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/asgard/pandora/internal/services"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -16,6 +17,7 @@ import (
 type SignInRequest struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
+	AccessCode string `json:"accessCode,omitempty"`
 }
 
 // SignUpRequest represents a sign up request.
@@ -87,6 +89,22 @@ func (s *Server) handleSignIn(w http.ResponseWriter, r *http.Request) {
 	if err := bcrypt.CompareHashAndPassword([]byte(passwordHash), []byte(req.Password)); err != nil {
 		s.writeError(w, http.StatusUnauthorized, "Invalid credentials", "INVALID_CREDENTIALS")
 		return
+	}
+
+	if s.accessCodeService != nil {
+		required, err := s.accessCodeService.RequiresAccessCode(ctx, userID)
+		if err != nil {
+			s.writeError(w, http.StatusInternalServerError, "Failed to validate access code", "ACCESS_CODE_ERROR")
+			return
+		}
+		if required {
+			record, err := s.accessCodeService.ValidateForUser(ctx, req.AccessCode, userID, "portal")
+			if err != nil {
+				s.writeAccessCodeError(w, err)
+				return
+			}
+			_ = record
+		}
 	}
 
 	// Update last login
@@ -227,6 +245,23 @@ func (s *Server) handleRefreshToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	s.writeJSON(w, http.StatusOK, map[string]string{"token": token})
+}
+
+func (s *Server) writeAccessCodeError(w http.ResponseWriter, err error) {
+	switch err {
+	case services.ErrAccessCodeRequired:
+		s.writeError(w, http.StatusForbidden, "Access code required", "ACCESS_CODE_REQUIRED")
+	case services.ErrAccessCodeExpired:
+		s.writeError(w, http.StatusForbidden, "Access code expired", "ACCESS_CODE_EXPIRED")
+	case services.ErrAccessCodeRevoked:
+		s.writeError(w, http.StatusForbidden, "Access code revoked", "ACCESS_CODE_REVOKED")
+	case services.ErrAccessCodeScopeMismatch:
+		s.writeError(w, http.StatusForbidden, "Access code scope mismatch", "ACCESS_CODE_SCOPE")
+	case services.ErrAccessCodeUsageExceeded:
+		s.writeError(w, http.StatusForbidden, "Access code usage exceeded", "ACCESS_CODE_EXHAUSTED")
+	default:
+		s.writeError(w, http.StatusUnauthorized, "Invalid access code", "ACCESS_CODE_INVALID")
+	}
 }
 
 func generateTokenForUser(userID, email, tier string, isGovernment bool) (string, error) {

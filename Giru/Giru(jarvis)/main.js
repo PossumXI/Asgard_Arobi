@@ -4,6 +4,7 @@ const path = require("path");
 let mainWindow;
 let monitorWindow;
 let settingsWindow;
+let adminWindow;
 
 const createWindow = () => {
   mainWindow = new BrowserWindow({
@@ -33,6 +34,11 @@ const createWindow = () => {
           label: "Open Monitor Dashboard",
           accelerator: "CmdOrCtrl+M",
           click: () => openMonitorWindow(),
+        },
+        {
+          label: "Open Admin Portal",
+          accelerator: "CmdOrCtrl+Shift+A",
+          click: () => openAdminWindow(),
         },
         { type: "separator" },
         {
@@ -173,6 +179,33 @@ const openSettingsWindow = () => {
   });
 };
 
+const openAdminWindow = () => {
+  if (adminWindow) {
+    adminWindow.focus();
+    return;
+  }
+
+  adminWindow = new BrowserWindow({
+    width: 1400,
+    height: 900,
+    backgroundColor: "#0a0e17",
+    title: "ASGARD Admin Portal",
+    webPreferences: {
+      contextIsolation: true,
+      nodeIntegration: false,
+    },
+  });
+
+  const portalUrl = process.env.ASGARD_ADMIN_PORTAL_URL || "http://localhost:5173/dashboard/admin";
+  adminWindow.loadURL(portalUrl).catch(() => {
+    adminWindow.loadFile(path.join(__dirname, "renderer", "admin.html"));
+  });
+
+  adminWindow.on("closed", () => {
+    adminWindow = null;
+  });
+};
+
 app.whenReady().then(() => {
   createWindow();
 
@@ -210,4 +243,9 @@ ipcMain.on("open-monitor", () => {
 // Handle opening settings from renderer
 ipcMain.on("open-settings", () => {
   openSettingsWindow();
+});
+
+// Handle opening admin portal from renderer
+ipcMain.on("open-admin", () => {
+  openAdminWindow();
 });

@@ -7,6 +7,7 @@ import (
 	"net/smtp"
 	"os"
 	"strings"
+	"time"
 )
 
 // EmailService handles email sending for the application.
@@ -131,6 +132,25 @@ func (es *EmailService) SendGovernmentNotification(to, subject, message string) 
 	}
 
 	return es.SendEmail(to, fmt.Sprintf("[ASGARD Gov] %s", subject), buf.String())
+}
+
+// SendAccessCodeEmail sends a clearance access code email.
+func (es *EmailService) SendAccessCodeEmail(to, accessCode string, expiresAt time.Time, scope, clearance string) error {
+	body := fmt.Sprintf(`
+		<html>
+		<body>
+			<h2>ASGARD Access Code</h2>
+			<p>Your access code is:</p>
+			<p><strong>%s</strong></p>
+			<p>Scope: %s</p>
+			<p>Clearance: %s</p>
+			<p>Expires at: %s (UTC)</p>
+			<p>If you did not request this code, contact security immediately.</p>
+		</body>
+		</html>
+	`, accessCode, scope, clearance, expiresAt.UTC().Format(time.RFC3339))
+
+	return es.SendEmail(to, "ASGARD Access Code", body)
 }
 
 // SendSubscriptionConfirmation sends a subscription confirmation email.

@@ -1,7 +1,9 @@
 package api
 
 import (
+	"crypto/rand"
 	"database/sql"
+	"encoding/base32"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -10,7 +12,9 @@ import (
 
 	"github.com/asgard/pandora/internal/controlplane"
 	"github.com/asgard/pandora/internal/platform/realtime"
+	"github.com/asgard/pandora/internal/services"
 	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type adminUser struct {
@@ -29,6 +33,16 @@ type adminUserUpdate struct {
 	IsGovernment     *bool   `json:"isGovernment"`
 }
 
+type adminUserCreate struct {
+	Email             string `json:"email"`
+	FullName          string `json:"fullName"`
+	Password          string `json:"password,omitempty"`
+	SubscriptionTier  string `json:"subscriptionTier,omitempty"`
+	IsGovernment      bool   `json:"isGovernment,omitempty"`
+	CreateAccessCode  bool   `json:"createAccessCode,omitempty"`
+	ClearanceLevel     string `json:"clearanceLevel,omitempty"`
+}
+
 type controlCommandRequest struct {
 	TargetDomain string                 `json:"targetDomain"`
 	TargetSystem string                 `json:"targetSystem"`
@@ -38,10 +52,6 @@ type controlCommandRequest struct {
 }
 
 func (s *Server) handleAdminUsers(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		s.writeError(w, http.StatusMethodNotAllowed, "Method not allowed", "METHOD_NOT_ALLOWED")
-		return
-	}
 	if !s.requireAdminAccess(w, r) {
 		return
 	}
@@ -49,33 +59,122 @@ func (s *Server) handleAdminUsers(w http.ResponseWriter, r *http.Request) {
 		s.writeError(w, http.StatusServiceUnavailable, "Database not available", "DB_UNAVAILABLE")
 		return
 	}
-
-	rows, err := s.pgDB.QueryContext(r.Context(), `
-		SELECT id::text, email, COALESCE(full_name, ''), subscription_tier, is_government, created_at, updated_at
-		FROM users
-		ORDER BY created_at DESC
-		LIMIT 200
-	`)
-	if err != nil {
-		s.writeError(w, http.StatusInternalServerError, "Failed to load users", "DB_ERROR")
-		return
-	}
-	defer rows.Close()
-
-	users := []adminUser{}
-	for rows.Next() {
-		var item adminUser
-		var createdAt time.Time
-		var updatedAt time.Time
-		if scanErr := rows.Scan(&item.ID, &item.Email, &item.FullName, &item.SubscriptionTier, &item.IsGovernment, &createdAt, &updatedAt); scanErr != nil {
-			continue
+	switch r.Method {
+	case http.MethodGet:
+		rows, err := s.pgDB.QueryContext(r.Context(), `
+			SELECT id::text, email, COALESCE(full_name, ''), subscription_tier, is_government, created_at, updated_at
+			FROM users
+			ORDER BY created_at DESC
+			LIMIT 200
+		`)
+		if err != nil {
+			s.writeError(w, http.StatusInternalServerError, "Failed to load users", "DB_ERROR")
+			return
 		}
-		item.CreatedAt = createdAt.UTC().Format(time.RFC3339)
-		item.UpdatedAt = updatedAt.UTC().Format(time.RFC3339)
-		users = append(users, item)
-	}
+		defer rows.Close()
 
-	s.writeJSON(w, http.StatusOK, users)
+		users := []adminUser{}
+		for rows.Next() {
+			var item adminUser
+			var createdAt time.Time
+			var updatedAt time.Time
+			if scanErr := rows.Scan(&item.ID, &item.Email, &item.FullName, &item.SubscriptionTier, &item.IsGovernment, &createdAt, &updatedAt); scanErr != nil {
+				continue
+			}
+			item.CreatedAt = createdAt.UTC().Format(time.RFC3339)
+			item.UpdatedAt = updatedAt.UTC().Format(time.RFC3339)
+			users = append(users, item)
+		}
+
+		s.writeJSON(w, http.StatusOK, users)
+	case http.MethodPost:
+		var req adminUserCreate
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			s.writeError(w, http.StatusBadRequest, "Invalid request body", "INVALID_REQUEST")
+			return
+		}
+		req.Email = strings.TrimSpace(req.Email)
+		req.FullName = strings.TrimSpace(req.FullName)
+		if req.Email == "" || req.FullName == "" {
+			s.writeError(w, http.StatusBadRequest, "Email and fullName required", "INVALID_REQUEST")
+			return
+		}
+		tier := strings.ToLower(strings.TrimSpace(req.SubscriptionTier))
+		if tier == "" {
+			tier = "observer"
+		}
+		if tier == "free" {
+			tier = "observer"
+		}
+		switch tier {
+		case "observer", "supporter", "commander":
+		default:
+			s.writeError(w, http.StatusBadRequest, "Invalid subscription tier", "INVALID_TIER")
+			return
+		}
+
+		password := strings.TrimSpace(req.Password)
+		if password == "" {
+			password = generateTemporaryPassword()
+		}
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+		if err != nil {
+			s.writeError(w, http.StatusInternalServerError, "Failed to generate password", "INTERNAL_ERROR")
+			return
+		}
+
+		userID := uuid.New()
+		now := time.Now().UTC()
+		_, err = s.pgDB.ExecContext(r.Context(), `
+			INSERT INTO users (id, email, password_hash, full_name, subscription_tier, is_government, email_verified, email_verified_at, created_at, updated_at)
+			VALUES ($1, $2, $3, $4, $5, $6, true, $7, $8, $9)
+		`, userID, req.Email, string(hashedPassword), req.FullName, tier, req.IsGovernment, now, now, now)
+		if err != nil {
+			if strings.Contains(strings.ToLower(err.Error()), "duplicate") {
+				s.writeError(w, http.StatusConflict, "Email already exists", "EMAIL_EXISTS")
+				return
+			}
+			s.writeError(w, http.StatusInternalServerError, "Failed to create user", "DB_ERROR")
+			return
+		}
+
+		response := map[string]interface{}{
+			"user": adminUser{
+				ID:               userID.String(),
+				Email:            req.Email,
+				FullName:         req.FullName,
+				SubscriptionTier: tier,
+				IsGovernment:     req.IsGovernment,
+				CreatedAt:        now.Format(time.RFC3339),
+				UpdatedAt:        now.Format(time.RFC3339),
+			},
+			"temporaryPassword": password,
+		}
+
+		if req.CreateAccessCode && s.accessCodeService != nil {
+			clearance := strings.TrimSpace(req.ClearanceLevel)
+			if clearance == "" {
+				if req.IsGovernment {
+					clearance = "government"
+				} else {
+					clearance = "interstellar"
+				}
+			}
+			codeResult, err := s.accessCodeService.IssueForUser(r.Context(), services.AccessCodeIssueRequest{
+				UserID:        userID.String(),
+				CreatedBy:     s.getRequesterID(r),
+				ClearanceLevel: clearance,
+				Scope:         "all",
+			})
+			if err == nil {
+				response["accessCode"] = codeResult.Code
+			}
+		}
+
+		s.writeJSON(w, http.StatusCreated, response)
+	default:
+		s.writeError(w, http.StatusMethodNotAllowed, "Method not allowed", "METHOD_NOT_ALLOWED")
+	}
 }
 
 func (s *Server) handleAdminUser(w http.ResponseWriter, r *http.Request) {
@@ -292,4 +391,28 @@ func (s *Server) requireAdminAccess(w http.ResponseWriter, r *http.Request) bool
 
 	s.writeError(w, http.StatusForbidden, "Forbidden", "FORBIDDEN")
 	return false
+}
+
+func (s *Server) getRequesterID(r *http.Request) string {
+	token := extractToken(r)
+	if token == "" {
+		return ""
+	}
+	userID, _, _, _, err := parseJWTClaims(token)
+	if err != nil {
+		return ""
+	}
+	return userID
+}
+
+func generateTemporaryPassword() string {
+	buf := make([]byte, 12)
+	if _, err := rand.Read(buf); err != nil {
+		return "Temp-Access-ChangeMe!"
+	}
+	encoded := strings.TrimRight(base32.StdEncoding.EncodeToString(buf), "=")
+	if len(encoded) > 12 {
+		encoded = encoded[:12]
+	}
+	return "Temp-" + encoded + "!"
 }

@@ -4,10 +4,14 @@ package livefeed
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"os"
+	"strings"
 	"sync"
 	"time"
 
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
 )
@@ -249,20 +253,64 @@ func (lfs *LiveFeedStreamer) closeAllClients() {
 	}
 }
 
-// validateClearance validates a clearance token
+// validateClearance validates a clearance token using JWT
 func (lfs *LiveFeedStreamer) validateClearance(token string) int {
-	// TODO: Implement actual token validation
-	// For now, return basic clearance
-	if token == "admin" {
+	if token == "" {
+		return ClearancePublic
+	}
+
+	// Validate JWT token
+	secret := []byte(os.Getenv("ASGARD_JWT_SECRET"))
+	if len(secret) < 32 {
+		lfs.logger.Warn("ASGARD_JWT_SECRET missing or too short; defaulting to public clearance")
+		return ClearancePublic
+	}
+
+	parsedToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return secret, nil
+	})
+
+	if err != nil || !parsedToken.Valid {
+		return ClearancePublic
+	}
+
+	claims, ok := parsedToken.Claims.(jwt.MapClaims)
+	if !ok {
+		return ClearancePublic
+	}
+
+	// Extract role and tier from claims
+	role, _ := claims["role"].(string)
+	tier, _ := claims["subscription_tier"].(string)
+	isGovernment, _ := claims["is_government"].(bool)
+
+	// Determine clearance level
+	if isGovernment {
 		return ClearanceAdmin
 	}
-	if token == "commander" {
+
+	switch strings.ToLower(role) {
+	case "admin":
+		return ClearanceAdmin
+	case "military", "commander":
 		return ClearanceCommander
-	}
-	if token == "operator" {
+	case "operator":
 		return ClearanceOperator
 	}
-	return ClearanceBasic
+
+	switch strings.ToLower(tier) {
+	case "commander":
+		return ClearanceCommander
+	case "supporter":
+		return ClearanceOperator
+	case "observer":
+		return ClearanceBasic
+	}
+
+	return ClearancePublic
 }
 
 // GetStats returns streaming statistics

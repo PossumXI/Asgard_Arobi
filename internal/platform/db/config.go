@@ -87,7 +87,7 @@ func LoadConfig() (*Config, error) {
 		PostgresSSLMode:  getEnv("POSTGRES_SSLMODE", "disable"),
 
 		MongoHost:     getEnv("MONGO_HOST", "localhost"),
-		MongoPort:     getEnv("MONGO_PORT", "27017"),
+		MongoPort:     getEnv("MONGO_PORT", "27018"),
 		MongoUser:     getEnv("MONGO_USER", "admin"),
 		MongoPassword: mongoPassword,
 		MongoDB:       getEnv("MONGO_DB", "asgard"),
@@ -117,11 +117,12 @@ func (c *Config) PostgresDSN() string {
 
 func (c *Config) MongoURI() string {
 	return fmt.Sprintf(
-		"mongodb://%s:%s@%s:%s",
+		"mongodb://%s:%s@%s:%s/%s?authSource=admin",
 		c.MongoUser,
 		c.MongoPassword,
 		c.MongoHost,
 		c.MongoPort,
+		c.MongoDB,
 	)
 }
 

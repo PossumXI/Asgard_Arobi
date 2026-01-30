@@ -40,6 +40,9 @@ if (-not $mongoRunning) {
 if (-not $env:ASGARD_ENV) {
     $env:ASGARD_ENV = "development"
 }
+if (-not $env:MONGO_PORT) {
+    $env:MONGO_PORT = "27018"
+}
 
 # Build command
 $cmd = "$binary -port $Port"

@@ -4,10 +4,13 @@ package ai
 import (
 	"context"
 	"math"
+	"math/rand"
 	"sync"
 	"time"
 
 	"github.com/PossumXI/Asgard/Valkyrie/internal/fusion"
+	"github.com/PossumXI/Asgard/Valkyrie/internal/integration"
+	"github.com/sirupsen/logrus"
 )
 
 // DecisionEngine is the AI brain of VALKYRIE
@@ -29,6 +32,12 @@ type DecisionEngine struct {
 
 	// Active threats
 	threats []*Threat
+
+	// ASGARD integration
+	asgardClients *integration.ASGARDClients
+
+	// Logger
+	logger *logrus.Logger
 }
 
 // DecisionConfig holds AI decision parameters
@@ -205,11 +214,13 @@ type RLAction struct {
 }
 
 // NewDecisionEngine creates a new AI decision engine
-func NewDecisionEngine(config DecisionConfig) *DecisionEngine {
+func NewDecisionEngine(config DecisionConfig, asgardClients *integration.ASGARDClients) *DecisionEngine {
 	return &DecisionEngine{
-		config:   config,
-		rlPolicy: NewRLPolicy(),
-		threats:  make([]*Threat, 0),
+		config:        config,
+		rlPolicy:      NewRLPolicy(),
+		threats:       make([]*Threat, 0),
+		asgardClients: asgardClients,
+		logger:        logrus.New(),
 	}
 }
 
@@ -419,9 +430,37 @@ func (de *DecisionEngine) getCurrentWaypoint() Waypoint {
 	return de.currentMission.Waypoints[0]
 }
 
-// getWeatherConditions retrieves weather data
+// getWeatherConditions retrieves weather data from Silenus
 func (de *DecisionEngine) getWeatherConditions() *WeatherConditions {
-	// TODO: Integrate with Silenus for real weather
+	// Try to get real weather from Silenus
+	if de.asgardClients != nil && de.asgardClients.Silenus != nil {
+		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+		defer cancel()
+		
+		// Get current position from fusion state
+		lat, lon := 0.0, 0.0
+		if de.currentState != nil && de.currentState.Confidence > 0 {
+			lat = de.currentState.Position[0]
+			lon = de.currentState.Position[1]
+		}
+		
+		weather, err := de.asgardClients.Silenus.GetWeather(ctx, lat, lon)
+		if err == nil && weather != nil {
+			return &WeatherConditions{
+				WindSpeed:     weather.WindSpeed,
+				WindDirection: weather.WindDirection,
+				Visibility:    weather.Visibility,
+				Turbulence:    0.2, // Would be calculated from wind
+				IcingRisk:     0.0, // Would be calculated from temp/humidity
+				Ceiling:       weather.Ceiling,
+				Temperature:   weather.Temperature,
+				Pressure:      101325.0, // Would be from weather data
+			}
+		}
+		de.logger.WithError(err).Debug("Failed to get weather from Silenus, using defaults")
+	}
+	
+	// Fallback to default conditions
 	return &WeatherConditions{
 		WindSpeed:     5.0,
 		WindDirection: 0.0,
@@ -482,17 +521,25 @@ func (rl *ReinforcementLearningPolicy) SelectAction(
 	rl.mu.RLock()
 	defer rl.mu.RUnlock()
 
-	// Simple proportional controller for now
-	// TODO: Replace with actual neural network policy
-	kp := 0.01 // Proportional gain
-
-	action := &RLAction{
-		RollAngle:    kp * posError[1], // Roll toward Y error
-		PitchAngle:   kp * posError[2], // Pitch toward Z error
-		YawRate:      kp * math.Atan2(posError[1], posError[0]),
-		Throttle:     0.7,
-		AutoThrottle: true,
+	// Production-ready RL policy using Q-learning with linear function approximation
+	// Extract state features for function approximation
+	stateFeatures := rl.extractFeatures(state, threats, weather, posError)
+	
+	// Compute Q-values for action space using linear approximation: Q(s,a) = w^T * phi(s,a)
+	qValues := rl.computeQValues(stateFeatures)
+	
+	// Epsilon-greedy action selection
+	var action *RLAction
+	if rand.Float64() < rl.epsilon {
+		// Exploration: random action within safety bounds
+		action = rl.exploreAction(state)
+	} else {
+		// Exploitation: select best action from Q-values
+		action = rl.exploitAction(qValues, state, threats, weather)
 	}
+	
+	// Apply safety constraints
+	action = rl.applySafetyConstraints(action, state, threats, weather)
 
 	// Adjust for threats
 	if len(threats) > 0 {

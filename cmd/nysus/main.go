@@ -37,7 +37,7 @@ func main() {
 	dbHost := flag.String("db-host", "localhost", "PostgreSQL host")
 	dbPort := flag.String("db-port", "55432", "PostgreSQL port")
 	mongoHost := flag.String("mongo-host", "localhost", "MongoDB host")
-	mongoPort := flag.String("mongo-port", "27017", "MongoDB port")
+	mongoPort := flag.String("mongo-port", "27018", "MongoDB port")
 	flag.Parse()
 
 	log.Println("=== ASGARD Nysus - Central Nervous System ===")

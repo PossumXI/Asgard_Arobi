@@ -159,23 +159,97 @@ Open the monitor dashboard to see Giru's activities in real-time:
 | "Security threats?" | Giru Security scan |
 | "Hunoid status" | Robot unit status |
 
-### Valkyrie Flight Control (NEW)
+### Valkyrie Flight Control
 
 | Say This | Giru Does This |
 |----------|----------------|
 | "Valkyrie status" | Get flight system status |
-| "Valkyrie position" | Current position/coordinates |
 | "Arm aircraft" / "Arm Valkyrie" | Arm flight controller |
 | "Disarm aircraft" | Disarm flight controller |
-| "Set mode auto" | Change flight mode |
-| "Current flight mode" | Query flight mode |
-| "Mission status" | Get mission progress |
-| "Start mission" | Begin autonomous mission |
-| "Pause mission" | Hold current position |
 | "Return to base" / "RTB" | Emergency return home |
 | "Emergency land" | Land immediately |
-| "AI status" | Decision engine status |
-| "Sensor status" | Sensor fusion health |
+| "Autopilot status" | Check autonomous system |
+
+### Flight Assistance for Passengers (NEW)
+
+GIRU JARVIS now provides intelligent flight assistance when integrated with the Valkyrie Autonomous Flight System. Passengers can ask natural questions about their flight.
+
+**Flight Status Queries:**
+
+| Say This | Giru Does This |
+|----------|----------------|
+| "What's our flight status?" | Full flight briefing |
+| "How high are we?" / "Altitude?" | Current altitude in feet |
+| "How fast are we going?" | Current speed in knots/mph |
+| "When will we arrive?" / "ETA?" | Estimated time of arrival |
+| "Any turbulence ahead?" | Turbulence conditions |
+| "Flight briefing" | Comprehensive flight update |
+
+**Weather Information:**
+
+| Say This | Giru Does This |
+|----------|----------------|
+| "Weather at destination?" | Weather when you land |
+| "What's the weather outside?" | Current conditions at altitude |
+| "Weather along our route?" | Conditions ahead |
+| "Any storms ahead?" | Weather warnings |
+
+**Air Traffic & Airspace:**
+
+| Say This | Giru Does This |
+|----------|----------------|
+| "Any air traffic nearby?" | Traffic information |
+| "Other planes around us?" | Aircraft proximity |
+| "Airspace ahead?" | Restricted zone status |
+
+**Route & Rerouting:**
+
+| Say This | Giru Does This |
+|----------|----------------|
+| "What's our route?" | Current flight path |
+| "Where are we going?" | Destination info |
+| "Can we reroute?" | Request route change |
+| "Can we go around the weather?" | Weather avoidance request |
+| "Request higher altitude" | Altitude change request |
+
+**Safety Information:**
+
+| Say This | Giru Does This |
+|----------|----------------|
+| "Safety briefing" | Emergency procedures |
+| "What if there's an emergency?" | Emergency info |
+| "Safety information" | Full safety brief |
+
+### WiFi Imaging & Triangulation (NEW)
+
+| Say This | Giru Does This |
+|----------|----------------|
+| "WiFi scan" | Run WiFi CSI imaging scan |
+| "Through wall scan" | Get through-wall observations |
+| "What's behind the wall?" | Same as above |
+| "WiFi routers" | List registered routers |
+| "Material analysis" | Analyze wall materials |
+| "Triangulation" | Get position estimate |
+| "WiFi status" | Imaging system status |
+
+### Vision Systems (NEW)
+
+| Say This | Giru Does This |
+|----------|----------------|
+| "What do you see?" | Get current detections |
+| "Vision scan" | Same as above |
+| "Camera status" | Camera system health |
+| "Detect person" | Search for people |
+| "Detect vehicle" | Search for vehicles |
+| "Detect aircraft" | Search for aircraft |
+| "Visual threats" | Check for fire/smoke |
+
+### Sensor Fusion (NEW)
+
+| Say This | Giru Does This |
+|----------|----------------|
+| "Sensor fusion status" | EKF status |
+| "Sensors active" | List active sensors |
 
 ### Weather & News (NEW)
 

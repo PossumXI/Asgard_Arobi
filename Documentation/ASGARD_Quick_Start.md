@@ -38,7 +38,7 @@ Get-ChildItem bin/*.exe
 
 ```powershell
 cd Data
-docker-compose up -d
+docker compose up -d
 
 # Wait for containers to be healthy
 docker ps
@@ -178,7 +178,7 @@ Get-NetTCPConnection -LocalPort 8080 | Select-Object OwningProcess
 docker ps
 
 # Restart if needed
-cd Data && docker-compose restart
+cd Data && docker compose restart
 ```
 
 ### Giru can't capture packets

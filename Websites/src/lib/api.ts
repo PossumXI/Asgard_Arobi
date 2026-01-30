@@ -130,8 +130,8 @@ export interface WebAuthnCredentialPayload {
 }
 
 export const authApi = {
-  signIn: (email: string, password: string) =>
-    api.post<{ user: User; token: string }>('/auth/signin', { email, password }),
+  signIn: (email: string, password: string, accessCode?: string) =>
+    api.post<{ user: User; token: string }>('/auth/signin', { email, password, accessCode }),
   
   signUp: (data: SignUpData) =>
     api.post<{ user: User; token: string }>('/auth/signup', data),
@@ -242,6 +242,30 @@ export interface AdminUser {
   isGovernment: boolean;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface AdminCreateUserResponse {
+  user: AdminUser;
+  temporaryPassword: string;
+  accessCode?: string;
+}
+
+export interface AccessCodeRecord {
+  id: string;
+  codeLast4: string;
+  clearanceLevel: string;
+  scope: string;
+  issuedAt: string;
+  expiresAt: string;
+  revokedAt?: string | null;
+  lastUsedAt?: string | null;
+  usageCount: number;
+  maxUses?: number | null;
+  rotationIntervalHours: number;
+  nextRotationAt: string;
+  userId?: string | null;
+  userEmail?: string | null;
+  userFullName?: string | null;
 }
 
 export interface ControlCommandPayload {
@@ -374,6 +398,30 @@ export const adminApi = {
   listUsers: () => api.get<AdminUser[]>('/admin/users'),
   updateUser: (userId: string, data: Partial<Pick<AdminUser, 'fullName' | 'subscriptionTier' | 'isGovernment'>>) =>
     api.patch<AdminUser>(`/admin/users/${userId}`, data),
+  createUser: (payload: {
+    email: string;
+    fullName: string;
+    password?: string;
+    subscriptionTier?: AdminUser['subscriptionTier'];
+    isGovernment?: boolean;
+    createAccessCode?: boolean;
+    clearanceLevel?: string;
+  }) => api.post<AdminCreateUserResponse>('/admin/users', payload),
+  listAccessCodes: () => api.get<AccessCodeRecord[]>('/admin/access-codes'),
+  issueAccessCode: (payload: {
+    userId?: string;
+    email?: string;
+    clearanceLevel?: string;
+    scope?: string;
+    expiresInHours?: number;
+    maxUses?: number | null;
+    rotationIntervalHours?: number;
+    note?: string;
+  }) => api.post<{ code: string; codeLast4: string; record: AccessCodeRecord }>('/admin/access-codes', payload),
+  rotateAccessCode: (payload: { userId?: string; email?: string }) =>
+    api.post<{ code: string; codeLast4: string; record: AccessCodeRecord }>('/admin/access-codes/rotate', payload),
+  rotateAllAccessCodes: () => api.post<{ userId: string; email: string; code: string }[]>('/admin/access-codes/rotate', { rotateAll: true }),
+  revokeAccessCode: (codeId: string) => api.delete<{ status: string }>(`/admin/access-codes/${codeId}`),
 };
 
 export const controlPlaneApi = {

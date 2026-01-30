@@ -139,6 +139,46 @@ docker run -p 8093:8093 -p 9093:9093 valkyrie:latest
 - Tiered access (Public, Basic, Operator, Commander, Admin)
 - Flight data recording
 
+## GIRU JARVIS Voice Control Integration
+
+Valkyrie integrates seamlessly with GIRU JARVIS for hands-free voice-activated flight assistance. Passengers and crew can interact naturally with the flight system.
+
+### Passenger Voice Commands
+
+| Voice Command | Response |
+|---------------|----------|
+| "What's our altitude?" | Current altitude in feet |
+| "How fast are we going?" | Speed in knots/mph |
+| "When will we arrive?" | Estimated arrival time |
+| "Any turbulence?" | Current/expected turbulence |
+| "Weather at destination?" | Destination weather |
+| "Can we reroute?" | Request route change |
+| "Flight status" | Comprehensive briefing |
+
+### Crew Voice Commands
+
+| Voice Command | Response |
+|---------------|----------|
+| "Arm aircraft" | Arms flight controller |
+| "Return to base" | Initiates RTB |
+| "Emergency land" | Immediate landing |
+| "Air traffic nearby?" | Traffic awareness |
+| "Valkyrie status" | Full system status |
+
+### Starting with Voice Control
+
+```powershell
+# 1. Start Valkyrie
+cd Valkyrie
+.\bin\valkyrie.exe -sim
+
+# 2. Start GIRU JARVIS
+cd "Giru\Giru(jarvis)"
+npm run dev:win
+
+# 3. Say "Giru, what's our flight status?"
+```
+
 ## API Endpoints
 
 | Endpoint | Method | Description |

@@ -14,6 +14,7 @@ import { useToast } from '@/components/ui/Toaster';
 const signInSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
   password: z.string().min(1, 'Password is required'),
+  accessCode: z.string().optional(),
 });
 
 type SignInFormData = z.infer<typeof signInSchema>;
@@ -39,12 +40,24 @@ export default function SignIn() {
     setIsLoading(true);
     try {
       setRequiresFido2(false);
-      await signIn(data.email, data.password);
+      await signIn(data.email, data.password, data.accessCode);
     } catch (err) {
       const code = (err as { code?: string })?.code;
       if (code === 'FIDO2_REQUIRED') {
         setRequiresFido2(true);
         showError('Security key required', 'Use your FIDO2 device to complete sign in.');
+      } else if (code === 'ACCESS_CODE_REQUIRED') {
+        showError('Access code required', 'Enter your clearance code to continue.');
+      } else if (code === 'ACCESS_CODE_EXPIRED') {
+        showError('Access code expired', 'Request a new clearance code.');
+      } else if (code === 'ACCESS_CODE_REVOKED') {
+        showError('Access code revoked', 'Contact administration for a new code.');
+      } else if (code === 'ACCESS_CODE_EXHAUSTED') {
+        showError('Access code exhausted', 'Request a new clearance code.');
+      } else if (code === 'ACCESS_CODE_SCOPE') {
+        showError('Access code scope mismatch', 'Use the correct clearance code for this portal.');
+      } else if (code === 'ACCESS_CODE_INVALID') {
+        showError('Invalid access code', 'Check your code and try again.');
       } else if (code === 'EMAIL_NOT_VERIFIED') {
         showError('Email verification required', 'Check your inbox to verify your email address.');
       } else {
@@ -140,6 +153,18 @@ export default function SignIn() {
                     <Eye className="w-5 h-5" />
                   )}
                 </button>
+              </div>
+
+              <div>
+                <Input
+                  {...register('accessCode')}
+                  type="text"
+                  label="Access Code (Gov/Admin)"
+                  placeholder="AG-XXXX-XXXX"
+                />
+                <p className="mt-1 text-xs text-asgard-500">
+                  Required for clearance-based access.
+                </p>
               </div>
 
               <div className="flex items-center justify-between">

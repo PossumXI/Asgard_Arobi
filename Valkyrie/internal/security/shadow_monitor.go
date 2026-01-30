@@ -4,9 +4,13 @@ package security
 import (
 	"context"
 	"fmt"
+	"os"
+	"os/exec"
 	"sync"
+	"syscall"
 	"time"
 
+	"github.com/PossumXI/Asgard/Valkyrie/internal/integration"
 	"github.com/sirupsen/logrus"
 )
 
@@ -22,6 +26,9 @@ type ShadowMonitor struct {
 
 	// Configuration
 	config ShadowConfig
+
+	// ASGARD integration
+	asgardClients *integration.ASGARDClients
 
 	// Logger
 	logger *logrus.Logger
@@ -133,16 +140,17 @@ func (at AnomalyType) String() string {
 }
 
 // NewShadowMonitor creates a new shadow monitor
-func NewShadowMonitor(config ShadowConfig) *ShadowMonitor {
+func NewShadowMonitor(config ShadowConfig, asgardClients *integration.ASGARDClients) *ShadowMonitor {
 	if config.ScanInterval == 0 {
 		config.ScanInterval = 100 * time.Millisecond
 	}
 
 	sm := &ShadowMonitor{
-		processes: make(map[string]*ProcessMonitor),
-		anomalies: make(chan *Anomaly, 100),
-		config:    config,
-		logger:    logrus.New(),
+		processes:     make(map[string]*ProcessMonitor),
+		anomalies:     make(chan *Anomaly, 100),
+		config:        config,
+		asgardClients: asgardClients,
+		logger:        logrus.New(),
 	}
 
 	// Register critical processes
@@ -420,7 +428,32 @@ func (sm *ShadowMonitor) sendAlert(anomaly *Anomaly) {
 		"severity":   anomaly.Severity,
 	}).Error("SECURITY ALERT: Anomaly requires attention")
 
-	// TODO: Send to alerting system (Nysus, email, etc.)
+	// Send alert to ASGARD systems
+	if sm.asgardClients != nil {
+		// Send to Giru for security analysis
+		alertData := map[string]interface{}{
+			"anomaly_id":   anomaly.ID,
+			"process_name": anomaly.ProcessName,
+			"pid":          anomaly.PID,
+			"type":         anomaly.Type.String(),
+			"severity":     anomaly.Severity,
+			"description":  anomaly.Description,
+			"timestamp":    anomaly.Timestamp,
+		}
+		if err := sm.asgardClients.Giru.ReportAnomaly(context.Background(), alertData); err != nil {
+			sm.logger.WithError(err).Warn("Failed to report anomaly to Giru")
+		}
+
+		// Send to Nysus for orchestration
+		telemetryData := map[string]interface{}{
+			"component": "valkyrie_security",
+			"event":     "anomaly_detected",
+			"data":      alertData,
+		}
+		if err := sm.asgardClients.Nysus.ReportTelemetry(context.Background(), telemetryData); err != nil {
+			sm.logger.WithError(err).Warn("Failed to report anomaly to Nysus")
+		}
+	}
 }
 
 // quarantineProcess isolates a process
@@ -432,7 +465,12 @@ func (sm *ShadowMonitor) quarantineProcess(pid int) {
 		if proc.PID == pid {
 			proc.Status = ProcessStatusQuarantined
 			sm.logger.WithField("pid", pid).Warn("Process quarantined")
-			// TODO: Implement actual isolation (cgroups, namespaces, etc.)
+			
+			// Implement process isolation using cgroups (Linux)
+			// On Windows, use job objects or process groups
+			if err := sm.isolateProcess(pid); err != nil {
+				sm.logger.WithError(err).Error("Failed to isolate process")
+			}
 			break
 		}
 	}
@@ -444,8 +482,22 @@ func (sm *ShadowMonitor) killProcess(pid int) {
 	defer sm.mu.Unlock()
 
 	sm.logger.WithField("pid", pid).Error("Terminating compromised process")
-	// TODO: Implement actual process termination
-	// syscall.Kill(pid, syscall.SIGKILL)
+	
+	// Terminate process using syscall
+	proc, err := os.FindProcess(pid)
+	if err != nil {
+		sm.logger.WithError(err).Error("Failed to find process")
+		return
+	}
+	
+	if err := proc.Signal(syscall.SIGKILL); err != nil {
+		sm.logger.WithError(err).Error("Failed to kill process")
+		// Fallback: use kill command
+		cmd := exec.Command("kill", "-9", fmt.Sprintf("%d", pid))
+		if err := cmd.Run(); err != nil {
+			sm.logger.WithError(err).Error("Failed to kill process via kill command")
+		}
+	}
 }
 
 // GetStats returns monitoring statistics

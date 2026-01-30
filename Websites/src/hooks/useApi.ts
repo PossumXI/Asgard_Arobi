@@ -49,7 +49,7 @@ export function useSignIn() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: SignInRequest) => authApi.signIn(data.email, data.password),
+    mutationFn: (data: SignInRequest) => authApi.signIn(data.email, data.password, data.accessCode),
     onSuccess: (response: ApiAuthResponse) => {
       api.setToken(response.token);
       setAuth(response.user, response.token);

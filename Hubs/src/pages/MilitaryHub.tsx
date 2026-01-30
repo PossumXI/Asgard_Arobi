@@ -3,9 +3,13 @@ import { motion } from 'framer-motion';
 import { Shield, Lock, AlertTriangle, Key, Crosshair, Target, Loader2 } from 'lucide-react';
 import StreamCard from '@/components/StreamCard';
 import { useStreams, useStreamUpdates } from '@/hooks/useStreams';
+import { hubsApi } from '@/lib/api';
 
 export default function MilitaryHub() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [accessCode, setAccessCode] = useState('');
+  const [accessError, setAccessError] = useState<string | null>(null);
+  const [isVerifying, setIsVerifying] = useState(false);
   const { data, isLoading, error } = useStreams({ type: 'military' });
   useStreamUpdates();
 
@@ -53,18 +57,49 @@ export default function MilitaryHub() {
                 <input
                   type="password"
                   placeholder="Enter access code"
+                  value={accessCode}
+                  onChange={(e) => setAccessCode(e.target.value)}
                   className="w-full h-12 pl-11 pr-4 rounded-xl bg-hub-surface border border-hub-border text-white placeholder-gray-500 focus:outline-none focus:border-military"
                 />
               </div>
 
               <button
-                onClick={() => setIsAuthenticated(true)}
-                className="w-full h-12 rounded-xl bg-military text-white font-medium hover:bg-military/90 transition-colors flex items-center justify-center gap-2"
+                onClick={async () => {
+                  setIsVerifying(true);
+                  setAccessError(null);
+                  try {
+                    const result = await hubsApi.validateAccessCode(accessCode, 'hubs');
+                    const clearance = result.clearanceLevel || 'public';
+                    const clearanceRank: Record<string, number> = {
+                      public: 0,
+                      civilian: 1,
+                      military: 2,
+                      interstellar: 3,
+                      government: 4,
+                      admin: 5,
+                    };
+                    if (result.valid && clearanceRank[clearance] >= 2) {
+                      setIsAuthenticated(true);
+                    } else {
+                      setAccessError('Access code not authorized for military hub.');
+                    }
+                  } catch (err) {
+                    setAccessError('Failed to verify access code.');
+                  } finally {
+                    setIsVerifying(false);
+                  }
+                }}
+                disabled={isVerifying || accessCode.trim() === ''}
+                className="w-full h-12 rounded-xl bg-military text-white font-medium hover:bg-military/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-60"
               >
-                <Key className="w-4 h-4" />
-                Verify Clearance
+                {isVerifying ? <Loader2 className="w-4 h-4 animate-spin" /> : <Key className="w-4 h-4" />}
+                {isVerifying ? 'Verifying...' : 'Verify Clearance'}
               </button>
             </div>
+
+            {accessError && (
+              <p className="text-xs text-red-400 mt-3">{accessError}</p>
+            )}
 
             <p className="text-xs text-gray-500 mt-6">
               Contact your commanding officer for access credentials

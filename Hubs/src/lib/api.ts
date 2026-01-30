@@ -69,6 +69,13 @@ export interface ChatMessage {
   timestamp: string;
 }
 
+export interface AccessCodeValidation {
+  valid: boolean;
+  userId?: string;
+  clearanceLevel?: string;
+  scope?: string;
+}
+
 // ============================================================================
 // API Client
 // ============================================================================
@@ -158,6 +165,13 @@ class HubsApiClient {
     return this.request(`/streams/${streamId}/chat`, {
       method: 'POST',
       body: JSON.stringify({ message }),
+    });
+  }
+
+  async validateAccessCode(code: string, scope: string): Promise<AccessCodeValidation> {
+    return this.request('/access-codes/validate', {
+      method: 'POST',
+      body: JSON.stringify({ code, scope }),
     });
   }
 }

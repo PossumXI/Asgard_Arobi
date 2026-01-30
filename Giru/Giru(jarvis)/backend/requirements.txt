@@ -4,6 +4,7 @@
 # Core
 websockets>=12.0
 aiohttp>=3.9.0
+python-dotenv>=1.0.0
 
 # Speech Recognition & TTS
 SpeechRecognition>=3.10.0
@@ -20,6 +21,9 @@ psutil>=5.9.0
 
 # Audio playback (for ElevenLabs MP3)
 pygame>=2.5.0
+
+# Offline Wake Word Detection
+pvporcupine>=4.0.0
 
 # Database (built-in sqlite3, no extra deps needed)
 

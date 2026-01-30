@@ -6,20 +6,50 @@ generated specifications belong here.
 
 ## Contents
 
+### Audit Reports
+| File | Description | Date |
+|------|-------------|------|
+| `Infrastructure_Audit_Report_2026-01-28.md` | CI/CD, Docker, Kubernetes audit | 2026-01-28 |
+| `Comprehensive_Audit_Report_2026-01-28.md` | Full codebase security audit | 2026-01-28 |
+| `Docker_DB_Audit_Report_2026-01-24.md` | Database Docker audit | 2026-01-24 |
+| `Docker_Audit_Report_2026-01-21.md` | Docker infrastructure audit | 2026-01-21 |
+| `System_Audit_Report_2026-01-23.md` | System-wide audit | 2026-01-23 |
+| `PRODUCTION_AUDIT_REPORT.md` | Production readiness audit | - |
+
+### Architecture & Technical
 | File | Description |
 |------|-------------|
 | `Backend_Architecture.md` | System architecture overview |
+| `ASGARD_Technical_Architecture.md` | Complete technical architecture |
+| `ASGARD_Services_Deep_Dive.md` | Detailed service documentation |
+| `ASGARD_API_Reference.md` | API reference documentation |
+
+### Operations
+| File | Description |
+|------|-------------|
 | `Build_Log.md` | Build events and deployment history |
 | `Credentials_Registry.md` | All service credentials and connection strings |
 | `Docker_Logs.md` | Docker container status and error tracking |
-| `Docker_Audit_Report_2026-01-21.md` | Full Docker infrastructure audit report |
 | `Audit_Activity.md` | File change audit log |
-| `Phases_7_15.md` | Build continuation phases 7-15 |
-| `Hunoid_Mission_System.md` | Mission planning, ethics, intervention, audit runtime |
-| `Hunoid_Demo_Scenarios.md` | Demo-ready Hunoid scenarios |
 | `Runbooks.md` | Operational incident response playbooks |
 | `Release_Procedure.md` | Staged release and rollback procedure |
-| `ASGARD_Demo_Catalog.md` | Demo-ready capabilities and scenarios |
+| `Port_Allocations.md` | Service port assignments |
+
+### Features & Demos
+| File | Description |
+|------|-------------|
+| `Hunoid_Mission_System.md` | Mission planning, ethics, intervention, audit runtime |
+| `Hunoid_Demo_Scenarios.md` | Demo-ready Hunoid scenarios |
+| `PRICILLA_Demonstration_Guide.md` | Pricilla guidance demo guide |
+| `ASGARD_Demonstrations.md` | Demo-ready capabilities and scenarios |
+
+### Business & Reports
+| File | Description |
+|------|-------------|
+| `ASGARD_Investor_Partner_Report_2026.md` | Investor/partner report |
+| `ASGARD_Investor_Public_Report.md` | Public investor report |
+| `INVESTOR_OUTREACH.md` | Investor outreach materials |
+| `Marketing_Outreach_2026-01-23.md` | Marketing outreach plan |
 
 ## Automation Scripts
 

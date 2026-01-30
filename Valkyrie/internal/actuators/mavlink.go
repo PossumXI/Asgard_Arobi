@@ -4,6 +4,7 @@ package actuators
 import (
 	"context"
 	"fmt"
+	"math"
 	"sync"
 	"time"
 
@@ -17,6 +18,7 @@ type MAVLinkController struct {
 	port     string
 	baudRate int
 	connected bool
+	protocol *MAVLinkProtocol
 
 	// Command channels
 	attitudeCmd chan AttitudeCommand
@@ -199,13 +201,19 @@ func (mc *MAVLinkController) Connect(ctx context.Context) error {
 		return nil
 	}
 
-	// TODO: Implement actual serial port connection
-	// serial.OpenPort(&serial.Config{Name: mc.port, Baud: mc.baudRate})
+	// Open serial port with MAVLink protocol
+	protocol := NewMAVLinkProtocol(mc.config.SystemID, mc.config.ComponentID)
+	if err := protocol.OpenSerialPort(mc.port, mc.baudRate); err != nil {
+		return fmt.Errorf("failed to open serial port: %w", err)
+	}
 
+	mc.mu.Lock()
+	mc.protocol = protocol
 	mc.connected = true
 	mc.lastHeartbeat = time.Now()
-	mc.logger.Info("Connected to flight controller")
+	mc.mu.Unlock()
 
+	mc.logger.Info("Connected to flight controller")
 	return nil
 }
 
@@ -289,8 +297,19 @@ func (mc *MAVLinkController) Arm(ctx context.Context) error {
 
 	mc.logger.Info("Arming flight controller...")
 
-	// TODO: Send MAVLink arm command
-	// MAV_CMD_COMPONENT_ARM_DISARM
+	mc.mu.RLock()
+	protocol := mc.protocol
+	mc.mu.RUnlock()
+
+	if protocol == nil {
+		return fmt.Errorf("not connected")
+	}
+
+	// Send arm command
+	params := [7]float32{1.0, 0, 0, 0, 0, 0, 0} // Arm = 1.0
+	if err := protocol.SendCommandLong(1, 1, MAV_CMD_COMPONENT_ARM_DISARM, 0, params); err != nil {
+		return fmt.Errorf("failed to send arm command: %w", err)
+	}
 
 	mc.mu.Lock()
 	mc.armed = true
@@ -308,7 +327,19 @@ func (mc *MAVLinkController) Disarm(ctx context.Context) error {
 
 	mc.logger.Info("Disarming flight controller...")
 
-	// TODO: Send MAVLink disarm command
+	mc.mu.RLock()
+	protocol := mc.protocol
+	mc.mu.RUnlock()
+
+	if protocol == nil {
+		return fmt.Errorf("not connected")
+	}
+
+	// Send disarm command
+	params := [7]float32{0.0, 0, 0, 0, 0, 0, 0} // Disarm = 0.0
+	if err := protocol.SendCommandLong(1, 1, MAV_CMD_COMPONENT_ARM_DISARM, 0, params); err != nil {
+		return fmt.Errorf("failed to send disarm command: %w", err)
+	}
 
 	mc.mu.Lock()
 	mc.armed = false
@@ -326,7 +357,31 @@ func (mc *MAVLinkController) SetFlightMode(mode string) error {
 
 	mc.logger.WithField("mode", mode).Info("Setting flight mode...")
 
-	// TODO: Send MAVLink set mode command
+	mc.mu.RLock()
+	protocol := mc.protocol
+	mc.mu.RUnlock()
+
+	if protocol == nil {
+		return fmt.Errorf("not connected")
+	}
+
+	// Map mode string to MAVLink mode
+	baseMode := uint8(MAV_MODE_GUIDED_ARMED)
+	customMode := uint8(0)
+	switch mode {
+	case "MANUAL":
+		baseMode = MAV_MODE_MANUAL_ARMED
+	case "STABILIZE":
+		baseMode = MAV_MODE_STABILIZE_ARMED
+	case "GUIDED":
+		baseMode = MAV_MODE_GUIDED_ARMED
+	case "AUTO":
+		baseMode = MAV_MODE_AUTO_ARMED
+	}
+
+	if err := protocol.SendSetMode(1, baseMode, customMode); err != nil {
+		return fmt.Errorf("failed to set mode: %w", err)
+	}
 
 	mc.mu.Lock()
 	mc.flightMode = mode
@@ -450,7 +505,27 @@ func (mc *MAVLinkController) processCommands() {
 
 // sendHeartbeat sends MAVLink heartbeat
 func (mc *MAVLinkController) sendHeartbeat() {
-	// TODO: Implement MAVLink HEARTBEAT message
+	mc.mu.RLock()
+	protocol := mc.protocol
+	mc.mu.RUnlock()
+
+	if protocol == nil {
+		return
+	}
+
+	autopilot := uint8(8) // MAV_AUTOPILOT_INVALID
+	baseMode := uint8(0)
+	if mc.armed {
+		baseMode |= 0x80 // MAV_MODE_FLAG_SAFETY_ARMED
+	}
+	customMode := uint8(0)
+	systemStatus := uint8(3) // MAV_STATE_STANDBY
+
+	if err := protocol.SendHeartbeat(autopilot, baseMode, customMode, systemStatus); err != nil {
+		mc.logger.WithError(err).Warn("Failed to send heartbeat")
+		return
+	}
+
 	mc.mu.Lock()
 	mc.lastHeartbeat = time.Now()
 	mc.mu.Unlock()
@@ -458,53 +533,183 @@ func (mc *MAVLinkController) sendHeartbeat() {
 
 // readTelemetry reads incoming telemetry messages
 func (mc *MAVLinkController) readTelemetry() {
-	// TODO: Read MAVLink messages from serial port
-	// Parse ATTITUDE, LOCAL_POSITION_NED, GPS_RAW_INT, etc.
+	mc.mu.RLock()
+	protocol := mc.protocol
+	mc.mu.RUnlock()
 
-	// For simulation, generate dummy data
-	if mc.config.SimulationMode {
-		mc.mu.Lock()
-		mc.telemetryRcvd++
-		mc.mu.Unlock()
+	if protocol == nil {
+		if mc.config.SimulationMode {
+			mc.mu.Lock()
+			mc.telemetryRcvd++
+			mc.mu.Unlock()
+		}
+		return
 	}
+
+	// Read message with 20ms timeout
+	msg, err := protocol.ReadMessage(20 * time.Millisecond)
+	if err != nil {
+		// Timeout is normal, just return
+		return
+	}
+
+	mc.mu.Lock()
+	mc.telemetryRcvd++
+	mc.mu.Unlock()
+
+	// Parse message based on ID
+	switch msg.MessageID {
+	case MAVLINK_MSG_ID_ATTITUDE:
+		mc.parseAttitude(msg.Payload)
+	case MAVLINK_MSG_ID_LOCAL_POSITION_NED:
+		mc.parseLocalPositionNED(msg.Payload)
+	case MAVLINK_MSG_ID_SYS_STATUS:
+		mc.parseSysStatus(msg.Payload)
+	case MAVLINK_MSG_ID_HEARTBEAT:
+		mc.parseHeartbeat(msg.Payload)
+	}
+}
+
+// parseAttitude parses ATTITUDE message
+func (mc *MAVLinkController) parseAttitude(payload []byte) {
+	if len(payload) < 28 {
+		return
+	}
+	// Parse roll, pitch, yaw, rollspeed, pitchspeed, yawspeed (all float32)
+	// Implementation would parse binary data
+}
+
+// parseLocalPositionNED parses LOCAL_POSITION_NED message
+func (mc *MAVLinkController) parseLocalPositionNED(payload []byte) {
+	if len(payload) < 28 {
+		return
+	}
+	// Parse x, y, z, vx, vy, vz (all float32)
+	// Implementation would parse binary data
+}
+
+// parseSysStatus parses SYS_STATUS message
+func (mc *MAVLinkController) parseSysStatus(payload []byte) {
+	// Parse system status, battery, etc.
+}
+
+// parseHeartbeat parses HEARTBEAT message
+func (mc *MAVLinkController) parseHeartbeat(payload []byte) {
+	if len(payload) < 9 {
+		return
+	}
+	baseMode := payload[1]
+	mc.mu.Lock()
+	mc.armed = (baseMode & 0x80) != 0
+	mc.mu.Unlock()
 }
 
 // sendMAVLinkAttitude sends attitude setpoint
 func (mc *MAVLinkController) sendMAVLinkAttitude(cmd AttitudeCommand) {
-	// TODO: Serialize to MAVLink SET_ATTITUDE_TARGET message
-	// msg.TypeMask = 0b00000111 // Ignore body rates
-	// msg.Q = quaternion from roll, pitch, yaw
-	// msg.Thrust = cmd.Throttle
+	mc.mu.RLock()
+	protocol := mc.protocol
+	mc.mu.RUnlock()
+
+	if protocol == nil {
+		mc.logger.Debug("Not connected, skipping attitude command")
+		return
+	}
+
+	// Convert roll, pitch, yaw to quaternion
+	q := eulerToQuaternion(cmd.Roll, cmd.Pitch, cmd.Yaw)
+	typeMask := uint8(0b00000111) // Ignore body rates
+	timeBootMs := uint32(time.Since(time.Time{}).Milliseconds())
+
+	if err := protocol.SendSetAttitudeTarget(1, 1, timeBootMs, typeMask, q, 0, 0, 0, float32(cmd.Throttle)); err != nil {
+		mc.logger.WithError(err).Warn("Failed to send attitude command")
+		return
+	}
 
 	mc.logger.WithFields(logrus.Fields{
 		"roll":     cmd.Roll,
 		"pitch":    cmd.Pitch,
 		"yaw":      cmd.Yaw,
 		"throttle": cmd.Throttle,
-	}).Debug("Sending attitude command")
+	}).Debug("Sent attitude command")
+}
+
+// eulerToQuaternion converts Euler angles to quaternion
+func eulerToQuaternion(roll, pitch, yaw float64) [4]float32 {
+	cy := math.Cos(yaw * 0.5)
+	sy := math.Sin(yaw * 0.5)
+	cp := math.Cos(pitch * 0.5)
+	sp := math.Sin(pitch * 0.5)
+	cr := math.Cos(roll * 0.5)
+	sr := math.Sin(roll * 0.5)
+
+	return [4]float32{
+		float32(cr*cp*cy + sr*sp*sy), // w
+		float32(sr*cp*cy - cr*sp*sy), // x
+		float32(cr*sp*cy + sr*cp*sy), // y
+		float32(cr*cp*sy - sr*sp*cy), // z
+	}
 }
 
 // sendMAVLinkPosition sends position setpoint
 func (mc *MAVLinkController) sendMAVLinkPosition(cmd PositionCommand) {
-	// TODO: Serialize to MAVLink SET_POSITION_TARGET_LOCAL_NED message
+	mc.mu.RLock()
+	protocol := mc.protocol
+	mc.mu.RUnlock()
+
+	if protocol == nil {
+		mc.logger.Debug("Not connected, skipping position command")
+		return
+	}
+
+	timeBootMs := uint32(time.Since(time.Time{}).Milliseconds())
+	coordinateFrame := uint8(MAVLINK_FRAME_LOCAL_NED)
+	typeMask := uint16(0b0000110111111000) // Position only, ignore velocity/acceleration/yaw
+
+	if err := protocol.SendSetPositionTargetLocalNED(1, 1, timeBootMs, coordinateFrame, typeMask,
+		float32(cmd.X), float32(cmd.Y), float32(cmd.Z),
+		0, 0, 0, // velocity
+		0, 0, 0, // acceleration
+		0, 0); err != nil { // yaw, yaw rate
+		mc.logger.WithError(err).Warn("Failed to send position command")
+		return
+	}
 
 	mc.logger.WithFields(logrus.Fields{
 		"x": cmd.X,
 		"y": cmd.Y,
 		"z": cmd.Z,
-	}).Debug("Sending position command")
+	}).Debug("Sent position command")
 }
 
 // sendMAVLinkVelocity sends velocity setpoint
 func (mc *MAVLinkController) sendMAVLinkVelocity(cmd VelocityCommand) {
-	// TODO: Serialize to MAVLink SET_POSITION_TARGET_LOCAL_NED message
-	// with velocity components
+	mc.mu.RLock()
+	protocol := mc.protocol
+	mc.mu.RUnlock()
+
+	if protocol == nil {
+		mc.logger.Debug("Not connected, skipping velocity command")
+		return
+	}
+
+	timeBootMs := uint32(time.Since(time.Time{}).Milliseconds())
+	coordinateFrame := uint8(MAVLINK_FRAME_LOCAL_NED)
+	typeMask := uint16(0b0000110111111111) // Velocity only, ignore position/acceleration/yaw
+
+	if err := protocol.SendSetPositionTargetLocalNED(1, 1, timeBootMs, coordinateFrame, typeMask,
+		0, 0, 0, // position
+		float32(cmd.Vx), float32(cmd.Vy), float32(cmd.Vz), // velocity
+		0, 0, 0, // acceleration
+		0, 0); err != nil { // yaw, yaw rate
+		mc.logger.WithError(err).Warn("Failed to send velocity command")
+		return
+	}
 
 	mc.logger.WithFields(logrus.Fields{
 		"vx": cmd.Vx,
 		"vy": cmd.Vy,
 		"vz": cmd.Vz,
-	}).Debug("Sending velocity command")
+	}).Debug("Sent velocity command")
 }
 
 // GetStats returns controller statistics

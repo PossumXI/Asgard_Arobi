@@ -52,7 +52,7 @@ services:
     restart: unless-stopped
 
   nats:
-    image: nats:latest
+    image: nats:2.10-alpine
     container_name: asgard_nats
     ports:
       - "127.0.0.1:4222:4222"  # Client connections - localhost only

@@ -121,10 +121,3 @@ func (r *StreamChatRepository) Add(ctx context.Context, streamID, userID, userna
 
 	return msg, nil
 }
-
-func nullUUID(value sql.NullString) interface{} {
-	if value.Valid {
-		return value.String
-	}
-	return nil
-}

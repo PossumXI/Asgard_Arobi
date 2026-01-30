@@ -214,6 +214,7 @@ export interface SignInRequest {
   email: string;
   password: string;
   rememberMe?: boolean;
+  accessCode?: string;
 }
 
 export interface SubscriptionPlan {

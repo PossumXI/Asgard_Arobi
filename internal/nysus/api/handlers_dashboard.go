@@ -287,9 +287,8 @@ func (s *Server) handleMissions(w http.ResponseWriter, r *http.Request) {
 	query := `
 		SELECT m.id, m.mission_type, m.priority, m.status, m.description,
 			   m.created_at, m.started_at,
-			   COALESCE(array_agg(mh.hunoid_id) FILTER (WHERE mh.hunoid_id IS NOT NULL), '{}')
+			   COALESCE(m.assigned_hunoid_ids, '{}')
 		FROM missions m
-		LEFT JOIN mission_hunoids mh ON m.id = mh.mission_id
 	`
 	args := []interface{}{}
 	
@@ -298,7 +297,7 @@ func (s *Server) handleMissions(w http.ResponseWriter, r *http.Request) {
 		args = append(args, status)
 	}
 	
-	query += " GROUP BY m.id ORDER BY m.created_at DESC LIMIT $" + strconv.Itoa(len(args)+1)
+	query += " ORDER BY m.created_at DESC LIMIT $" + strconv.Itoa(len(args)+1)
 	args = append(args, limit)
 
 	rows, err := s.pgDB.QueryContext(ctx, query, args...)

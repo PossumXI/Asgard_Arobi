@@ -42,6 +42,14 @@ const contactInfo = [
     bg: 'bg-blue-500/10'
   },
   {
+    icon: Mail,
+    title: 'Gov Relations',
+    value: 'Govrelations@aura-genesis.org',
+    link: 'mailto:Govrelations@aura-genesis.org',
+    color: 'text-indigo-500',
+    bg: 'bg-indigo-500/10'
+  },
+  {
     icon: Building2,
     title: 'Company',
     value: 'Arobi - ASGARD Product Line',

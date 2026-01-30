@@ -13,7 +13,7 @@ interface AuthContextValue {
   user: User | null;
   isLoading: boolean;
   isAuthenticated: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
+  signIn: (email: string, password: string, accessCode?: string) => Promise<void>;
   signInWithFido2: (email: string) => Promise<void>;
   registerFido2: () => Promise<void>;
   signUp: (data: { email: string; password: string; fullName: string }) => Promise<void>;
@@ -58,8 +58,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     initAuth();
   }, [refreshUser]);
 
-  const signIn = async (email: string, password: string) => {
-    const response = await authApi.signIn(email, password);
+  const signIn = async (email: string, password: string, accessCode?: string) => {
+    const response = await authApi.signIn(email, password, accessCode);
     localStorage.setItem(TOKEN_KEY, response.token);
     api.setToken(response.token);
     setUser(response.user);

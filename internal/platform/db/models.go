@@ -22,6 +22,26 @@ type User struct {
 	LastLogin        sql.NullTime   `db:"last_login"`
 }
 
+// AccessCode represents a clearance access code tied to a user or scope.
+type AccessCode struct {
+	ID                   uuid.UUID      `db:"id"`
+	CodeHash             string         `db:"code_hash"`
+	CodeLast4            string         `db:"code_last4"`
+	UserID               sql.NullString `db:"user_id"`
+	CreatedBy            sql.NullString `db:"created_by"`
+	ClearanceLevel       string         `db:"clearance_level"`
+	Scope                string         `db:"scope"`
+	IssuedAt             time.Time      `db:"issued_at"`
+	ExpiresAt            time.Time      `db:"expires_at"`
+	RevokedAt            sql.NullTime   `db:"revoked_at"`
+	LastUsedAt           sql.NullTime   `db:"last_used_at"`
+	UsageCount           int            `db:"usage_count"`
+	MaxUses              sql.NullInt32  `db:"max_uses"`
+	RotationIntervalHours int           `db:"rotation_interval_hours"`
+	NextRotationAt       time.Time      `db:"next_rotation_at"`
+	Note                 sql.NullString `db:"note"`
+}
+
 // NotificationSettings represents user notification preferences.
 type NotificationSettings struct {
 	UserID            uuid.UUID `db:"user_id"`

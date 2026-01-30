@@ -30,6 +30,21 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
+# Load environment variables from .env file
+try:
+    from dotenv import load_dotenv
+    # Load from backend/.env first, then fall back to root .env
+    env_path = Path(__file__).parent / ".env"
+    if env_path.exists():
+        load_dotenv(env_path)
+    else:
+        # Try root ASGARD .env
+        root_env = Path(__file__).parent.parent.parent.parent / ".env"
+        if root_env.exists():
+            load_dotenv(root_env)
+except ImportError:
+    pass  # dotenv not installed, use system env vars
+
 import psutil
 import pyaudio
 import pyttsx3
@@ -60,6 +75,15 @@ try:
 except ImportError:
     VALKYRIE_AVAILABLE = False
 
+try:
+    from sensors_client import (
+        get_wifi_client, get_vision_client, get_fusion_client,
+        handle_wifi_imaging_command, handle_vision_command, handle_sensor_fusion_command
+    )
+    SENSORS_AVAILABLE = True
+except ImportError:
+    SENSORS_AVAILABLE = False
+
 
 # =============================================================================
 # CONFIGURATION
@@ -85,6 +109,7 @@ NYSUS_URL = os.getenv("NYSUS_URL", "http://localhost:8080")
 SILENUS_URL = os.getenv("SILENUS_URL", "http://localhost:9093")
 HUNOID_URL = os.getenv("HUNOID_URL", "http://localhost:8090")
 GIRU_SECURITY_URL = os.getenv("GIRU_SECURITY_URL", "http://localhost:9090")
+VALKYRIE_URL = os.getenv("VALKYRIE_URL", "http://localhost:8093")
 
 # Email settings
 SMTP_SERVER = os.getenv("SMTP_SERVER", "smtp.gmail.com")
@@ -1109,16 +1134,59 @@ async def handle_command(text: str) -> str:
         return await giru_security_get_threats()
     
     # =========================================================================
-    # VALKYRIE FLIGHT CONTROL
+    # WIFI IMAGING & TRIANGULATION
+    # =========================================================================
+    
+    if SENSORS_AVAILABLE and any(phrase in lower for phrase in [
+        "wifi imaging", "wifi scan", "through wall", "wall scan", "wifi routers",
+        "triangulate", "triangulation", "wifi status", "csi", "material analysis"
+    ]):
+        return await handle_wifi_imaging_command(text)
+    
+    # =========================================================================
+    # VISION SYSTEMS
+    # =========================================================================
+    
+    if SENSORS_AVAILABLE and any(phrase in lower for phrase in [
+        "vision", "camera", "detections", "what do you see", "detect person",
+        "detect vehicle", "detect aircraft", "detect ship", "fire detected",
+        "smoke detected", "visual threat", "objects detected"
+    ]):
+        return await handle_vision_command(text)
+    
+    # =========================================================================
+    # SENSOR FUSION
+    # =========================================================================
+    
+    if SENSORS_AVAILABLE and any(phrase in lower for phrase in [
+        "sensor fusion", "fusion status", "sensors active", "ekf", "kalman"
+    ]):
+        return await handle_sensor_fusion_command(text)
+    
+    # =========================================================================
+    # VALKYRIE FLIGHT CONTROL & PASSENGER ASSISTANCE
     # =========================================================================
     
     if VALKYRIE_AVAILABLE and any(phrase in lower for phrase in [
+        # Flight system commands
         "valkyrie", "flight", "aircraft", "drone", "arm", "disarm", 
-        "rtb", "return to base", "emergency land", "mission"
+        "rtb", "return to base", "emergency land", "autopilot",
+        # Passenger information queries
+        "altitude", "how high", "how fast", "speed", "airspeed",
+        "eta", "when will we arrive", "when do we land", "arrival time",
+        "turbulence", "bumpy", "rough air", "smooth",
+        "flight status", "flight briefing", "flight update",
+        # Weather during flight
+        "weather destination", "weather when we land", "weather ahead",
+        # Air traffic
+        "air traffic", "other planes", "traffic nearby", "airspace",
+        # Route management
+        "reroute", "change route", "alternate route", "different route",
+        "flight path", "where are we going", "route",
+        # Safety
+        "safety briefing", "emergency procedure", "safety information"
     ]):
-        # Exclude generic "mission" that might be for Pricilla
-        if "valkyrie" in lower or "flight" in lower or "aircraft" in lower or "arm" in lower or "disarm" in lower or "rtb" in lower:
-            return await handle_valkyrie_command(text)
+        return await handle_valkyrie_command(text)
     
     # =========================================================================
     # WEATHER & FORECAST
@@ -1623,6 +1691,8 @@ async def main() -> None:
     port = int(os.getenv("GIRU_PORT", "7777"))
     monitor_port = int(os.getenv("GIRU_MONITOR_PORT", "7778"))
     
+    valkyrie_status = "ONLINE" if VALKYRIE_AVAILABLE else "offline"
+    
     print(f"""
 +--------------------------------------------------------------------------+
 |                        GIRU JARVIS v2.0                                  |
@@ -1638,10 +1708,15 @@ async def main() -> None:
 |    Paid:  {len(paid_models):>2} models (Claude, GPT-4, Gemini Pro)                    |
 +--------------------------------------------------------------------------+
 |  ASGARD Integrations:                                                    |
+|    - Valkyrie (Flight):    {VALKYRIE_URL:<37} [{valkyrie_status}]|
 |    - Pricilla (Targeting): {PRICILLA_URL:<40}|
 |    - Nysus (Command):      {NYSUS_URL:<40}|
 |    - Silenus (Orbital):    {SILENUS_URL:<40}|
 |    - Hunoid (Robots):      {HUNOID_URL:<40}|
++--------------------------------------------------------------------------+
+|  Flight Assistance Commands:                                             |
+|    "What's our altitude?" | "ETA?" | "Any turbulence?"                   |
+|    "Weather at destination" | "Can we reroute?" | "Air traffic?"         |
 +--------------------------------------------------------------------------+
 """)
     

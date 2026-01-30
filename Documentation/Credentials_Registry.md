@@ -58,7 +58,7 @@ host=localhost port=55432 user=postgres password=asgard_secure_2026 dbname=asgar
 | **Container Name** | `asgard_mongodb` |
 | **Image** | `mongo:7` |
 | **Host** | `localhost` |
-| **Port** | `27017` |
+| **Port** | `27018` |
 | **Database** | `asgard` |
 | **Username** | `admin` |
 | **Password** | `${MONGO_PASSWORD}` (set in .env) |
@@ -66,11 +66,11 @@ host=localhost port=55432 user=postgres password=asgard_secure_2026 dbname=asgar
 
 **Connection URI:**
 ```
-mongodb://admin:asgard_mongo_2026@localhost:27017
+mongodb://admin:asgard_mongo_2026@localhost:27018/asgard?authSource=admin
 ```
 
 **Source Files:**
-- `Data/docker-compose.yml` (lines 24-25)
+- `Data/docker-compose.yml` (lines 39-43)
 - `internal/platform/db/config.go` (lines 38-42)
 - `Data/init_databases.ps1` (line 69)
 
@@ -152,8 +152,8 @@ docker exec -it asgard_redis redis-cli -a $REDIS_PASSWORD
 
 | App | Port | URL |
 |-----|------|-----|
-| Websites | 5173 (default) | `http://localhost:5173` |
-| Hubs | 5174 (default) | `http://localhost:5174` |
+| Websites | 3000 | `http://localhost:3000` |
+| Hubs | 3001 | `http://localhost:3001` |
 
 ---
 
@@ -172,7 +172,7 @@ POSTGRES_SSLMODE=disable
 
 # MongoDB
 MONGO_HOST=localhost
-MONGO_PORT=27017
+MONGO_PORT=27018
 MONGO_USER=admin
 MONGO_PASSWORD=your_secure_mongo_password
 MONGO_DB=asgard
