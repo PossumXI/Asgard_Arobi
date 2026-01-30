@@ -1,6 +1,6 @@
 module github.com/PossumXI/Asgard/Valkyrie
 
-go 1.21
+go 1.23.0
 
 require (
 	github.com/golang-jwt/jwt/v5 v5.3.1
@@ -12,6 +12,6 @@ require (
 
 require (
 	github.com/creack/goselect v0.1.2 // indirect
-	golang.org/x/net v0.20.0 // indirect
-	golang.org/x/sys v0.19.0 // indirect
+	golang.org/x/net v0.38.0 // indirect
+	golang.org/x/sys v0.31.0 // indirect
 )
