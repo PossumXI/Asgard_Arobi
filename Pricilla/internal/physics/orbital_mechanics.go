@@ -27,19 +27,19 @@ const (
 	R_Mars  = 3.3895e6 // Mars radius
 
 	// Earth-specific constants
-	EarthJ2           = 1.08263e-3  // J2 oblateness coefficient
-	EarthJ3           = -2.54e-6   // J3 coefficient
-	EarthJ4           = -1.62e-6   // J4 coefficient
-	EarthEquatorialR  = 6.378137e6 // Equatorial radius
-	EarthPolarR       = 6.356752e6 // Polar radius
+	EarthJ2           = 1.08263e-3   // J2 oblateness coefficient
+	EarthJ3           = -2.54e-6     // J3 coefficient
+	EarthJ4           = -1.62e-6     // J4 coefficient
+	EarthEquatorialR  = 6.378137e6   // Equatorial radius
+	EarthPolarR       = 6.356752e6   // Polar radius
 	EarthRotationRate = 7.2921159e-5 // rad/s
 
 	// Atmospheric constants
-	SeaLevelDensity    = 1.225        // kg/m³
-	SeaLevelPressure   = 101325.0     // Pa
-	ScaleHeight        = 8500.0       // meters (Earth atmosphere)
-	KarmanLine         = 100000.0     // meters - edge of space
-	SpeedOfSound       = 343.0        // m/s at sea level
+	SeaLevelDensity  = 1.225    // kg/m³
+	SeaLevelPressure = 101325.0 // Pa
+	ScaleHeight      = 8500.0   // meters (Earth atmosphere)
+	KarmanLine       = 100000.0 // meters - edge of space
+	SpeedOfSound     = 343.0    // m/s at sea level
 
 	// Physical constants
 	StefanBoltzmann = 5.67e-8     // W/(m²·K⁴)
@@ -110,24 +110,24 @@ func (v Vector3D) Normalize() Vector3D {
 
 // OrbitalState represents the complete state of a body
 type OrbitalState struct {
-	Position     Vector3D  // ECI position (meters)
-	Velocity     Vector3D  // ECI velocity (m/s)
-	Mass         float64   // kg
-	Time         time.Time
-	Epoch        time.Time
-	CoordFrame   string    // "ECI", "ECEF", "LCI", etc.
+	Position   Vector3D // ECI position (meters)
+	Velocity   Vector3D // ECI velocity (m/s)
+	Mass       float64  // kg
+	Time       time.Time
+	Epoch      time.Time
+	CoordFrame string // "ECI", "ECEF", "LCI", etc.
 }
 
 // KeplerianElements represents classical orbital elements
 type KeplerianElements struct {
-	SemiMajorAxis     float64 // a (meters)
-	Eccentricity      float64 // e (dimensionless)
-	Inclination       float64 // i (radians)
-	RAAN              float64 // Ω (radians) - Right Ascension of Ascending Node
-	ArgOfPeriapsis    float64 // ω (radians)
-	TrueAnomaly       float64 // ν (radians)
-	MeanAnomaly       float64 // M (radians)
-	Epoch             time.Time
+	SemiMajorAxis  float64 // a (meters)
+	Eccentricity   float64 // e (dimensionless)
+	Inclination    float64 // i (radians)
+	RAAN           float64 // Ω (radians) - Right Ascension of Ascending Node
+	ArgOfPeriapsis float64 // ω (radians)
+	TrueAnomaly    float64 // ν (radians)
+	MeanAnomaly    float64 // M (radians)
+	Epoch          time.Time
 }
 
 // ================================================================================
@@ -195,7 +195,7 @@ func CalculateGravity(position Vector3D, model GravityModel, centralBody string)
 	// J2 acceleration components
 	factor_j2 := 1.5 * j2 * gm * re2 / r5
 	j2_factor := 5.0 * z2 / r2
-	
+
 	ax_j2 := factor_j2 * position.X * (j2_factor - 1.0)
 	ay_j2 := factor_j2 * position.Y * (j2_factor - 1.0)
 	az_j2 := factor_j2 * position.Z * (j2_factor - 3.0)
@@ -216,7 +216,7 @@ func CalculateGravity(position Vector3D, model GravityModel, centralBody string)
 
 	// J3 terms
 	factor_j3 := 2.5 * j3 * gm * re3 / r7
-	j3_xy_factor := 7.0 * z3 / r2 - 3.0 * z
+	j3_xy_factor := 7.0*z3/r2 - 3.0*z
 	ax_j3 := factor_j3 * position.X * j3_xy_factor
 	ay_j3 := factor_j3 * position.Y * j3_xy_factor
 	az_j3 := factor_j3 * (6.0*z2 - 7.0*z4/r2 - 0.6*r2)
@@ -249,12 +249,12 @@ const (
 
 // AtmosphericProperties contains atmospheric state
 type AtmosphericProperties struct {
-	Density     float64 // kg/m³
-	Pressure    float64 // Pa
-	Temperature float64 // K
-	SpeedOfSound float64 // m/s
+	Density          float64 // kg/m³
+	Pressure         float64 // Pa
+	Temperature      float64 // K
+	SpeedOfSound     float64 // m/s
 	DynamicViscosity float64 // Pa·s
-	MolarMass   float64 // kg/mol
+	MolarMass        float64 // kg/mol
 }
 
 // GetAtmosphericDensity returns atmospheric density at altitude
@@ -279,9 +279,9 @@ func GetAtmosphericDensity(altitude float64, model AtmosphereModel) float64 {
 func us76Density(h float64) float64 {
 	// Geopotential altitude layers (km)
 	// Using piecewise model with lapse rates
-	
+
 	hKm := h / 1000.0 // Convert to km
-	
+
 	// Define atmospheric layers
 	type layer struct {
 		hBase   float64 // Base altitude (km)
@@ -311,7 +311,7 @@ func us76Density(h float64) float64 {
 	}
 
 	dh := hKm - l.hBase
-	
+
 	if l.lapse == 0 {
 		// Isothermal layer
 		return l.rhoBase * math.Exp(-34.1632*dh/l.TBase)
@@ -409,17 +409,17 @@ func isInShadow(position, sunPosition Vector3D) bool {
 
 	// Check if Earth is between spacecraft and sun
 	posMag := position.Magnitude()
-	
+
 	// Project position onto sun line
 	proj := position.Dot(toSunDir)
-	
+
 	if proj > 0 {
 		return false // Sun is in front
 	}
 
 	// Distance from sun line
 	perpDist := math.Sqrt(posMag*posMag - proj*proj)
-	
+
 	// Simple cylindrical shadow model
 	return perpDist < R_Earth && math.Abs(proj) < toSunMag
 }
@@ -430,18 +430,18 @@ func isInShadow(position, sunPosition Vector3D) bool {
 
 // RadiationEnvironment contains radiation flux data
 type RadiationEnvironment struct {
-	TotalDose        float64 // rad/s
-	ProtonFlux       float64 // particles/cm²/s
-	ElectronFlux     float64 // particles/cm²/s
+	TotalDose         float64 // rad/s
+	ProtonFlux        float64 // particles/cm²/s
+	ElectronFlux      float64 // particles/cm²/s
 	SolarParticleFlux float64 // particles/cm²/s
-	IsInVanAllen     bool
-	VanAllenZone     string // "inner", "outer", "slot", "none"
+	IsInVanAllen      bool
+	VanAllenZone      string // "inner", "outer", "slot", "none"
 }
 
 // CalculateRadiationEnvironment estimates radiation at position
 func CalculateRadiationEnvironment(position Vector3D, solarActivity float64) RadiationEnvironment {
 	altitude := position.Magnitude() - R_Earth
-	
+
 	env := RadiationEnvironment{}
 
 	// Determine Van Allen belt zone
@@ -490,23 +490,23 @@ func CalculateRadiationEnvironment(position Vector3D, solarActivity float64) Rad
 
 // PropagatorConfig configures the orbital propagator
 type PropagatorConfig struct {
-	GravityModel    GravityModel
-	AtmosphereModel AtmosphereModel
-	IncludeDrag     bool
-	IncludeSRP      bool
-	IncludeJ2       bool
+	GravityModel     GravityModel
+	AtmosphereModel  AtmosphereModel
+	IncludeDrag      bool
+	IncludeSRP       bool
+	IncludeJ2        bool
 	IncludeThirdBody bool // Moon/Sun perturbations
-	IntegrationStep time.Duration
+	IntegrationStep  time.Duration
 }
 
 // DefaultPropagatorConfig returns a high-fidelity default configuration
 func DefaultPropagatorConfig() PropagatorConfig {
 	return PropagatorConfig{
-		GravityModel:    GravityJ2J3J4,
-		AtmosphereModel: AtmosphereUS76,
-		IncludeDrag:     true,
-		IncludeSRP:      true,
-		IncludeJ2:       true,
+		GravityModel:     GravityJ2J3J4,
+		AtmosphereModel:  AtmosphereUS76,
+		IncludeDrag:      true,
+		IncludeSRP:       true,
+		IncludeJ2:        true,
 		IncludeThirdBody: true,
 		IntegrationStep:  10 * time.Second,
 	}
@@ -516,30 +516,30 @@ func DefaultPropagatorConfig() PropagatorConfig {
 func Propagate(state OrbitalState, duration time.Duration, config PropagatorConfig, spacecraft SpacecraftParams) []OrbitalState {
 	dt := config.IntegrationStep.Seconds()
 	steps := int(duration.Seconds() / dt)
-	
+
 	states := make([]OrbitalState, 0, steps+1)
 	states = append(states, state)
 
 	current := state
-	
+
 	for i := 0; i < steps; i++ {
 		// RK4 integration
 		k1_v, k1_a := computeAcceleration(current, config, spacecraft)
-		
+
 		mid1 := OrbitalState{
 			Position: current.Position.Add(k1_v.Scale(dt / 2)),
 			Velocity: current.Velocity.Add(k1_a.Scale(dt / 2)),
 			Mass:     current.Mass,
 		}
 		k2_v, k2_a := computeAcceleration(mid1, config, spacecraft)
-		
+
 		mid2 := OrbitalState{
 			Position: current.Position.Add(k2_v.Scale(dt / 2)),
 			Velocity: current.Velocity.Add(k2_a.Scale(dt / 2)),
 			Mass:     current.Mass,
 		}
 		k3_v, k3_a := computeAcceleration(mid2, config, spacecraft)
-		
+
 		end := OrbitalState{
 			Position: current.Position.Add(k3_v.Scale(dt)),
 			Velocity: current.Velocity.Add(k3_a.Scale(dt)),
@@ -567,11 +567,11 @@ func Propagate(state OrbitalState, duration time.Duration, config PropagatorConf
 
 // SpacecraftParams contains spacecraft physical properties
 type SpacecraftParams struct {
-	DragArea      float64 // m²
-	SRPArea       float64 // m²
-	DragCoeff     float64 // dimensionless
-	Reflectivity  float64 // 0-1
-	DryMass       float64 // kg
+	DragArea     float64 // m²
+	SRPArea      float64 // m²
+	DragCoeff    float64 // dimensionless
+	Reflectivity float64 // 0-1
+	DryMass      float64 // kg
 }
 
 // computeAcceleration computes total acceleration at a state
@@ -628,7 +628,7 @@ func thirdBodyAccel(position, bodyPosition Vector3D, gm float64) Vector3D {
 	}
 
 	// Third body acceleration
-	return r.Scale(-gm/rMag3).Sub(rBody.Scale(gm / rBodyMag3))
+	return r.Scale(-gm / rMag3).Sub(rBody.Scale(gm / rBodyMag3))
 }
 
 // ================================================================================
@@ -637,15 +637,15 @@ func thirdBodyAccel(position, bodyPosition Vector3D, gm float64) Vector3D {
 
 // InterceptSolution contains the solution for intercepting a moving target
 type InterceptSolution struct {
-	InterceptPoint   Vector3D
-	InterceptTime    time.Duration
-	LaunchVelocity   Vector3D
-	ImpactVelocity   Vector3D
-	FlightTime       time.Duration
-	DeltaV           float64
-	Feasibility      float64
-	ClosingVelocity  float64
-	ImpactAngle      float64 // radians from vertical
+	InterceptPoint  Vector3D
+	InterceptTime   time.Duration
+	LaunchVelocity  Vector3D
+	ImpactVelocity  Vector3D
+	FlightTime      time.Duration
+	DeltaV          float64
+	Feasibility     float64
+	ClosingVelocity float64
+	ImpactAngle     float64 // radians from vertical
 }
 
 // CalculateMovingTargetIntercept computes intercept for a maneuvering target
@@ -655,13 +655,13 @@ func CalculateMovingTargetIntercept(
 	maxDeltaV float64,
 	maxFlightTime time.Duration,
 ) (*InterceptSolution, error) {
-	
+
 	// Iterative solution using predicted impact point (PIP)
 	// Start with current target position as first guess
-	
+
 	bestSolution := &InterceptSolution{Feasibility: 0}
 	dt := 1.0 // seconds
-	
+
 	for tFlight := 10.0; tFlight <= maxFlightTime.Seconds(); tFlight += dt {
 		// Predict target position at time tFlight
 		// Using constant acceleration model: r = r0 + v0*t + 0.5*a*t²
@@ -675,7 +675,7 @@ func CalculateMovingTargetIntercept(
 		// Simplified: straight line (would use Lambert solver for orbital)
 		toTarget := targetFuture.Sub(launchPos)
 		distance := toTarget.Magnitude()
-		
+
 		// Check if distance is reasonable for the flight time
 		minSpeed := distance / tFlight
 		if minSpeed > 50000 { // 50 km/s is unreasonable for most payloads
@@ -688,7 +688,7 @@ func CalculateMovingTargetIntercept(
 		if altitude > KarmanLine {
 			gravityCorrection = Vector3D{} // In space, use orbital mechanics
 		}
-		
+
 		toTargetCorrected := toTarget.Add(gravityCorrection)
 		requiredVel := toTargetCorrected.Scale(1 / tFlight)
 
@@ -714,7 +714,7 @@ func CalculateMovingTargetIntercept(
 
 		// Score this solution
 		feasibility := 1.0 - (deltaV / maxDeltaV)
-		feasibility *= math.Min(1.0, 50.0/tFlight) // Prefer shorter flight times
+		feasibility *= math.Min(1.0, 50.0/tFlight)     // Prefer shorter flight times
 		feasibility *= math.Min(1.0, closingVel/500.0) // Prefer higher closing speeds
 
 		if feasibility > bestSolution.Feasibility {
@@ -745,13 +745,13 @@ func CalculateMovingTargetIntercept(
 
 // LambertSolution contains a Lambert problem solution
 type LambertSolution struct {
-	V1          Vector3D // Initial velocity
-	V2          Vector3D // Final velocity
-	DeltaV1     float64  // Delta-V at departure
-	DeltaV2     float64  // Delta-V at arrival
-	TotalDeltaV float64
+	V1           Vector3D // Initial velocity
+	V2           Vector3D // Final velocity
+	DeltaV1      float64  // Delta-V at departure
+	DeltaV2      float64  // Delta-V at arrival
+	TotalDeltaV  float64
 	TransferTime time.Duration
-	ShortWay    bool
+	ShortWay     bool
 }
 
 // SolveLambert solves Lambert's problem for orbital transfer
@@ -764,14 +764,14 @@ func SolveLambert(r1, r2 Vector3D, transferTime time.Duration, gm float64, short
 
 	r1Mag := r1.Magnitude()
 	r2Mag := r2.Magnitude()
-	
+
 	// Cross product determines transfer direction
 	cross := r1.Cross(r2)
-	
+
 	// Angle between position vectors
 	cosTA := r1.Dot(r2) / (r1Mag * r2Mag)
 	cosTA = math.Max(-1, math.Min(1, cosTA)) // Clamp
-	
+
 	var sinTA float64
 	if shortWay {
 		if cross.Z >= 0 {
@@ -792,34 +792,34 @@ func SolveLambert(r1, r2 Vector3D, transferTime time.Duration, gm float64, short
 
 	// Universal variable iteration
 	z := 0.0 // Initial guess
-	
+
 	for iter := 0; iter < 100; iter++ {
 		C, S := stumpffCS(z)
-		
+
 		y := r1Mag + r2Mag + A*(z*S-1)/math.Sqrt(C)
 		if y < 0 {
 			z += 0.1
 			continue
 		}
-		
+
 		sqrtY := math.Sqrt(y)
 		x := sqrtY / math.Sqrt(C)
-		
+
 		// Time of flight equation
 		tofCalc := (x*x*x*S + A*sqrtY) / math.Sqrt(gm)
-		
+
 		// Derivative
 		if math.Abs(z) > 1e-6 {
 			// Non-zero z
 		} else {
 			// z ≈ 0
 		}
-		
+
 		// Newton iteration
 		if math.Abs(tofCalc-tof) < 1e-6 {
 			break
 		}
-		
+
 		// Simple iteration adjustment
 		if tofCalc > tof {
 			z += 0.5
@@ -831,7 +831,7 @@ func SolveLambert(r1, r2 Vector3D, transferTime time.Duration, gm float64, short
 	// Compute velocities
 	C, S := stumpffCS(z)
 	y := r1Mag + r2Mag + A*(z*S-1)/math.Sqrt(C)
-	
+
 	f := 1 - y/r1Mag
 	g := A * math.Sqrt(y/gm)
 	gDot := 1 - y/r2Mag
@@ -873,37 +873,37 @@ func stumpffCS(z float64) (float64, float64) {
 
 // ReentryParams contains re-entry vehicle parameters
 type ReentryParams struct {
-	Mass            float64 // kg
-	NoseRadius      float64 // m
-	BaseArea        float64 // m²
-	CD              float64 // drag coefficient
-	AblationRate    float64 // kg/(m²·s) at reference flux
-	HeatShieldMass  float64 // kg
-	ThermalLimit    float64 // K (max temperature)
+	Mass           float64 // kg
+	NoseRadius     float64 // m
+	BaseArea       float64 // m²
+	CD             float64 // drag coefficient
+	AblationRate   float64 // kg/(m²·s) at reference flux
+	HeatShieldMass float64 // kg
+	ThermalLimit   float64 // K (max temperature)
 }
 
 // ReentryState contains re-entry trajectory state
 type ReentryState struct {
-	Position     Vector3D
-	Velocity     Vector3D
-	Mass         float64
-	HeatRate     float64 // W/m²
-	Temperature  float64 // K surface temperature
+	Position            Vector3D
+	Velocity            Vector3D
+	Mass                float64
+	HeatRate            float64 // W/m²
+	Temperature         float64 // K surface temperature
 	HeatShieldRemaining float64 // kg
-	Altitude     float64
-	Mach         float64
-	GLoad        float64 // g's
+	Altitude            float64
+	Mach                float64
+	GLoad               float64 // g's
 }
 
 // SimulateReentry simulates atmospheric re-entry
 func SimulateReentry(initialState OrbitalState, params ReentryParams, targetPos Vector3D) []ReentryState {
 	states := make([]ReentryState, 0)
-	
+
 	dt := 0.1 // seconds
 	state := ReentryState{
-		Position:     initialState.Position,
-		Velocity:     initialState.Velocity,
-		Mass:         params.Mass,
+		Position:            initialState.Position,
+		Velocity:            initialState.Velocity,
+		Mass:                params.Mass,
 		HeatShieldRemaining: params.HeatShieldMass,
 	}
 
@@ -915,13 +915,13 @@ func SimulateReentry(initialState OrbitalState, params ReentryParams, targetPos 
 
 		// Atmospheric density
 		rho := GetAtmosphericDensity(altitude, AtmosphereUS76)
-		
+
 		// Velocity magnitude
 		vMag := state.Velocity.Magnitude()
-		
+
 		// Mach number
 		T := 288.15 - 0.0065*math.Min(altitude, 11000) // Temperature approximation
-		a := math.Sqrt(1.4 * 287 * T) // Speed of sound
+		a := math.Sqrt(1.4 * 287 * T)                  // Speed of sound
 		state.Mach = vMag / a
 
 		// Drag force
@@ -988,13 +988,13 @@ func SimulateReentry(initialState OrbitalState, params ReentryParams, targetPos 
 
 // DeliveryAccuracy contains precision metrics
 type DeliveryAccuracy struct {
-	CEP             float64 // Circular Error Probable (meters) - 50% within this radius
-	SEP             float64 // Spherical Error Probable (meters)
-	MaxError        float64 // Maximum error (meters)
-	MeanError       float64 // Mean error (meters)
-	StdDeviation    float64 // Standard deviation (meters)
+	CEP             float64  // Circular Error Probable (meters) - 50% within this radius
+	SEP             float64  // Spherical Error Probable (meters)
+	MaxError        float64  // Maximum error (meters)
+	MeanError       float64  // Mean error (meters)
+	StdDeviation    float64  // Standard deviation (meters)
 	Bias            Vector3D // Systematic bias
-	ConfidenceLevel float64 // 0-1
+	ConfidenceLevel float64  // 0-1
 }
 
 // CalculateDeliveryAccuracy computes accuracy metrics from a set of delivery points
@@ -1035,7 +1035,7 @@ func CalculateDeliveryAccuracy(targetPos Vector3D, impactPoints []Vector3D) Deli
 	sortedErrors := make([]float64, n)
 	copy(sortedErrors, errors)
 	sort.Float64s(sortedErrors)
-	
+
 	cepIndex := n / 2
 	cep := sortedErrors[cepIndex]
 

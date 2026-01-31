@@ -87,20 +87,20 @@ func (h *AccessHTTPHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // LoginRequest represents a login request
 type LoginRequest struct {
-	Username  string `json:"username"`
-	Password  string `json:"password"`
-	MFACode   string `json:"mfaCode,omitempty"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+	MFACode  string `json:"mfaCode,omitempty"`
 }
 
 // LoginResponse represents a login response
 type LoginResponse struct {
-	SessionID string         `json:"sessionId"`
-	Token     string         `json:"token"`
-	UserID    string         `json:"userId"`
-	Username  string         `json:"username"`
-	Clearance ClearanceLevel `json:"clearance"`
-	ClearanceName string     `json:"clearanceName"`
-	ExpiresAt time.Time      `json:"expiresAt"`
+	SessionID     string         `json:"sessionId"`
+	Token         string         `json:"token"`
+	UserID        string         `json:"userId"`
+	Username      string         `json:"username"`
+	Clearance     ClearanceLevel `json:"clearance"`
+	ClearanceName string         `json:"clearanceName"`
+	ExpiresAt     time.Time      `json:"expiresAt"`
 }
 
 // handleLogin handles user login
@@ -163,7 +163,7 @@ func (h *AccessHTTPHandler) handleLogout(w http.ResponseWriter, r *http.Request)
 func (h *AccessHTTPHandler) handleValidateSession(w http.ResponseWriter, r *http.Request) {
 	// Try session ID from header first
 	sessionID := r.Header.Get("X-Session-ID")
-	
+
 	// Try Authorization header (Bearer token)
 	authHeader := r.Header.Get("Authorization")
 	if authHeader != "" && strings.HasPrefix(authHeader, "Bearer ") {
@@ -362,7 +362,7 @@ func (h *AccessHTTPHandler) handleCheckAccess(w http.ResponseWriter, r *http.Req
 // handleGetAuditLogs gets recent audit logs
 func (h *AccessHTTPHandler) handleGetAuditLogs(w http.ResponseWriter, r *http.Request) {
 	limit := 100 // Default limit
-	
+
 	logs := h.controller.GetAuditLogs(limit)
 	json.NewEncoder(w).Encode(logs)
 }

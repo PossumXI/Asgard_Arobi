@@ -25,18 +25,18 @@ import (
 
 // Server represents the Nysus HTTP API server.
 type Server struct {
-	httpServer      *http.Server
-	pgDB            *db.PostgresDB
-	mongoDB         *db.MongoDB
-	eventBus        *events.EventBus
-	wsHub           *WebSocketHub
-	natsBridge      *realtime.Bridge
-	wsManager       *realtime.WebSocketManager
-	accessRules     *realtime.AccessRules
-	signalingServer *signaling.Server
-	sfu             *webrtc.SFU
-	streamService   *services.StreamService
-	chatStore       *chatStore
+	httpServer        *http.Server
+	pgDB              *db.PostgresDB
+	mongoDB           *db.MongoDB
+	eventBus          *events.EventBus
+	wsHub             *WebSocketHub
+	natsBridge        *realtime.Bridge
+	wsManager         *realtime.WebSocketManager
+	accessRules       *realtime.AccessRules
+	signalingServer   *signaling.Server
+	sfu               *webrtc.SFU
+	streamService     *services.StreamService
+	chatStore         *chatStore
 	accessCodeService *services.AccessCodeService
 	accessCodeCancel  context.CancelFunc
 }
@@ -107,17 +107,17 @@ func NewServer(cfg Config, pgDB *db.PostgresDB, mongoDB *db.MongoDB, eventBus *e
 	log.Println("[Nysus] WebRTC signaling server initialized")
 
 	s := &Server{
-		pgDB:            pgDB,
-		mongoDB:         mongoDB,
-		eventBus:        eventBus,
-		wsHub:           NewWebSocketHub(eventBus),
-		natsBridge:      natsBridge,
-		wsManager:       wsManager,
-		accessRules:     accessRules,
-		signalingServer: signalingServer,
-		sfu:             sfu,
-		streamService:   streamService,
-		chatStore:       newChatStore(pgDB),
+		pgDB:              pgDB,
+		mongoDB:           mongoDB,
+		eventBus:          eventBus,
+		wsHub:             NewWebSocketHub(eventBus),
+		natsBridge:        natsBridge,
+		wsManager:         wsManager,
+		accessRules:       accessRules,
+		signalingServer:   signalingServer,
+		sfu:               sfu,
+		streamService:     streamService,
+		chatStore:         newChatStore(pgDB),
 		accessCodeService: accessCodeService,
 	}
 
@@ -287,7 +287,7 @@ func (s *Server) registerRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/api/controlplane/command", s.handleControlPlaneCommand)
 
 	// WebSocket endpoints
-	mux.HandleFunc("/ws", s.handleRealtimeWebSocket)       // Fallback for /ws without suffix
+	mux.HandleFunc("/ws", s.handleRealtimeWebSocket) // Fallback for /ws without suffix
 	mux.HandleFunc("/ws/realtime", s.handleWebSocket)
 	mux.HandleFunc("/ws/events", s.handleRealtimeWebSocket)
 	mux.HandleFunc("/ws/signaling", s.handleSignalingWebSocket)

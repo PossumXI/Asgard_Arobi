@@ -18,12 +18,12 @@ type PostgresBundleStorage struct {
 // NewPostgresBundleStorage creates a new PostgreSQL-backed bundle storage.
 func NewPostgresBundleStorage(pgDB *db.PostgresDB) (*PostgresBundleStorage, error) {
 	storage := &PostgresBundleStorage{db: pgDB}
-	
+
 	// Create table if it doesn't exist
 	if err := storage.createTable(); err != nil {
 		return nil, fmt.Errorf("failed to create bundle storage table: %w", err)
 	}
-	
+
 	return storage, nil
 }
 
@@ -55,7 +55,7 @@ func (s *PostgresBundleStorage) createTable() error {
 		CREATE INDEX IF NOT EXISTS idx_bundles_priority ON dtn_bundles(priority DESC);
 		CREATE INDEX IF NOT EXISTS idx_bundles_stored_at ON dtn_bundles(stored_at);
 	`
-	
+
 	_, err := s.db.Exec(query)
 	return err
 }
@@ -290,7 +290,7 @@ func (s *PostgresBundleStorage) PurgeExpired(ctx context.Context) (int, error) {
 		WHERE (creation_timestamp + lifetime) < EXTRACT(EPOCH FROM NOW()) * 1000
 		RETURNING id
 	`
-	
+
 	rows, err := s.db.QueryContext(ctx, query)
 	if err != nil {
 		return 0, fmt.Errorf("failed to purge expired bundles: %w", err)

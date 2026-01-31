@@ -865,9 +865,9 @@ func (s *Server) createControlCommand(
 	}
 
 	response := map[string]interface{}{
-		"command_id": commandID.String(),
-		"command":    commandType,
-		"status":     "pending",
+		"command_id":  commandID.String(),
+		"command":     commandType,
+		"status":      "pending",
 		"target_type": targetType,
 	}
 	if targetID != nil {

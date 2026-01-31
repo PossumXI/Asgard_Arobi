@@ -50,16 +50,16 @@ type Detection struct {
 
 // Response represents a defensive response action
 type Response struct {
-	ID           string
-	DetectionID  string
-	Type         DefenseType
-	Action       string
-	Target       string
-	Status       string
-	StartTime    time.Time
-	EndTime      *time.Time
-	Success      bool
-	Notes        []string
+	ID          string
+	DetectionID string
+	Type        DefenseType
+	Action      string
+	Target      string
+	Status      string
+	StartTime   time.Time
+	EndTime     *time.Time
+	Success     bool
+	Notes       []string
 }
 
 // Rule represents a detection rule
@@ -84,27 +84,27 @@ type RuleLogic struct {
 
 // Agent is an automated blue team agent
 type Agent struct {
-	mu           sync.RWMutex
-	id           string
-	name         string
-	detections   []Detection
-	responses    []Response
-	rules        map[string]*Rule
-	blocklist    map[string]time.Time
-	config       AgentConfig
-	alertChan    chan Detection
-	stopCh       chan struct{}
-	wg           sync.WaitGroup
+	mu         sync.RWMutex
+	id         string
+	name       string
+	detections []Detection
+	responses  []Response
+	rules      map[string]*Rule
+	blocklist  map[string]time.Time
+	config     AgentConfig
+	alertChan  chan Detection
+	stopCh     chan struct{}
+	wg         sync.WaitGroup
 }
 
 // AgentConfig configures the blue team agent
 type AgentConfig struct {
-	AutoRespond         bool
-	ResponseTimeout     time.Duration
-	BlockDuration       time.Duration
-	MaxBlocklistSize    int
-	AlertThreshold      int
-	EnableHeuristics    bool
+	AutoRespond      bool
+	ResponseTimeout  time.Duration
+	BlockDuration    time.Duration
+	MaxBlocklistSize int
+	AlertThreshold   int
+	EnableHeuristics bool
 }
 
 // DefaultAgentConfig returns safe defaults
@@ -169,7 +169,7 @@ func (a *Agent) AddRule(rule *Rule) {
 func (a *Agent) RemoveRule(ruleID string) error {
 	a.mu.Lock()
 	defer a.mu.Unlock()
-	
+
 	if _, exists := a.rules[ruleID]; !exists {
 		return fmt.Errorf("rule not found: %s", ruleID)
 	}
@@ -293,7 +293,7 @@ func (a *Agent) IsBlocked(ip string) bool {
 // Respond executes a defensive response
 func (a *Agent) Respond(ctx context.Context, detectionID string, defenseType DefenseType, action string, target string) (*Response, error) {
 	a.mu.Lock()
-	
+
 	// Find detection
 	var detection *Detection
 	for i := range a.detections {
@@ -302,7 +302,7 @@ func (a *Agent) Respond(ctx context.Context, detectionID string, defenseType Def
 			break
 		}
 	}
-	
+
 	if detection == nil {
 		a.mu.Unlock()
 		return nil, fmt.Errorf("detection not found: %s", detectionID)
@@ -394,15 +394,15 @@ func (a *Agent) GetStatistics() map[string]interface{} {
 	}
 
 	return map[string]interface{}{
-		"agent_id":              a.id,
-		"agent_name":            a.name,
-		"total_detections":      len(a.detections),
-		"detections_by_level":   detectionsByLevel,
-		"total_responses":       len(a.responses),
-		"successful_responses":  successfulResponses,
-		"active_rules":          len(a.rules),
-		"blocklist_size":        len(a.blocklist),
-		"auto_respond":          a.config.AutoRespond,
+		"agent_id":             a.id,
+		"agent_name":           a.name,
+		"total_detections":     len(a.detections),
+		"detections_by_level":  detectionsByLevel,
+		"total_responses":      len(a.responses),
+		"successful_responses": successfulResponses,
+		"active_rules":         len(a.rules),
+		"blocklist_size":       len(a.blocklist),
+		"auto_respond":         a.config.AutoRespond,
 	}
 }
 

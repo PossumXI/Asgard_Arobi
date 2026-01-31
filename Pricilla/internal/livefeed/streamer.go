@@ -14,25 +14,25 @@ import (
 type StreamType string
 
 const (
-	StreamTelemetry   StreamType = "telemetry"     // Position, velocity, status
-	StreamVideo       StreamType = "video"         // Live video feed
-	StreamThermal     StreamType = "thermal"       // Thermal imaging
-	StreamRadar       StreamType = "radar"         // Radar overlay
-	StreamMap         StreamType = "map"           // 3D map visualization
-	StreamCommand     StreamType = "command"       // Command feed
-	StreamAlert       StreamType = "alert"         // Alert notifications
+	StreamTelemetry StreamType = "telemetry" // Position, velocity, status
+	StreamVideo     StreamType = "video"     // Live video feed
+	StreamThermal   StreamType = "thermal"   // Thermal imaging
+	StreamRadar     StreamType = "radar"     // Radar overlay
+	StreamMap       StreamType = "map"       // 3D map visualization
+	StreamCommand   StreamType = "command"   // Command feed
+	StreamAlert     StreamType = "alert"     // Alert notifications
 )
 
 // ClearanceLevel defines access tiers
 type ClearanceLevel int
 
 const (
-	ClearancePublic    ClearanceLevel = 0  // Public access - basic info only
-	ClearanceCivilian  ClearanceLevel = 1  // Civilian - humanitarian missions
-	ClearanceMilitary  ClearanceLevel = 2  // Military - tactical missions
-	ClearanceGov       ClearanceLevel = 3  // Government - classified missions
-	ClearanceSecret    ClearanceLevel = 4  // Secret - top secret missions
-	ClearanceUltra     ClearanceLevel = 5  // Ultra - highest classification
+	ClearancePublic   ClearanceLevel = 0 // Public access - basic info only
+	ClearanceCivilian ClearanceLevel = 1 // Civilian - humanitarian missions
+	ClearanceMilitary ClearanceLevel = 2 // Military - tactical missions
+	ClearanceGov      ClearanceLevel = 3 // Government - classified missions
+	ClearanceSecret   ClearanceLevel = 4 // Secret - top secret missions
+	ClearanceUltra    ClearanceLevel = 5 // Ultra - highest classification
 )
 
 // Vector3D represents 3D coordinates
@@ -90,16 +90,16 @@ type TelemetryFrame struct {
 
 // VideoFrame represents a video frame
 type VideoFrame struct {
-	ID         string    `json:"id"`
-	FeedID     string    `json:"feedId"`
-	Timestamp  time.Time `json:"timestamp"`
-	FrameNum   int64     `json:"frameNum"`
-	Data       []byte    `json:"data,omitempty"` // JPEG/H264 data
-	Width      int       `json:"width"`
-	Height     int       `json:"height"`
-	Format     string    `json:"format"` // jpeg, h264, h265
-	Keyframe   bool      `json:"keyframe"`
-	Encrypted  bool      `json:"encrypted"`
+	ID        string    `json:"id"`
+	FeedID    string    `json:"feedId"`
+	Timestamp time.Time `json:"timestamp"`
+	FrameNum  int64     `json:"frameNum"`
+	Data      []byte    `json:"data,omitempty"` // JPEG/H264 data
+	Width     int       `json:"width"`
+	Height    int       `json:"height"`
+	Format    string    `json:"format"` // jpeg, h264, h265
+	Keyframe  bool      `json:"keyframe"`
+	Encrypted bool      `json:"encrypted"`
 }
 
 // MapOverlay represents a 3D map visualization update
@@ -107,23 +107,23 @@ type MapOverlay struct {
 	ID             string     `json:"id"`
 	FeedID         string     `json:"feedId"`
 	Timestamp      time.Time  `json:"timestamp"`
-	PayloadTrack   []Vector3D `json:"payloadTrack"`   // Historical positions
-	PlannedRoute   []Vector3D `json:"plannedRoute"`   // Future waypoints
-	ThreatZones    []Zone     `json:"threatZones"`    // Active threats
-	NoFlyZones     []Zone     `json:"noFlyZones"`     // Restricted areas
+	PayloadTrack   []Vector3D `json:"payloadTrack"`          // Historical positions
+	PlannedRoute   []Vector3D `json:"plannedRoute"`          // Future waypoints
+	ThreatZones    []Zone     `json:"threatZones"`           // Active threats
+	NoFlyZones     []Zone     `json:"noFlyZones"`            // Restricted areas
 	TerrainMesh    []byte     `json:"terrainMesh,omitempty"` // 3D terrain data
 	WeatherOverlay []byte     `json:"weatherOverlay,omitempty"`
 }
 
 // Zone represents a geographic zone
 type Zone struct {
-	ID        string   `json:"id"`
-	Name      string   `json:"name"`
-	Center    Vector3D `json:"center"`
-	Radius    float64  `json:"radius"`
-	ZoneType  string   `json:"zoneType"`
-	Severity  string   `json:"severity"`
-	Active    bool     `json:"active"`
+	ID       string   `json:"id"`
+	Name     string   `json:"name"`
+	Center   Vector3D `json:"center"`
+	Radius   float64  `json:"radius"`
+	ZoneType string   `json:"zoneType"`
+	Severity string   `json:"severity"`
+	Active   bool     `json:"active"`
 }
 
 // AlertFrame represents an alert notification
@@ -131,7 +131,7 @@ type AlertFrame struct {
 	ID          string         `json:"id"`
 	FeedID      string         `json:"feedId"`
 	Timestamp   time.Time      `json:"timestamp"`
-	AlertType   string         `json:"alertType"`   // warning, critical, info
+	AlertType   string         `json:"alertType"` // warning, critical, info
 	Title       string         `json:"title"`
 	Message     string         `json:"message"`
 	Severity    string         `json:"severity"`
@@ -159,7 +159,7 @@ type LiveFeedManager struct {
 
 	feeds       map[string]*LiveFeed
 	subscribers map[string]map[string]*Subscriber // feedID -> subscriberID -> subscriber
-	
+
 	// Channels for broadcasting
 	telemetryChannels map[string]chan *TelemetryFrame
 	videoChannels     map[string]chan *VideoFrame

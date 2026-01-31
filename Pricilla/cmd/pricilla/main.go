@@ -41,12 +41,12 @@ const (
 type ClearanceLevel int
 
 const (
-	ClearancePublic    ClearanceLevel = 0
-	ClearanceCivilian  ClearanceLevel = 1
-	ClearanceMilitary  ClearanceLevel = 2
-	ClearanceGov       ClearanceLevel = 3
-	ClearanceSecret    ClearanceLevel = 4
-	ClearanceUltra     ClearanceLevel = 5
+	ClearancePublic   ClearanceLevel = 0
+	ClearanceCivilian ClearanceLevel = 1
+	ClearanceMilitary ClearanceLevel = 2
+	ClearanceGov      ClearanceLevel = 3
+	ClearanceSecret   ClearanceLevel = 4
+	ClearanceUltra    ClearanceLevel = 5
 )
 
 func getClearanceName(level ClearanceLevel) string {
@@ -131,21 +131,21 @@ type GeoCoord struct {
 
 // Config holds application configuration
 type Config struct {
-	HTTPPort           int    `json:"httpPort"`
-	MetricsPort        int    `json:"metricsPort"`
-	NysusEndpoint      string `json:"nysusEndpoint"`
-	SatNetEndpoint     string `json:"satnetEndpoint"`
-	GiruEndpoint       string `json:"giruEndpoint"`
-	SilenusEndpoint    string `json:"silenusEndpoint"`
-	NATSURL            string `json:"natsUrl"`
-	EnableStealth      bool   `json:"enableStealth"`
-	EnablePrediction   bool   `json:"enablePrediction"`
-	EnableMultiPayload bool   `json:"enableMultiPayload"`
-	EnableNATS         bool   `json:"enableNats"`
-	EnableSensorFusion bool   `json:"enableSensorFusion"`
-	EnableWiFiImaging  bool   `json:"enableWiFiImaging"`
+	HTTPPort           int           `json:"httpPort"`
+	MetricsPort        int           `json:"metricsPort"`
+	NysusEndpoint      string        `json:"nysusEndpoint"`
+	SatNetEndpoint     string        `json:"satnetEndpoint"`
+	GiruEndpoint       string        `json:"giruEndpoint"`
+	SilenusEndpoint    string        `json:"silenusEndpoint"`
+	NATSURL            string        `json:"natsUrl"`
+	EnableStealth      bool          `json:"enableStealth"`
+	EnablePrediction   bool          `json:"enablePrediction"`
+	EnableMultiPayload bool          `json:"enableMultiPayload"`
+	EnableNATS         bool          `json:"enableNats"`
+	EnableSensorFusion bool          `json:"enableSensorFusion"`
+	EnableWiFiImaging  bool          `json:"enableWiFiImaging"`
 	ReplanInterval     time.Duration `json:"replanInterval"`
-	LogLevel           string `json:"logLevel"`
+	LogLevel           string        `json:"logLevel"`
 }
 
 // Vector3D represents 3D coordinates
@@ -178,32 +178,32 @@ type Trajectory struct {
 
 // Mission represents a guidance mission
 type Mission struct {
-	ID              string    `json:"id"`
-	Type            string    `json:"type"`
-	PayloadID       string    `json:"payloadId"`
-	PayloadType     string    `json:"payloadType"`
-	StartPosition   Vector3D  `json:"startPosition"`
-	TargetPosition  Vector3D  `json:"targetPosition"`
-	Priority        int       `json:"priority"`
-	StealthRequired bool      `json:"stealthRequired"`
-	Status          string    `json:"status"`
+	ID              string      `json:"id"`
+	Type            string      `json:"type"`
+	PayloadID       string      `json:"payloadId"`
+	PayloadType     string      `json:"payloadType"`
+	StartPosition   Vector3D    `json:"startPosition"`
+	TargetPosition  Vector3D    `json:"targetPosition"`
+	Priority        int         `json:"priority"`
+	StealthRequired bool        `json:"stealthRequired"`
+	Status          string      `json:"status"`
 	Trajectory      *Trajectory `json:"trajectory,omitempty"`
-	CreatedAt       time.Time `json:"createdAt"`
-	UpdatedAt       time.Time `json:"updatedAt"`
+	CreatedAt       time.Time   `json:"createdAt"`
+	UpdatedAt       time.Time   `json:"updatedAt"`
 }
 
 // PayloadState represents current state of a payload
 type PayloadState struct {
-	ID           string    `json:"id"`
-	Type         string    `json:"type"`
-	Position     Vector3D  `json:"position"`
-	Velocity     Vector3D  `json:"velocity"`
-	Heading      float64   `json:"heading"`
-	Fuel         float64   `json:"fuel"`
-	Battery      float64   `json:"battery"`
-	Health       float64   `json:"health"`
-	Status       string    `json:"status"`
-	LastUpdate   time.Time `json:"lastUpdate"`
+	ID         string    `json:"id"`
+	Type       string    `json:"type"`
+	Position   Vector3D  `json:"position"`
+	Velocity   Vector3D  `json:"velocity"`
+	Heading    float64   `json:"heading"`
+	Fuel       float64   `json:"fuel"`
+	Battery    float64   `json:"battery"`
+	Health     float64   `json:"health"`
+	Status     string    `json:"status"`
+	LastUpdate time.Time `json:"lastUpdate"`
 }
 
 // TargetingMetrics captures real-time targeting performance data
@@ -220,37 +220,37 @@ type TargetingMetrics struct {
 	CompletionDistance  float64   `json:"completionDistance"`
 	MissionCompletedAt  time.Time `json:"missionCompletedAt"`
 	// Enhanced targeting metrics
-	HitProbability      float64   `json:"hitProbability"`      // Estimated probability of hit (0-1)
-	CEP                 float64   `json:"cep"`                 // Circular Error Probable in meters
-	TerminalGuidanceOn  bool      `json:"terminalGuidanceOn"`  // Terminal guidance mode active
-	TimeToImpact        float64   `json:"timeToImpact"`        // Seconds until impact
-	ClosingVelocity     float64   `json:"closingVelocity"`     // m/s closing rate
-	CrossTrackError     float64   `json:"crossTrackError"`     // meters off optimal path
-	ECMDetected         bool      `json:"ecmDetected"`         // Electronic countermeasures detected
-	WeatherImpact       float64   `json:"weatherImpact"`       // Weather degradation factor (0-1)
+	HitProbability     float64 `json:"hitProbability"`     // Estimated probability of hit (0-1)
+	CEP                float64 `json:"cep"`                // Circular Error Probable in meters
+	TerminalGuidanceOn bool    `json:"terminalGuidanceOn"` // Terminal guidance mode active
+	TimeToImpact       float64 `json:"timeToImpact"`       // Seconds until impact
+	ClosingVelocity    float64 `json:"closingVelocity"`    // m/s closing rate
+	CrossTrackError    float64 `json:"crossTrackError"`    // meters off optimal path
+	ECMDetected        bool    `json:"ecmDetected"`        // Electronic countermeasures detected
+	WeatherImpact      float64 `json:"weatherImpact"`      // Weather degradation factor (0-1)
 }
 
 // WeatherCondition represents current weather affecting guidance
 type WeatherCondition struct {
-	WindSpeed       float64 `json:"windSpeed"`       // m/s
-	WindDirection   float64 `json:"windDirection"`   // radians
-	Visibility      float64 `json:"visibility"`      // meters
-	Precipitation   float64 `json:"precipitation"`   // mm/hr
-	Temperature     float64 `json:"temperature"`     // Celsius
-	Turbulence      float64 `json:"turbulence"`      // 0-1 severity
-	IcingRisk       float64 `json:"icingRisk"`       // 0-1 risk level
+	WindSpeed     float64 `json:"windSpeed"`     // m/s
+	WindDirection float64 `json:"windDirection"` // radians
+	Visibility    float64 `json:"visibility"`    // meters
+	Precipitation float64 `json:"precipitation"` // mm/hr
+	Temperature   float64 `json:"temperature"`   // Celsius
+	Turbulence    float64 `json:"turbulence"`    // 0-1 severity
+	IcingRisk     float64 `json:"icingRisk"`     // 0-1 risk level
 }
 
 // ECMThreat represents electronic countermeasure detection
 type ECMThreat struct {
-	ID             string    `json:"id"`
-	Type           string    `json:"type"`           // jamming, spoofing, deception
-	Position       Vector3D  `json:"position"`
-	EffectRadius   float64   `json:"effectRadius"`
-	Strength       float64   `json:"strength"`       // 0-1
-	FrequencyBand  string    `json:"frequencyBand"`  // GPS, radar, comms
-	DetectedAt     time.Time `json:"detectedAt"`
-	Active         bool      `json:"active"`
+	ID            string    `json:"id"`
+	Type          string    `json:"type"` // jamming, spoofing, deception
+	Position      Vector3D  `json:"position"`
+	EffectRadius  float64   `json:"effectRadius"`
+	Strength      float64   `json:"strength"`      // 0-1
+	FrequencyBand string    `json:"frequencyBand"` // GPS, radar, comms
+	DetectedAt    time.Time `json:"detectedAt"`
+	Active        bool      `json:"active"`
 }
 
 // TerminalGuidanceConfig configures precision terminal approach
@@ -270,20 +270,20 @@ type GuidanceEngine struct {
 	missions     map[string]*Mission
 	trajectories map[string]*Trajectory
 	payloads     map[string]*PayloadState
-	
+
 	// Access Control
-	users        map[string]*User
-	sessions     map[string]*Session
-	terminals    map[string]*Terminal
-	
+	users     map[string]*User
+	sessions  map[string]*Session
+	terminals map[string]*Terminal
+
 	// Live Feeds
-	feeds        map[string]*LiveFeed
-	telemetry    map[string]*TelemetryFrame
-	
+	feeds     map[string]*LiveFeed
+	telemetry map[string]*TelemetryFrame
+
 	// Integration components
-	natsBridge   *integration.NATSBridge
-	sensorFusion *sensors.SensorFusion
-	metrics      *metrics.Metrics
+	natsBridge        *integration.NATSBridge
+	sensorFusion      *sensors.SensorFusion
+	metrics           *metrics.Metrics
 	asgardIntegration *integration.ASGARDIntegration
 	silenusClient     integration.SilenusClient
 	giruClient        integration.GiruClient
@@ -292,24 +292,24 @@ type GuidanceEngine struct {
 	aiGuidance        *guidance.AIGuidanceEngine
 	stealthOptimizer  *stealth.StealthOptimizer
 	threatIDs         []string
-	replanInterval time.Duration
-	lastReplan      time.Time
-	wifiModel       *sensors.WiFiImagingModel
-	wifiRouters     map[string]sensors.WiFiRouter
-	targetingMetrics TargetingMetrics
-	
+	replanInterval    time.Duration
+	lastReplan        time.Time
+	wifiModel         *sensors.WiFiImagingModel
+	wifiRouters       map[string]sensors.WiFiRouter
+	targetingMetrics  TargetingMetrics
+
 	// Enhanced guidance systems
-	weather           *WeatherCondition
-	ecmThreats        map[string]*ECMThreat
-	terminalConfig    TerminalGuidanceConfig
-	abortedMissions   map[string]string // missionID -> abort reason
-	
+	weather         *WeatherCondition
+	ecmThreats      map[string]*ECMThreat
+	terminalConfig  TerminalGuidanceConfig
+	abortedMissions map[string]string // missionID -> abort reason
+
 	// Warning throttling
-	lastStaleWarning  map[string]time.Time // payloadID -> last warning time
-	
-	config       Config
-	ctx          context.Context
-	cancel       context.CancelFunc
+	lastStaleWarning map[string]time.Time // payloadID -> last warning time
+
+	config Config
+	ctx    context.Context
+	cancel context.CancelFunc
 }
 
 // NewGuidanceEngine creates a new guidance engine
@@ -319,17 +319,17 @@ func NewGuidanceEngine(config Config) *GuidanceEngine {
 		replanInterval = 250 * time.Millisecond
 	}
 	ge := &GuidanceEngine{
-		missions:     make(map[string]*Mission),
-		trajectories: make(map[string]*Trajectory),
-		payloads:     make(map[string]*PayloadState),
-		users:        make(map[string]*User),
-		sessions:     make(map[string]*Session),
-		terminals:    make(map[string]*Terminal),
-		feeds:        make(map[string]*LiveFeed),
-		telemetry:    make(map[string]*TelemetryFrame),
-		config:       config,
-		replanInterval: replanInterval,
-		wifiRouters:  make(map[string]sensors.WiFiRouter),
+		missions:         make(map[string]*Mission),
+		trajectories:     make(map[string]*Trajectory),
+		payloads:         make(map[string]*PayloadState),
+		users:            make(map[string]*User),
+		sessions:         make(map[string]*Session),
+		terminals:        make(map[string]*Terminal),
+		feeds:            make(map[string]*LiveFeed),
+		telemetry:        make(map[string]*TelemetryFrame),
+		config:           config,
+		replanInterval:   replanInterval,
+		wifiRouters:      make(map[string]sensors.WiFiRouter),
 		targetingMetrics: TargetingMetrics{},
 		// Enhanced systems initialization
 		ecmThreats:       make(map[string]*ECMThreat),
@@ -337,11 +337,11 @@ func NewGuidanceEngine(config Config) *GuidanceEngine {
 		lastStaleWarning: make(map[string]time.Time),
 		terminalConfig: TerminalGuidanceConfig{
 			Enabled:            true,
-			ActivationDistance: 1000,  // 1km terminal phase
-			UpdateRateHz:       50,    // 50Hz terminal updates
-			MaxCorrection:      0.5,   // 0.5 rad/s max correction
-			PredictorHorizon:   5,     // 5 second prediction
-			ProNavGain:         4.0,   // Standard PN gain
+			ActivationDistance: 1000, // 1km terminal phase
+			UpdateRateHz:       50,   // 50Hz terminal updates
+			MaxCorrection:      0.5,  // 0.5 rad/s max correction
+			PredictorHorizon:   5,    // 5 second prediction
+			ProNavGain:         4.0,  // Standard PN gain
 		},
 	}
 
@@ -513,10 +513,10 @@ func (ge *GuidanceEngine) initASGARDIntegration() error {
 // NATS event handlers
 func (ge *GuidanceEngine) handleThreatEvent(threat integration.Threat) {
 	log.Printf("[%s] Received threat event: %s (severity: %s)", AppName, threat.ID, threat.Severity)
-	
+
 	// Record metric
 	metrics.RecordThreatAssessment(threat.Severity, "received")
-	
+
 	// Update service connection status
 	metrics.UpdateServiceConnectionStatus("giru", true)
 }
@@ -552,21 +552,21 @@ func (ge *GuidanceEngine) handleTelemetryEvent(telemetry integration.Telemetry) 
 
 func (ge *GuidanceEngine) handleMissionEvent(mission integration.Mission) {
 	log.Printf("[%s] Received mission event: %s (status: %s)", AppName, mission.ID, mission.Status)
-	
+
 	// Update service connection status
 	metrics.UpdateServiceConnectionStatus("nysus", true)
 }
 
 func (ge *GuidanceEngine) handleHunoidEvent(state integration.HunoidState) {
 	log.Printf("[%s] Received Hunoid state: %s (status: %s)", AppName, state.HunoidID, state.Status)
-	
+
 	// Update service connection status
 	metrics.UpdateServiceConnectionStatus("hunoid", true)
 }
 
 func (ge *GuidanceEngine) handleSatelliteEvent(position integration.SatellitePosition) {
 	log.Printf("[%s] Received satellite position: %s", AppName, position.SatelliteID)
-	
+
 	// Update service connection status
 	metrics.UpdateServiceConnectionStatus("silenus", true)
 }
@@ -579,13 +579,13 @@ func (ge *GuidanceEngine) handleFusedStateUpdate(state sensors.FusedState) {
 
 func (ge *GuidanceEngine) handleSensorFailure(sensorID string, health sensors.SensorHealth) {
 	log.Printf("[%s] Sensor failure detected: %s (status: %s)", AppName, sensorID, health.Status)
-	
+
 	// Record detection event for sensor failure
 	metrics.RecordDetectionEvent("sensor", "failure")
 }
 
 func (ge *GuidanceEngine) handleSensorAnomaly(anomaly sensors.AnomalyReport) {
-	log.Printf("[%s] Sensor anomaly detected: %s on %s (severity: %.2f)", 
+	log.Printf("[%s] Sensor anomaly detected: %s on %s (severity: %.2f)",
 		AppName, anomaly.AnomalyType, anomaly.SensorID, anomaly.Severity)
 }
 
@@ -1282,17 +1282,17 @@ func (ge *GuidanceEngine) AbortMission(missionID, reason string, returnToBase bo
 	if returnToBase && mission.Trajectory != nil && len(mission.Trajectory.Waypoints) > 0 {
 		// Generate RTB trajectory
 		rtbMission := &Mission{
-			ID:             uuid.New().String(),
-			Type:           "rtb",
-			PayloadID:      mission.PayloadID,
-			PayloadType:    mission.PayloadType,
-			StartPosition:  mission.Trajectory.Waypoints[len(mission.Trajectory.Waypoints)/2].Position, // Current approx position
-			TargetPosition: mission.StartPosition, // Return to launch position
-			Priority:       mission.Priority + 1,  // Higher priority
+			ID:              uuid.New().String(),
+			Type:            "rtb",
+			PayloadID:       mission.PayloadID,
+			PayloadType:     mission.PayloadType,
+			StartPosition:   mission.Trajectory.Waypoints[len(mission.Trajectory.Waypoints)/2].Position, // Current approx position
+			TargetPosition:  mission.StartPosition,                                                      // Return to launch position
+			Priority:        mission.Priority + 1,                                                       // Higher priority
 			StealthRequired: true,
-			Status:         "active",
-			CreatedAt:      time.Now(),
-			UpdatedAt:      time.Now(),
+			Status:          "active",
+			CreatedAt:       time.Now(),
+			UpdatedAt:       time.Now(),
 		}
 		ge.missions[rtbMission.ID] = rtbMission
 		log.Printf("[%s] RTB mission created: %s for payload %s", AppName, rtbMission.ID, mission.PayloadID)
@@ -1691,11 +1691,11 @@ func (ge *GuidanceEngine) toGuidanceTrajectory(traj *Trajectory, payloadType gui
 	}
 
 	aiTraj := &guidance.Trajectory{
-		ID:          traj.ID,
-		PayloadType: payloadType,
-		Waypoints:   make([]guidance.Waypoint, 0, len(traj.Waypoints)),
-		CreatedAt:   traj.CreatedAt,
-		Confidence:  traj.Confidence,
+		ID:           traj.ID,
+		PayloadType:  payloadType,
+		Waypoints:    make([]guidance.Waypoint, 0, len(traj.Waypoints)),
+		CreatedAt:    traj.CreatedAt,
+		Confidence:   traj.Confidence,
 		StealthScore: traj.StealthScore,
 	}
 
@@ -1715,9 +1715,9 @@ func (ge *GuidanceEngine) toGuidanceTrajectory(traj *Trajectory, payloadType gui
 		}
 
 		aiTraj.Waypoints = append(aiTraj.Waypoints, guidance.Waypoint{
-			Position: guidance.Vector3D{X: wp.Position.X, Y: wp.Position.Y, Z: wp.Position.Z},
-			Velocity: guidance.Vector3D{X: wp.Velocity.X, Y: wp.Velocity.Y, Z: wp.Velocity.Z},
-			Timestamp: wp.Timestamp,
+			Position:    guidance.Vector3D{X: wp.Position.X, Y: wp.Position.Y, Z: wp.Position.Z},
+			Velocity:    guidance.Vector3D{X: wp.Velocity.X, Y: wp.Velocity.Y, Z: wp.Velocity.Z},
+			Timestamp:   wp.Timestamp,
 			Constraints: constraints,
 		})
 	}
@@ -1853,7 +1853,7 @@ func (ge *GuidanceEngine) processTelemetry() {
 		if time.Since(state.LastUpdate) > 30*time.Second {
 			lastWarning, warned := ge.lastStaleWarning[payloadID]
 			if !warned || time.Since(lastWarning) > 60*time.Second {
-				log.Printf("[%s] Warning: Payload %s telemetry stale (no updates for %.0fs)", 
+				log.Printf("[%s] Warning: Payload %s telemetry stale (no updates for %.0fs)",
 					AppName, payloadID, time.Since(state.LastUpdate).Seconds())
 				ge.lastStaleWarning[payloadID] = time.Now()
 			}
@@ -1990,7 +1990,7 @@ type HTTPServer struct {
 // NewHTTPServer creates a new HTTP server
 func NewHTTPServer(engine *GuidanceEngine, port int) *HTTPServer {
 	mux := http.NewServeMux()
-	
+
 	s := &HTTPServer{
 		engine: engine,
 		server: &http.Server{
@@ -2009,14 +2009,14 @@ func NewHTTPServer(engine *GuidanceEngine, port int) *HTTPServer {
 	mux.HandleFunc("/api/v1/trajectories/", s.trajectoryHandler)
 	mux.HandleFunc("/api/v1/status", s.statusHandler)
 	mux.HandleFunc("/api/v1/metrics/targeting", s.targetingMetricsHandler)
-	
+
 	// Access Control routes
 	mux.HandleFunc("/api/v1/auth/login", s.loginHandler)
 	mux.HandleFunc("/api/v1/auth/validate", s.validateSessionHandler)
 	mux.HandleFunc("/api/v1/users", s.usersHandler)
 	mux.HandleFunc("/api/v1/terminals", s.terminalsHandler)
 	mux.HandleFunc("/api/v1/clearance/levels", s.clearanceLevelsHandler)
-	
+
 	// Live Feed routes
 	mux.HandleFunc("/api/v1/feeds", s.feedsHandler)
 	mux.HandleFunc("/api/v1/feeds/", s.feedHandler)
@@ -2058,7 +2058,7 @@ func (s *HTTPServer) healthHandler(w http.ResponseWriter, r *http.Request) {
 // statusHandler returns system status
 func (s *HTTPServer) statusHandler(w http.ResponseWriter, r *http.Request) {
 	missions := s.engine.GetAllMissions()
-	
+
 	activeMissions := 0
 	completedMissions := 0
 	for _, m := range missions {
@@ -2178,9 +2178,9 @@ func (s *HTTPServer) missionTargetHandler(w http.ResponseWriter, r *http.Request
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
-		"missionId":   missionID,
-		"trajectory":  trajectory,
-		"target":      target,
+		"missionId":  missionID,
+		"trajectory": trajectory,
+		"target":     target,
 	})
 }
 
@@ -2300,7 +2300,7 @@ func (s *HTTPServer) loginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "OPTIONS" {
 		return
 	}
-	
+
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -2570,15 +2570,15 @@ func (s *HTTPServer) telemetryHandler(w http.ResponseWriter, r *http.Request) {
 
 	speed := math.Sqrt(state.Velocity.X*state.Velocity.X + state.Velocity.Y*state.Velocity.Y + state.Velocity.Z*state.Velocity.Z)
 	telemetry := TelemetryFrame{
-		PayloadID:  state.ID,
-		Position:   state.Position,
-		Velocity:   state.Velocity,
-		Heading:    state.Heading,
-		Speed:      speed,
-		Fuel:       state.Fuel,
-		Battery:    state.Battery,
-		Status:     state.Status,
-		Timestamp:  state.LastUpdate,
+		PayloadID: state.ID,
+		Position:  state.Position,
+		Velocity:  state.Velocity,
+		Heading:   state.Heading,
+		Speed:     speed,
+		Fuel:      state.Fuel,
+		Battery:   state.Battery,
+		Status:    state.Status,
+		Timestamp: state.LastUpdate,
 	}
 
 	json.NewEncoder(w).Encode(telemetry)
@@ -2700,8 +2700,8 @@ func (s *HTTPServer) terminalGuidanceHandler(w http.ResponseWriter, r *http.Requ
 		s.engine.EnableTerminalGuidance(config)
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]interface{}{
-			"status":  "configured",
-			"config":  config,
+			"status": "configured",
+			"config": config,
 		})
 
 	default:
@@ -2859,12 +2859,12 @@ func (s *HTTPServer) hitProbabilityHandler(w http.ResponseWriter, r *http.Reques
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
-		"missionId":       missionID,
-		"hitProbability":  hitProb,
-		"cep":             cep,
-		"inTerminalPhase": inTerminal,
+		"missionId":        missionID,
+		"hitProbability":   hitProb,
+		"cep":              cep,
+		"inTerminalPhase":  inTerminal,
 		"distanceToTarget": distance,
-		"metrics":         s.engine.GetTargetingMetrics(),
+		"metrics":          s.engine.GetTargetingMetrics(),
 	})
 }
 
@@ -2960,23 +2960,23 @@ func main() {
 
 	// Create metrics server with Prometheus handler
 	metricsMux := http.NewServeMux()
-	
+
 	// Use Prometheus handler for /metrics endpoint
 	metricsMux.Handle("/metrics", promhttp.Handler())
-	
+
 	// Health check endpoint
 	metricsMux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("OK"))
 	})
-	
+
 	// Readiness check endpoint (checks NATS and sensor fusion status)
 	metricsMux.HandleFunc("/readyz", func(w http.ResponseWriter, r *http.Request) {
 		status := map[string]interface{}{
 			"status": "ready",
 			"uptime": time.Since(startTime).String(),
 		}
-		
+
 		// Check NATS connection
 		if engine.GetNATSBridge() != nil {
 			status["nats_connected"] = engine.GetNATSBridge().IsConnected()
@@ -2984,7 +2984,7 @@ func main() {
 		} else {
 			status["nats_enabled"] = false
 		}
-		
+
 		// Check sensor fusion
 		if engine.GetSensorFusion() != nil {
 			status["sensor_fusion_running"] = engine.GetSensorFusion().IsRunning()
@@ -2993,12 +2993,12 @@ func main() {
 		} else {
 			status["sensor_fusion_enabled"] = false
 		}
-		
+
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(status)
 	})
-	
+
 	// NATS stats endpoint
 	metricsMux.HandleFunc("/nats/stats", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -3008,7 +3008,7 @@ func main() {
 			json.NewEncoder(w).Encode(map[string]string{"status": "nats_disabled"})
 		}
 	})
-	
+
 	// Sensor fusion stats endpoint
 	metricsMux.HandleFunc("/sensors/health", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -3018,7 +3018,7 @@ func main() {
 			json.NewEncoder(w).Encode(map[string]string{"status": "sensor_fusion_disabled"})
 		}
 	})
-	
+
 	metricsMux.HandleFunc("/sensors/state", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		if engine.GetSensorFusion() != nil {
@@ -3032,7 +3032,7 @@ func main() {
 		Addr:    fmt.Sprintf(":%d", config.MetricsPort),
 		Handler: metricsMux,
 	}
-	
+
 	go func() {
 		log.Printf("[%s] Metrics server listening on :%d", AppName, config.MetricsPort)
 		if err := metricsServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {

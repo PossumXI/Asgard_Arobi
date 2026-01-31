@@ -28,13 +28,13 @@ const (
 type FormationType string
 
 const (
-	FormationLine     FormationType = "line"
-	FormationColumn   FormationType = "column"
-	FormationWedge    FormationType = "wedge"
-	FormationCircle   FormationType = "circle"
-	FormationGrid     FormationType = "grid"
-	FormationScatter  FormationType = "scatter"
-	FormationCustom   FormationType = "custom"
+	FormationLine    FormationType = "line"
+	FormationColumn  FormationType = "column"
+	FormationWedge   FormationType = "wedge"
+	FormationCircle  FormationType = "circle"
+	FormationGrid    FormationType = "grid"
+	FormationScatter FormationType = "scatter"
+	FormationCustom  FormationType = "custom"
 )
 
 // Vector3 represents a 3D position
@@ -46,15 +46,15 @@ type Vector3 struct {
 
 // RobotStatus represents individual robot status
 type RobotStatus struct {
-	ID             string
-	Position       Vector3
-	Velocity       Vector3
-	Battery        float64
-	Status         string
-	CurrentTask    string
-	LastHeartbeat  time.Time
-	IsLeader       bool
-	FormationSlot  int
+	ID            string
+	Position      Vector3
+	Velocity      Vector3
+	Battery       float64
+	Status        string
+	CurrentTask   string
+	LastHeartbeat time.Time
+	IsLeader      bool
+	FormationSlot int
 }
 
 // SwarmMission defines a coordinated mission
@@ -75,8 +75,8 @@ type SwarmMission struct {
 
 // Area defines a geographic region
 type Area struct {
-	Center  Vector3 `json:"center"`
-	Radius  float64 `json:"radius"`
+	Center  Vector3   `json:"center"`
+	Radius  float64   `json:"radius"`
 	Polygon []Vector3 `json:"polygon,omitempty"`
 }
 
@@ -356,13 +356,13 @@ func (c *Coordinator) GetSwarmStatus() map[string]interface{} {
 	robots := make([]map[string]interface{}, 0, len(c.robots))
 	for _, r := range c.robots {
 		robots = append(robots, map[string]interface{}{
-			"id":             r.ID,
-			"position":       r.Position,
-			"battery":        r.Battery,
-			"status":         r.Status,
-			"isLeader":       r.IsLeader,
-			"formationSlot":  r.FormationSlot,
-			"currentTask":    r.CurrentTask,
+			"id":            r.ID,
+			"position":      r.Position,
+			"battery":       r.Battery,
+			"status":        r.Status,
+			"isLeader":      r.IsLeader,
+			"formationSlot": r.FormationSlot,
+			"currentTask":   r.CurrentTask,
 		})
 	}
 
@@ -374,13 +374,13 @@ func (c *Coordinator) GetSwarmStatus() map[string]interface{} {
 	}
 
 	return map[string]interface{}{
-		"swarmState":      c.swarmState,
-		"formation":       c.formation,
-		"leaderID":        c.leaderID,
-		"robotCount":      len(c.robots),
-		"robots":          robots,
-		"activeMissions":  activeMissions,
-		"swarmCenter":     c.getSwarmCenter(),
+		"swarmState":     c.swarmState,
+		"formation":      c.formation,
+		"leaderID":       c.leaderID,
+		"robotCount":     len(c.robots),
+		"robots":         robots,
+		"activeMissions": activeMissions,
+		"swarmCenter":    c.getSwarmCenter(),
 	}
 }
 

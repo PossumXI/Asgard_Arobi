@@ -35,35 +35,35 @@ type GPSConfig struct {
 	SerialPort string `json:"serialPort"` // e.g., "/dev/ttyUSB0", "COM3"
 
 	// Receiver settings
-	UpdateRate  int    `json:"updateRate"`  // Hz
+	UpdateRate    int    `json:"updateRate"`    // Hz
 	Constellation string `json:"constellation"` // GPS, GLONASS, Galileo, BeiDou, combined
 
 	// Space-specific
-	SpaceMode     bool    `json:"spaceMode"`     // Enable space vehicle mode (>12km altitude)
-	MaxAltitude   float64 `json:"maxAltitude"`   // m, for export control compliance
-	MaxVelocity   float64 `json:"maxVelocity"`   // m/s
-	SatelliteID   string  `json:"satelliteId"`
+	SpaceMode   bool    `json:"spaceMode"`   // Enable space vehicle mode (>12km altitude)
+	MaxAltitude float64 `json:"maxAltitude"` // m, for export control compliance
+	MaxVelocity float64 `json:"maxVelocity"` // m/s
+	SatelliteID string  `json:"satelliteId"`
 }
 
 // GPSPosition represents a GPS fix
 type GPSPosition struct {
-	Latitude     float64   `json:"latitude"`     // degrees
-	Longitude    float64   `json:"longitude"`    // degrees
-	Altitude     float64   `json:"altitude"`     // meters
-	HDOP         float64   `json:"hdop"`         // Horizontal dilution of precision
-	VDOP         float64   `json:"vdop"`         // Vertical dilution of precision
-	NumSatellites int      `json:"numSatellites"`
-	FixType      string    `json:"fixType"`      // none, 2D, 3D, RTK
-	Timestamp    time.Time `json:"timestamp"`
+	Latitude      float64   `json:"latitude"`  // degrees
+	Longitude     float64   `json:"longitude"` // degrees
+	Altitude      float64   `json:"altitude"`  // meters
+	HDOP          float64   `json:"hdop"`      // Horizontal dilution of precision
+	VDOP          float64   `json:"vdop"`      // Vertical dilution of precision
+	NumSatellites int       `json:"numSatellites"`
+	FixType       string    `json:"fixType"` // none, 2D, 3D, RTK
+	Timestamp     time.Time `json:"timestamp"`
 }
 
 // GPSVelocity represents velocity from GPS
 type GPSVelocity struct {
-	VX        float64   `json:"vx"`        // m/s ECEF X
-	VY        float64   `json:"vy"`        // m/s ECEF Y
-	VZ        float64   `json:"vz"`        // m/s ECEF Z
-	Speed     float64   `json:"speed"`     // m/s ground speed
-	Heading   float64   `json:"heading"`   // degrees
+	VX        float64   `json:"vx"`      // m/s ECEF X
+	VY        float64   `json:"vy"`      // m/s ECEF Y
+	VZ        float64   `json:"vz"`      // m/s ECEF Z
+	Speed     float64   `json:"speed"`   // m/s ground speed
+	Heading   float64   `json:"heading"` // degrees
 	Timestamp time.Time `json:"timestamp"`
 }
 
@@ -119,7 +119,7 @@ func (g *SpaceGPSController) initSerial() error {
 
 func (g *SpaceGPSController) initTCP(ctx context.Context) error {
 	addr := fmt.Sprintf("%s:%d", g.config.Address, g.config.Port)
-	
+
 	dialer := net.Dialer{Timeout: 10 * time.Second}
 	conn, err := dialer.DialContext(ctx, "tcp", addr)
 	if err != nil {
@@ -393,7 +393,7 @@ func (g *SpaceGPSController) GetPosition() (lat, lon, alt float64, err error) {
 
 	// Check for stale data (older than 10 seconds)
 	if time.Since(g.position.Timestamp) > 10*time.Second {
-		return g.position.Latitude, g.position.Longitude, g.position.Altitude, 
+		return g.position.Latitude, g.position.Longitude, g.position.Altitude,
 			fmt.Errorf("stale GPS data")
 	}
 
@@ -424,7 +424,7 @@ func (g *SpaceGPSController) GetVelocity() (vx, vy, vz float64, err error) {
 	// Convert speed and heading to ECEF velocity
 	// For satellites, this is typically provided directly by the receiver
 	// This conversion is simplified for ground-based or low-altitude use
-	
+
 	// Convert heading to radians
 	headingRad := g.velocity.Heading * math.Pi / 180.0
 	latRad := g.position.Latitude * math.Pi / 180.0
@@ -481,23 +481,23 @@ func (g *SpaceGPSController) Shutdown() error {
 
 // TLEPositionCalculator calculates position from TLE when GPS is unavailable
 type TLEPositionCalculator struct {
-	mu       sync.RWMutex
-	tle      TLE
-	gps      *SpaceGPSController
+	mu  sync.RWMutex
+	tle TLE
+	gps *SpaceGPSController
 }
 
 // TLE represents two-line element set for orbit propagation
 type TLE struct {
-	Name        string
-	Line1       string
-	Line2       string
-	Epoch       time.Time
-	Inclination float64
-	RAAN        float64
+	Name         string
+	Line1        string
+	Line2        string
+	Epoch        time.Time
+	Inclination  float64
+	RAAN         float64
 	Eccentricity float64
-	ArgPerigee  float64
-	MeanAnomaly float64
-	MeanMotion  float64
+	ArgPerigee   float64
+	MeanAnomaly  float64
+	MeanMotion   float64
 }
 
 // NewTLEPositionCalculator creates a hybrid position provider
@@ -533,60 +533,60 @@ func (o *TLEPositionCalculator) propagateTLE(t time.Time) (lat, lon, alt float64
 
 	// Simplified SGP4 propagation
 	// Real implementation would use full SGP4/SDP4 algorithm
-	
+
 	// Time since epoch
 	dt := t.Sub(tle.Epoch).Minutes()
-	
+
 	// Mean motion in rad/min
 	n := tle.MeanMotion * 2 * math.Pi / 1440.0
-	
+
 	// Mean anomaly at time t
 	M := tle.MeanAnomaly + n*dt
 	M = math.Mod(M, 2*math.Pi)
-	
+
 	// Simplified Kepler solver for eccentric anomaly
 	E := M
 	for i := 0; i < 10; i++ {
 		E = M + tle.Eccentricity*math.Sin(E)
 	}
-	
+
 	// True anomaly
 	v := 2 * math.Atan2(
 		math.Sqrt(1+tle.Eccentricity)*math.Sin(E/2),
 		math.Sqrt(1-tle.Eccentricity)*math.Cos(E/2),
 	)
-	
+
 	// Argument of latitude
 	u := v + tle.ArgPerigee
-	
+
 	// Semi-major axis (from mean motion)
 	mu := 398600.4418 // km^3/s^2
 	a := math.Pow(mu/math.Pow(n*60, 2), 1.0/3.0)
-	
+
 	// Orbital radius
 	r := a * (1 - tle.Eccentricity*math.Cos(E))
-	
+
 	// Position in orbital plane
 	xOrbital := r * math.Cos(u)
 	yOrbital := r * math.Sin(u)
-	
+
 	// Rotate to Earth-centered coordinates
 	raanRad := tle.RAAN * math.Pi / 180.0
 	inclRad := tle.Inclination * math.Pi / 180.0
-	
+
 	// Earth rotation since epoch
 	gmst := o.calculateGMST(t)
-	
+
 	// ECEF position
 	x := xOrbital*(math.Cos(raanRad)*math.Cos(gmst)+math.Sin(raanRad)*math.Sin(gmst)*math.Cos(inclRad)) -
 		yOrbital*(math.Sin(raanRad)*math.Cos(gmst)-math.Cos(raanRad)*math.Sin(gmst)*math.Cos(inclRad))
 	y := xOrbital*(-math.Cos(raanRad)*math.Sin(gmst)+math.Sin(raanRad)*math.Cos(gmst)*math.Cos(inclRad)) -
 		yOrbital*(math.Sin(raanRad)*math.Sin(gmst)+math.Cos(raanRad)*math.Cos(gmst)*math.Cos(inclRad))
 	z := xOrbital*math.Sin(raanRad)*math.Sin(inclRad) + yOrbital*math.Cos(raanRad)*math.Sin(inclRad)
-	
+
 	// Convert ECEF to geodetic
 	lat, lon, alt = o.ecefToGeodetic(x, y, z)
-	
+
 	return lat, lon, alt * 1000, nil // alt in meters
 }
 
@@ -600,9 +600,9 @@ func (o *TLEPositionCalculator) calculateGMST(t time.Time) float64 {
 
 func (o *TLEPositionCalculator) ecefToGeodetic(x, y, z float64) (lat, lon, alt float64) {
 	// WGS84 parameters
-	a := 6378.137          // km
+	a := 6378.137 // km
 	f := 1.0 / 298.257223563
-	_ = a * (1 - f)        // b (semi-minor axis) - kept for reference
+	_ = a * (1 - f) // b (semi-minor axis) - kept for reference
 	e2 := 2*f - f*f
 
 	// Longitude
@@ -611,7 +611,7 @@ func (o *TLEPositionCalculator) ecefToGeodetic(x, y, z float64) (lat, lon, alt f
 	// Iterative latitude calculation
 	p := math.Sqrt(x*x + y*y)
 	lat = math.Atan2(z, p*(1-e2))
-	
+
 	for i := 0; i < 10; i++ {
 		sinLat := math.Sin(lat)
 		N := a / math.Sqrt(1-e2*sinLat*sinLat)

@@ -323,9 +323,9 @@ type WeatherData struct {
 
 // TerrainData represents terrain information
 type TerrainData struct {
-	Elevation float64   `json:"elevation"`
-	Slope     float64   `json:"slope"`
-	Type      string    `json:"type"`
+	Elevation float64    `json:"elevation"`
+	Slope     float64    `json:"slope"`
+	Type      string     `json:"type"`
 	Obstacles []Obstacle `json:"obstacles"`
 }
 
@@ -407,12 +407,12 @@ func (snc *SatNetClient) post(ctx context.Context, path string, payload interfac
 
 // SatelliteInfo represents satellite status
 type SatelliteInfo struct {
-	ID        string    `json:"id"`
-	Name      string    `json:"name"`
-	Status    string    `json:"status"`
+	ID        string     `json:"id"`
+	Name      string     `json:"name"`
+	Status    string     `json:"status"`
 	Position  [3]float64 `json:"position"`
-	Visible   bool      `json:"visible"`
-	Elevation float64   `json:"elevation"`
+	Visible   bool       `json:"visible"`
+	Elevation float64    `json:"elevation"`
 }
 
 // --------- Giru Client Methods ---------
@@ -476,13 +476,13 @@ func (gc *GiruClient) post(ctx context.Context, path string, payload interface{}
 
 // ThreatIntel represents threat intelligence data
 type ThreatIntel struct {
-	ID       string    `json:"id"`
-	Type     string    `json:"type"`
-	Severity string    `json:"severity"`
+	ID       string     `json:"id"`
+	Type     string     `json:"type"`
+	Severity string     `json:"severity"`
 	Location [3]float64 `json:"location,omitempty"`
-	Range    float64   `json:"range,omitempty"`
-	Active   bool      `json:"active"`
-	Updated  time.Time `json:"updated"`
+	Range    float64    `json:"range,omitempty"`
+	Active   bool       `json:"active"`
+	Updated  time.Time  `json:"updated"`
 }
 
 // --------- Hunoid Client Methods ---------

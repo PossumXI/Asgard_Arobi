@@ -13,8 +13,8 @@ import (
 // SubscriptionService handles subscription-related business logic.
 type SubscriptionService struct {
 	subscriptionRepo *repositories.SubscriptionRepository
-	userRepo        *repositories.UserRepository
-	stripeService   *StripeService
+	userRepo         *repositories.UserRepository
+	stripeService    *StripeService
 }
 
 // NewSubscriptionService creates a new subscription service.

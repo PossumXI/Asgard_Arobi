@@ -23,24 +23,24 @@ type PricillaEventType string
 
 const (
 	// Inbound events (subscribed from ASGARD systems)
-	EventTypeThreatDetected     PricillaEventType = "threat_detected"
-	EventTypeSatellitePosition  PricillaEventType = "satellite_position"
-	EventTypeTelemetryUpdate    PricillaEventType = "telemetry_update"
-	EventTypeHunoidState        PricillaEventType = "hunoid_state"
-	EventTypeMissionAssigned    PricillaEventType = "mission_assigned"
-	EventTypeContactWindow      PricillaEventType = "contact_window"
-	EventTypeWeatherUpdate      PricillaEventType = "weather_update"
-	EventTypeNoFlyZoneUpdate    PricillaEventType = "no_fly_zone_update"
+	EventTypeThreatDetected    PricillaEventType = "threat_detected"
+	EventTypeSatellitePosition PricillaEventType = "satellite_position"
+	EventTypeTelemetryUpdate   PricillaEventType = "telemetry_update"
+	EventTypeHunoidState       PricillaEventType = "hunoid_state"
+	EventTypeMissionAssigned   PricillaEventType = "mission_assigned"
+	EventTypeContactWindow     PricillaEventType = "contact_window"
+	EventTypeWeatherUpdate     PricillaEventType = "weather_update"
+	EventTypeNoFlyZoneUpdate   PricillaEventType = "no_fly_zone_update"
 
 	// Outbound events (published by PRICILLA)
-	EventTypeTrajectoryUpdate   PricillaEventType = "trajectory_update"
-	EventTypeMissionUpdate      PricillaEventType = "pricilla_mission_update"
-	EventTypeThreatAlert        PricillaEventType = "pricilla_threat_alert"
-	EventTypeGuidanceCommand    PricillaEventType = "guidance_command"
-	EventTypePayloadStatus      PricillaEventType = "payload_status"
-	EventTypeEvasiveManeuver    PricillaEventType = "evasive_maneuver"
-	EventTypeArrivalEstimate    PricillaEventType = "arrival_estimate"
-	EventTypeRouteDeviation     PricillaEventType = "route_deviation"
+	EventTypeTrajectoryUpdate PricillaEventType = "trajectory_update"
+	EventTypeMissionUpdate    PricillaEventType = "pricilla_mission_update"
+	EventTypeThreatAlert      PricillaEventType = "pricilla_threat_alert"
+	EventTypeGuidanceCommand  PricillaEventType = "guidance_command"
+	EventTypePayloadStatus    PricillaEventType = "payload_status"
+	EventTypeEvasiveManeuver  PricillaEventType = "evasive_maneuver"
+	EventTypeArrivalEstimate  PricillaEventType = "arrival_estimate"
+	EventTypeRouteDeviation   PricillaEventType = "route_deviation"
 )
 
 // ============================================================================
@@ -100,13 +100,13 @@ type TrajectoryUpdateEvent struct {
 
 // ThreatAlertEvent contains threat detection information from PRICILLA.
 type ThreatAlertEvent struct {
-	PayloadID      string   `json:"payloadId"`
-	ThreatID       string   `json:"threatId"`
-	ThreatType     string   `json:"threatType"`
-	ThreatLocation GeoCoord `json:"threatLocation"`
-	DistanceKm     float64  `json:"distanceKm"`
-	Severity       string   `json:"severity"` // low, medium, high, critical
-	Action         string   `json:"action"`   // evade, monitor, proceed
+	PayloadID      string    `json:"payloadId"`
+	ThreatID       string    `json:"threatId"`
+	ThreatType     string    `json:"threatType"`
+	ThreatLocation GeoCoord  `json:"threatLocation"`
+	DistanceKm     float64   `json:"distanceKm"`
+	Severity       string    `json:"severity"` // low, medium, high, critical
+	Action         string    `json:"action"`   // evade, monitor, proceed
 	Timestamp      time.Time `json:"timestamp"`
 }
 
@@ -122,28 +122,28 @@ type GuidanceCommandEvent struct {
 
 // PayloadStatusEvent contains payload status updates.
 type PayloadStatusEvent struct {
-	PayloadID       string   `json:"payloadId"`
-	Position        Vector3D `json:"position"`
-	Velocity        Vector3D `json:"velocity"`
-	Heading         float64  `json:"heading"`
-	Altitude        float64  `json:"altitude"`
-	Speed           float64  `json:"speed"`
-	Fuel            float64  `json:"fuel"`
-	Battery         float64  `json:"battery"`
-	Status          string   `json:"status"`
-	CurrentWaypoint int      `json:"currentWaypoint"`
+	PayloadID       string    `json:"payloadId"`
+	Position        Vector3D  `json:"position"`
+	Velocity        Vector3D  `json:"velocity"`
+	Heading         float64   `json:"heading"`
+	Altitude        float64   `json:"altitude"`
+	Speed           float64   `json:"speed"`
+	Fuel            float64   `json:"fuel"`
+	Battery         float64   `json:"battery"`
+	Status          string    `json:"status"`
+	CurrentWaypoint int       `json:"currentWaypoint"`
 	ETA             time.Time `json:"eta"`
 	Timestamp       time.Time `json:"timestamp"`
 }
 
 // EvasiveManeuverEvent contains evasive action details.
 type EvasiveManeuverEvent struct {
-	PayloadID    string   `json:"payloadId"`
-	ManeuverType string   `json:"maneuverType"` // terrain_following, altitude_change, route_deviation
-	ThreatID     string   `json:"threatId,omitempty"`
-	OldPosition  Vector3D `json:"oldPosition"`
-	NewPosition  Vector3D `json:"newPosition"`
-	Duration     int      `json:"durationSeconds"`
+	PayloadID    string    `json:"payloadId"`
+	ManeuverType string    `json:"maneuverType"` // terrain_following, altitude_change, route_deviation
+	ThreatID     string    `json:"threatId,omitempty"`
+	OldPosition  Vector3D  `json:"oldPosition"`
+	NewPosition  Vector3D  `json:"newPosition"`
+	Duration     int       `json:"durationSeconds"`
 	Timestamp    time.Time `json:"timestamp"`
 }
 
@@ -194,13 +194,13 @@ type NATSBridge struct {
 	cancel        context.CancelFunc
 
 	// Event handlers
-	threatHandler          func(Threat)
-	satelliteHandler       func(SatellitePosition)
-	telemetryHandler       func(Telemetry)
-	hunoidHandler          func(HunoidState)
-	missionHandler         func(Mission)
-	contactWindowHandler   func(ContactWindow)
-	threatZoneHandler      func(ThreatZone)
+	threatHandler        func(Threat)
+	satelliteHandler     func(SatellitePosition)
+	telemetryHandler     func(Telemetry)
+	hunoidHandler        func(HunoidState)
+	missionHandler       func(Mission)
+	contactWindowHandler func(ContactWindow)
+	threatZoneHandler    func(ThreatZone)
 
 	// Event channels for internal consumption
 	threatChan    chan Threat
@@ -674,7 +674,7 @@ func (b *NATSBridge) PublishArrivalEstimate(payloadID string, missionID string, 
 		return fmt.Errorf("failed to marshal arrival estimate: %w", err)
 	}
 
-return b.publish(SubjectPricillaArrival, data)
+	return b.publish(SubjectPricillaArrival, data)
 }
 
 // PublishRouteDeviation publishes a route deviation notification.

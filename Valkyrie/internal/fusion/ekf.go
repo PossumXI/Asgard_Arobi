@@ -35,23 +35,23 @@ type SensorReading struct {
 
 // FusionState represents the fused estimate
 type FusionState struct {
-	Position    [3]float64 // X, Y, Z in meters
-	Velocity    [3]float64 // Vx, Vy, Vz in m/s
+	Position     [3]float64 // X, Y, Z in meters
+	Velocity     [3]float64 // Vx, Vy, Vz in m/s
 	Acceleration [3]float64 // Ax, Ay, Az in m/s²
-	Attitude    [3]float64 // Roll, Pitch, Yaw in radians
-	AngularRate [3]float64 // P, Q, R in rad/s
-	Timestamp   time.Time
-	Covariance  *mat.SymDense
-	Confidence  float64
+	Attitude     [3]float64 // Roll, Pitch, Yaw in radians
+	AngularRate  [3]float64 // P, Q, R in rad/s
+	Timestamp    time.Time
+	Covariance   *mat.SymDense
+	Confidence   float64
 }
 
 // ExtendedKalmanFilter implements multi-sensor fusion
 type ExtendedKalmanFilter struct {
 	mu           sync.RWMutex
-	state        *mat.VecDense  // State vector (15x1)
-	covariance   *mat.SymDense  // Covariance matrix (15x15)
-	processNoise *mat.SymDense  // Q matrix
-	dt           float64        // Time step
+	state        *mat.VecDense // State vector (15x1)
+	covariance   *mat.SymDense // Covariance matrix (15x15)
+	processNoise *mat.SymDense // Q matrix
+	dt           float64       // Time step
 
 	// Sensor buffers
 	sensorReadings chan SensorReading
@@ -67,7 +67,7 @@ type ExtendedKalmanFilter struct {
 
 // FusionConfig holds fusion parameters
 type FusionConfig struct {
-	UpdateRate       float64                 // Hz
+	UpdateRate       float64 // Hz
 	SensorWeights    map[SensorType]float64
 	OutlierThreshold float64
 	MinSensors       int

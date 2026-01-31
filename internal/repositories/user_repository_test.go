@@ -221,33 +221,33 @@ func TestListUsers_InvalidLimit(t *testing.T) {
 	// the implementation behavior.
 
 	tests := []struct {
-		name           string
-		inputLimit     int
-		expectedLimit  int
+		name            string
+		inputLimit      int
+		expectedLimit   int
 		shouldNormalize bool
 	}{
 		{
-			name:           "zero limit normalizes to 200",
-			inputLimit:     0,
-			expectedLimit:  200,
+			name:            "zero limit normalizes to 200",
+			inputLimit:      0,
+			expectedLimit:   200,
 			shouldNormalize: true,
 		},
 		{
-			name:           "negative limit normalizes to 200",
-			inputLimit:     -5,
-			expectedLimit:  200,
+			name:            "negative limit normalizes to 200",
+			inputLimit:      -5,
+			expectedLimit:   200,
 			shouldNormalize: true,
 		},
 		{
-			name:           "exceeding limit normalizes to 200",
-			inputLimit:     500,
-			expectedLimit:  200,
+			name:            "exceeding limit normalizes to 200",
+			inputLimit:      500,
+			expectedLimit:   200,
 			shouldNormalize: true,
 		},
 		{
-			name:           "valid limit stays unchanged",
-			inputLimit:     50,
-			expectedLimit:  50,
+			name:            "valid limit stays unchanged",
+			inputLimit:      50,
+			expectedLimit:   50,
 			shouldNormalize: false,
 		},
 	}

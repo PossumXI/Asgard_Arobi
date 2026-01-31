@@ -50,7 +50,7 @@ func TestAuthServiceMalformedTokens(t *testing.T) {
 
 	malformedTokens := []string{
 		"not.a.jwt",
-		"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",           // Missing parts
+		"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",          // Missing parts
 		"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..invalid", // Invalid signature
 		"random.string.here",
 		"",

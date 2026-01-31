@@ -68,10 +68,10 @@ func (s *DashboardService) GetStats() (map[string]interface{}, error) {
 	return map[string]interface{}{
 		"activeSatellites": activeSatellites,
 		"activeHunoids":    activeHunoids,
-		"pendingAlerts":     pendingAlerts,
-		"activeMissions":    activeMissions,
-		"threatsToday":      threatsToday,
-		"systemHealth":      systemHealth,
+		"pendingAlerts":    pendingAlerts,
+		"activeMissions":   activeMissions,
+		"threatsToday":     threatsToday,
+		"systemHealth":     systemHealth,
 	}, nil
 }
 

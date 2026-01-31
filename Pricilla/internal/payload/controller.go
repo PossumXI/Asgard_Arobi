@@ -49,40 +49,40 @@ type PayloadState struct {
 	Acceleration Vector3D    `json:"acceleration"`
 	Orientation  Quaternion  `json:"orientation"`
 	AngularVel   Vector3D    `json:"angularVelocity"`
-	Fuel         float64     `json:"fuel"`         // percentage
-	Battery      float64     `json:"battery"`      // percentage
-	Health       float64     `json:"health"`       // 0.0-1.0
+	Fuel         float64     `json:"fuel"`    // percentage
+	Battery      float64     `json:"battery"` // percentage
+	Health       float64     `json:"health"`  // 0.0-1.0
 	Armed        bool        `json:"armed"`
-	Status       string      `json:"status"`       // idle, active, mission, error
+	Status       string      `json:"status"` // idle, active, mission, error
 	Timestamp    time.Time   `json:"timestamp"`
 }
 
 // PayloadCapabilities defines what a payload can do
 type PayloadCapabilities struct {
-	MaxSpeed         float64 `json:"maxSpeed"`         // m/s
-	MaxAcceleration  float64 `json:"maxAcceleration"`  // m/s²
-	MaxTurnRate      float64 `json:"maxTurnRate"`      // rad/s
-	MaxAltitude      float64 `json:"maxAltitude"`      // meters
-	MinAltitude      float64 `json:"minAltitude"`      // meters
-	MaxRange         float64 `json:"maxRange"`         // meters
-	MaxFlightTime    time.Duration `json:"maxFlightTime"`
-	CanHover         bool    `json:"canHover"`
-	CanVerticalTakeoff bool  `json:"canVerticalTakeoff"`
-	HasStealth       bool    `json:"hasStealth"`
-	HasWeapons       bool    `json:"hasWeapons"`
-	HasSensors       bool    `json:"hasSensors"`
-	HasCommunications bool   `json:"hasCommunications"`
+	MaxSpeed           float64       `json:"maxSpeed"`        // m/s
+	MaxAcceleration    float64       `json:"maxAcceleration"` // m/s²
+	MaxTurnRate        float64       `json:"maxTurnRate"`     // rad/s
+	MaxAltitude        float64       `json:"maxAltitude"`     // meters
+	MinAltitude        float64       `json:"minAltitude"`     // meters
+	MaxRange           float64       `json:"maxRange"`        // meters
+	MaxFlightTime      time.Duration `json:"maxFlightTime"`
+	CanHover           bool          `json:"canHover"`
+	CanVerticalTakeoff bool          `json:"canVerticalTakeoff"`
+	HasStealth         bool          `json:"hasStealth"`
+	HasWeapons         bool          `json:"hasWeapons"`
+	HasSensors         bool          `json:"hasSensors"`
+	HasCommunications  bool          `json:"hasCommunications"`
 }
 
 // Command represents a control command to a payload
 type Command struct {
-	ID          string      `json:"id"`
-	PayloadID   string      `json:"payloadId"`
-	Type        CommandType `json:"type"`
-	Parameters  map[string]interface{} `json:"parameters"`
-	Priority    int         `json:"priority"`
-	Timestamp   time.Time   `json:"timestamp"`
-	ExpiresAt   time.Time   `json:"expiresAt"`
+	ID         string                 `json:"id"`
+	PayloadID  string                 `json:"payloadId"`
+	Type       CommandType            `json:"type"`
+	Parameters map[string]interface{} `json:"parameters"`
+	Priority   int                    `json:"priority"`
+	Timestamp  time.Time              `json:"timestamp"`
+	ExpiresAt  time.Time              `json:"expiresAt"`
 }
 
 // CommandType defines the type of command
@@ -131,12 +131,12 @@ func NewPayloadController(payloadID string, payloadType PayloadType, caps Payloa
 		capabilities: caps,
 		commands:     make(chan Command, 100),
 		state: PayloadState{
-			ID:     payloadID,
-			Type:   payloadType,
-			Status: "idle",
-			Fuel:   100.0,
+			ID:      payloadID,
+			Type:    payloadType,
+			Status:  "idle",
+			Fuel:    100.0,
 			Battery: 100.0,
-			Health: 1.0,
+			Health:  1.0,
 		},
 	}
 }
@@ -585,12 +585,12 @@ func GetDefaultCapabilities(payloadType PayloadType) PayloadCapabilities {
 	switch payloadType {
 	case PayloadHunoid:
 		return PayloadCapabilities{
-			MaxSpeed:           3.0,     // m/s walking
-			MaxAcceleration:    2.0,     // m/s²
-			MaxTurnRate:        1.0,     // rad/s
-			MaxAltitude:        0,       // ground only
+			MaxSpeed:           3.0, // m/s walking
+			MaxAcceleration:    2.0, // m/s²
+			MaxTurnRate:        1.0, // rad/s
+			MaxAltitude:        0,   // ground only
 			MinAltitude:        0,
-			MaxRange:           50000,   // 50km
+			MaxRange:           50000, // 50km
 			MaxFlightTime:      0,
 			CanHover:           false,
 			CanVerticalTakeoff: false,
@@ -602,12 +602,12 @@ func GetDefaultCapabilities(payloadType PayloadType) PayloadCapabilities {
 
 	case PayloadUAV:
 		return PayloadCapabilities{
-			MaxSpeed:           80.0,    // m/s
-			MaxAcceleration:    15.0,    // m/s²
-			MaxTurnRate:        3.0,     // rad/s
-			MaxAltitude:        10000,   // 10km
+			MaxSpeed:           80.0,  // m/s
+			MaxAcceleration:    15.0,  // m/s²
+			MaxTurnRate:        3.0,   // rad/s
+			MaxAltitude:        10000, // 10km
 			MinAltitude:        50,
-			MaxRange:           200000,  // 200km
+			MaxRange:           200000, // 200km
 			MaxFlightTime:      8 * time.Hour,
 			CanHover:           false,
 			CanVerticalTakeoff: false,
@@ -619,14 +619,14 @@ func GetDefaultCapabilities(payloadType PayloadType) PayloadCapabilities {
 
 	case PayloadRocket:
 		return PayloadCapabilities{
-			MaxSpeed:           3000.0,  // m/s
-			MaxAcceleration:    50.0,    // m/s²
-			MaxTurnRate:        0.5,     // rad/s
-			MaxAltitude:        400000,  // 400km (LEO)
+			MaxSpeed:           3000.0, // m/s
+			MaxAcceleration:    50.0,   // m/s²
+			MaxTurnRate:        0.5,    // rad/s
+			MaxAltitude:        400000, // 400km (LEO)
 			MinAltitude:        0,
 			MaxRange:           40000000, // around the world
 			MaxFlightTime:      15 * time.Minute,
-			CanHover:           true,    // with propulsive landing
+			CanHover:           true, // with propulsive landing
 			CanVerticalTakeoff: true,
 			HasStealth:         false,
 			HasWeapons:         false,
@@ -636,12 +636,12 @@ func GetDefaultCapabilities(payloadType PayloadType) PayloadCapabilities {
 
 	case PayloadMissile:
 		return PayloadCapabilities{
-			MaxSpeed:           1000.0,  // m/s (Mach 3)
-			MaxAcceleration:    100.0,   // m/s²
-			MaxTurnRate:        5.0,     // rad/s
-			MaxAltitude:        30000,   // 30km
+			MaxSpeed:           1000.0, // m/s (Mach 3)
+			MaxAcceleration:    100.0,  // m/s²
+			MaxTurnRate:        5.0,    // rad/s
+			MaxAltitude:        30000,  // 30km
 			MinAltitude:        10,
-			MaxRange:           500000,  // 500km
+			MaxRange:           500000, // 500km
 			MaxFlightTime:      30 * time.Minute,
 			CanHover:           false,
 			CanVerticalTakeoff: true,
@@ -653,12 +653,12 @@ func GetDefaultCapabilities(payloadType PayloadType) PayloadCapabilities {
 
 	case PayloadSpacecraft:
 		return PayloadCapabilities{
-			MaxSpeed:           10000.0, // m/s
-			MaxAcceleration:    5.0,     // m/s²
-			MaxTurnRate:        0.1,     // rad/s
-			MaxAltitude:        1000000000, // 1M km
-			MinAltitude:        200000,  // LEO min
-			MaxRange:           1e12,    // solar system scale
+			MaxSpeed:           10000.0,          // m/s
+			MaxAcceleration:    5.0,              // m/s²
+			MaxTurnRate:        0.1,              // rad/s
+			MaxAltitude:        1000000000,       // 1M km
+			MinAltitude:        200000,           // LEO min
+			MaxRange:           1e12,             // solar system scale
 			MaxFlightTime:      8760 * time.Hour, // 1 year
 			CanHover:           false,
 			CanVerticalTakeoff: false,
@@ -670,12 +670,12 @@ func GetDefaultCapabilities(payloadType PayloadType) PayloadCapabilities {
 
 	case PayloadDrone:
 		return PayloadCapabilities{
-			MaxSpeed:           20.0,    // m/s
-			MaxAcceleration:    10.0,    // m/s²
-			MaxTurnRate:        5.0,     // rad/s
-			MaxAltitude:        500,     // 500m
+			MaxSpeed:           20.0, // m/s
+			MaxAcceleration:    10.0, // m/s²
+			MaxTurnRate:        5.0,  // rad/s
+			MaxAltitude:        500,  // 500m
 			MinAltitude:        1,
-			MaxRange:           10000,   // 10km
+			MaxRange:           10000, // 10km
 			MaxFlightTime:      30 * time.Minute,
 			CanHover:           true,
 			CanVerticalTakeoff: true,
@@ -687,12 +687,12 @@ func GetDefaultCapabilities(payloadType PayloadType) PayloadCapabilities {
 
 	case PayloadGroundRobot:
 		return PayloadCapabilities{
-			MaxSpeed:           5.0,     // m/s
-			MaxAcceleration:    3.0,     // m/s²
-			MaxTurnRate:        2.0,     // rad/s
+			MaxSpeed:           5.0, // m/s
+			MaxAcceleration:    3.0, // m/s²
+			MaxTurnRate:        2.0, // rad/s
 			MaxAltitude:        0,
 			MinAltitude:        0,
-			MaxRange:           100000,  // 100km
+			MaxRange:           100000, // 100km
 			MaxFlightTime:      0,
 			CanHover:           false,
 			CanVerticalTakeoff: false,
@@ -704,12 +704,12 @@ func GetDefaultCapabilities(payloadType PayloadType) PayloadCapabilities {
 
 	case PayloadSubmarine:
 		return PayloadCapabilities{
-			MaxSpeed:           15.0,    // m/s (~30 knots)
-			MaxAcceleration:    2.0,     // m/s²
-			MaxTurnRate:        0.3,     // rad/s
-			MaxAltitude:        0,       // surface
-			MinAltitude:        -1000,   // 1km depth
-			MaxRange:           10000000, // global
+			MaxSpeed:           15.0,             // m/s (~30 knots)
+			MaxAcceleration:    2.0,              // m/s²
+			MaxTurnRate:        0.3,              // rad/s
+			MaxAltitude:        0,                // surface
+			MinAltitude:        -1000,            // 1km depth
+			MaxRange:           10000000,         // global
 			MaxFlightTime:      2160 * time.Hour, // 90 days
 			CanHover:           true,
 			CanVerticalTakeoff: false,
@@ -726,7 +726,7 @@ func GetDefaultCapabilities(payloadType PayloadType) PayloadCapabilities {
 			MaxTurnRate:        0.001,   // rad/s
 			MaxAltitude:        1e15,    // light years
 			MinAltitude:        0,
-			MaxRange:           1e18,    // interstellar
+			MaxRange:           1e18,               // interstellar
 			MaxFlightTime:      876000 * time.Hour, // 100 years
 			CanHover:           false,
 			CanVerticalTakeoff: false,
@@ -738,13 +738,13 @@ func GetDefaultCapabilities(payloadType PayloadType) PayloadCapabilities {
 
 	default:
 		return PayloadCapabilities{
-			MaxSpeed:           10.0,
-			MaxAcceleration:    5.0,
-			MaxTurnRate:        1.0,
-			MaxAltitude:        1000,
-			MinAltitude:        0,
-			MaxRange:           10000,
-			MaxFlightTime:      1 * time.Hour,
+			MaxSpeed:        10.0,
+			MaxAcceleration: 5.0,
+			MaxTurnRate:     1.0,
+			MaxAltitude:     1000,
+			MinAltitude:     0,
+			MaxRange:        10000,
+			MaxFlightTime:   1 * time.Hour,
 		}
 	}
 }

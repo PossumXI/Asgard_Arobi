@@ -34,7 +34,7 @@ type VLAModel interface {
 
 // ModelInfo contains VLA model metadata
 type ModelInfo struct {
-	Name            string
-	Version         string
+	Name             string
+	Version          string
 	SupportedActions []ActionType
 }

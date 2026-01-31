@@ -35,21 +35,21 @@ const (
 
 // Zero-width characters for encoding
 const (
-	zwsp  = '\u200B' // Zero-width space (bit 0)
-	zwnj  = '\u200C' // Zero-width non-joiner (bit 1)
-	zwj   = '\u200D' // Zero-width joiner (separator)
-	wj    = '\u2060' // Word joiner (end marker)
+	zwsp = '\u200B' // Zero-width space (bit 0)
+	zwnj = '\u200C' // Zero-width non-joiner (bit 1)
+	zwj  = '\u200D' // Zero-width joiner (separator)
+	wj   = '\u2060' // Word joiner (end marker)
 )
 
 // Message represents a steganographic message
 type Message struct {
-	ID           string
-	CoverText    string
-	SecretData   []byte
-	EncodedText  string
-	Method       EncodingMethod
-	Encrypted    bool
-	Timestamp    int64
+	ID          string
+	CoverText   string
+	SecretData  []byte
+	EncodedText string
+	Method      EncodingMethod
+	Encrypted   bool
+	Timestamp   int64
 }
 
 // Encoder handles steganographic encoding
@@ -198,12 +198,12 @@ func (e *Encoder) SetMethod(method EncodingMethod) {
 func (e *Encoder) SetEncryptionKey(key string) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
-	
+
 	if key == "" {
 		e.encryptionKey = nil
 		return
 	}
-	
+
 	hash := sha256.Sum256([]byte(key))
 	e.encryptionKey = hash[:]
 }
@@ -242,14 +242,14 @@ func (e *Encoder) GetCapacity(coverText string, method EncodingMethod) int {
 func (e *Encoder) encodeZeroWidth(cover string, data []byte) (string, error) {
 	// Convert data to binary string
 	binary := dataToBinary(data)
-	
+
 	var result strings.Builder
 	binaryIndex := 0
 
 	// Insert zero-width characters after each visible character
 	for _, char := range cover {
 		result.WriteRune(char)
-		
+
 		if binaryIndex < len(binary) && unicode.IsLetter(char) {
 			if binary[binaryIndex] == '0' {
 				result.WriteRune(zwsp)
@@ -283,7 +283,7 @@ func (e *Encoder) decodeZeroWidth(encoded string) ([]byte, error) {
 		case wj:
 			foundEnd = true
 		}
-		
+
 		if foundEnd {
 			break
 		}
@@ -335,7 +335,7 @@ func (e *Encoder) decodeSynonym(encoded string) ([]byte, error) {
 
 	for _, word := range words {
 		lowerWord := strings.ToLower(word)
-		
+
 		// Check if word is a synonym (bit 1)
 		for original, synonyms := range e.synonymMap {
 			for _, syn := range synonyms {
@@ -349,7 +349,7 @@ func (e *Encoder) decodeSynonym(encoded string) ([]byte, error) {
 				goto next
 			}
 		}
-		next:
+	next:
 	}
 
 	if binary.Len() == 0 {
@@ -368,7 +368,7 @@ func (e *Encoder) encodeWhitespace(cover string, data []byte) (string, error) {
 	var result strings.Builder
 	for i, word := range words {
 		result.WriteString(word)
-		
+
 		if i < len(words)-1 && binaryIndex < len(binary) {
 			// One space for 0, two spaces for 1
 			if binary[binaryIndex] == '0' {
@@ -426,17 +426,17 @@ func (e *Encoder) decodeWhitespace(encoded string) ([]byte, error) {
 func (e *Encoder) encodePunctuation(cover string, data []byte) (string, error) {
 	// Limited encoding using period/comma patterns
 	binary := dataToBinary(data)
-	
+
 	if len(binary) > 32 { // Limit to 4 bytes
 		return "", errors.New("punctuation method supports max 4 bytes")
 	}
 
 	result := cover
-	
+
 	// Append encoded data as subtle punctuation pattern at end
 	var encoded strings.Builder
 	for i := 0; i < len(binary); i += 2 {
-		bits := binary[i : min(i+2, len(binary))]
+		bits := binary[i:min(i+2, len(binary))]
 		switch bits {
 		case "00":
 			encoded.WriteString(".. ")
@@ -454,7 +454,7 @@ func (e *Encoder) encodePunctuation(cover string, data []byte) (string, error) {
 
 func (e *Encoder) decodePunctuation(encoded string) ([]byte, error) {
 	var binary strings.Builder
-	
+
 	// Find punctuation pattern at end
 	parts := strings.Split(encoded, " ")
 	for _, part := range parts {
@@ -706,15 +706,15 @@ func (c *Chat) AnalyzeText(text string) map[string]interface{} {
 	dotPatterns := strings.Count(text, "...")
 
 	return map[string]interface{}{
-		"has_zero_width":    zwCount > 0,
-		"zero_width_count":  zwCount,
-		"has_double_spaces": doubleSpaces > 0,
+		"has_zero_width":     zwCount > 0,
+		"zero_width_count":   zwCount,
+		"has_double_spaces":  doubleSpaces > 0,
 		"double_space_count": doubleSpaces,
-		"has_dot_patterns":  dotPatterns > 0,
-		"dot_pattern_count": dotPatterns,
-		"likely_stego":      zwCount > 5 || doubleSpaces > 3,
-		"text_length":       len(text),
-		"visible_length":    len(c.GetVisibleText(text)),
+		"has_dot_patterns":   dotPatterns > 0,
+		"dot_pattern_count":  dotPatterns,
+		"likely_stego":       zwCount > 5 || doubleSpaces > 3,
+		"text_length":        len(text),
+		"visible_length":     len(c.GetVisibleText(text)),
 	}
 }
 

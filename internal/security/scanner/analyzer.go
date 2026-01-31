@@ -16,11 +16,11 @@ import (
 // TrafficAnalyzer performs statistical analysis and anomaly detection on network traffic.
 type TrafficAnalyzer struct {
 	mu                sync.RWMutex
-	baselines          map[string]*Baseline
+	baselines         map[string]*Baseline
 	anomalyThresholds map[string]float64
-	recentPackets      []PacketInfo
-	maxRecentPackets   int
-	threatPatterns     map[string]*ThreatPattern
+	recentPackets     []PacketInfo
+	maxRecentPackets  int
+	threatPatterns    map[string]*ThreatPattern
 }
 
 // Baseline tracks statistical baselines for traffic patterns.
@@ -35,20 +35,20 @@ type Baseline struct {
 
 // ThreatPattern defines detection rules for specific threats.
 type ThreatPattern struct {
-	Name        string
-	Type        string
-	Severity    ThreatLevel
-	DetectFunc  func(PacketInfo, *Baseline) (bool, float64, string)
+	Name       string
+	Type       string
+	Severity   ThreatLevel
+	DetectFunc func(PacketInfo, *Baseline) (bool, float64, string)
 }
 
 // NewTrafficAnalyzer creates a new traffic analyzer.
 func NewTrafficAnalyzer() *TrafficAnalyzer {
 	analyzer := &TrafficAnalyzer{
-		baselines:          make(map[string]*Baseline),
+		baselines:         make(map[string]*Baseline),
 		anomalyThresholds: make(map[string]float64),
-		recentPackets:      make([]PacketInfo, 0, 1000),
-		maxRecentPackets:   1000,
-		threatPatterns:     make(map[string]*ThreatPattern),
+		recentPackets:     make([]PacketInfo, 0, 1000),
+		maxRecentPackets:  1000,
+		threatPatterns:    make(map[string]*ThreatPattern),
 	}
 
 	// Initialize threat patterns

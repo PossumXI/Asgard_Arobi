@@ -121,10 +121,10 @@ func TestMultipleDetections(t *testing.T) {
 	}
 
 	detections := []vision.Detection{
-		{Class: "fire", Confidence: 0.9},   // Should alert
-		{Class: "smoke", Confidence: 0.7},  // Should alert
+		{Class: "fire", Confidence: 0.9},    // Should alert
+		{Class: "smoke", Confidence: 0.7},   // Should alert
 		{Class: "person", Confidence: 0.95}, // Should not alert (wrong class)
-		{Class: "fire", Confidence: 0.5},   // Should not alert (low confidence)
+		{Class: "fire", Confidence: 0.5},    // Should not alert (low confidence)
 	}
 
 	alertCount := 0

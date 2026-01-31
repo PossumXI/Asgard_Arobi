@@ -35,7 +35,7 @@ const (
 	EventDTNLinkChange      CrossDomainEventType = "dtn.link.change"
 
 	// Autonomy events
-	EventAutonomyStatus      CrossDomainEventType = "autonomy.status"
+	EventAutonomyStatus       CrossDomainEventType = "autonomy.status"
 	EventAutonomyMissionStart CrossDomainEventType = "autonomy.mission.start"
 	EventAutonomyMissionEnd   CrossDomainEventType = "autonomy.mission.end"
 	EventAutonomyHalted       CrossDomainEventType = "autonomy.halted"
@@ -81,13 +81,13 @@ type CrossDomainEvent struct {
 // SecurityThreatEvent represents a security threat that requires cross-domain attention.
 type SecurityThreatEvent struct {
 	CrossDomainEvent
-	ThreatType     string   `json:"threat_type"`
-	ThreatID       string   `json:"threat_id"`
-	SourceIP       string   `json:"source_ip,omitempty"`
-	TargetSystem   string   `json:"target_system"`
-	Confidence     float64  `json:"confidence"`
-	AffectedNodes  []string `json:"affected_nodes"`
-	RecommendedAction string `json:"recommended_action"`
+	ThreatType        string   `json:"threat_type"`
+	ThreatID          string   `json:"threat_id"`
+	SourceIP          string   `json:"source_ip,omitempty"`
+	TargetSystem      string   `json:"target_system"`
+	Confidence        float64  `json:"confidence"`
+	AffectedNodes     []string `json:"affected_nodes"`
+	RecommendedAction string   `json:"recommended_action"`
 }
 
 // DTNBundleEvent represents significant DTN bundle routing events.
@@ -116,14 +116,14 @@ type DTNCongestionEvent struct {
 // AutonomyStatusEvent represents status updates from autonomous systems.
 type AutonomyStatusEvent struct {
 	CrossDomainEvent
-	SystemID       string             `json:"system_id"`
-	SystemType     AutonomySystemType `json:"system_type"`
-	State          AutonomyState      `json:"state"`
-	MissionID      string             `json:"mission_id,omitempty"`
-	Location       *GeoLocation       `json:"location,omitempty"`
-	BatteryLevel   float64            `json:"battery_level"` // 0-100
-	HealthStatus   string             `json:"health_status"`
-	LastHeartbeat  time.Time          `json:"last_heartbeat"`
+	SystemID      string             `json:"system_id"`
+	SystemType    AutonomySystemType `json:"system_type"`
+	State         AutonomyState      `json:"state"`
+	MissionID     string             `json:"mission_id,omitempty"`
+	Location      *GeoLocation       `json:"location,omitempty"`
+	BatteryLevel  float64            `json:"battery_level"` // 0-100
+	HealthStatus  string             `json:"health_status"`
+	LastHeartbeat time.Time          `json:"last_heartbeat"`
 }
 
 // AutonomySystemType identifies the type of autonomous system.
@@ -140,26 +140,26 @@ const (
 type AutonomyState string
 
 const (
-	StateIdle       AutonomyState = "idle"
-	StateActive     AutonomyState = "active"
-	StatePaused     AutonomyState = "paused"
-	StateEmergency  AutonomyState = "emergency"
+	StateIdle        AutonomyState = "idle"
+	StateActive      AutonomyState = "active"
+	StatePaused      AutonomyState = "paused"
+	StateEmergency   AutonomyState = "emergency"
 	StateMaintenance AutonomyState = "maintenance"
-	StateOffline    AutonomyState = "offline"
+	StateOffline     AutonomyState = "offline"
 )
 
 // EthicsDecisionEvent represents a decision from the ethics kernel.
 type EthicsDecisionEvent struct {
 	CrossDomainEvent
-	DecisionID      uuid.UUID    `json:"decision_id"`
-	ActionType      string       `json:"action_type"`
-	SystemID        string       `json:"system_id"`
-	Decision        string       `json:"decision"` // approved, rejected, escalated
-	Reasoning       string       `json:"reasoning"`
-	RulesChecked    []string     `json:"rules_checked"`
-	Score           float64      `json:"score"`
-	RequiresHuman   bool         `json:"requires_human"`
-	Timeout         time.Duration `json:"timeout_ns,omitempty"`
+	DecisionID    uuid.UUID     `json:"decision_id"`
+	ActionType    string        `json:"action_type"`
+	SystemID      string        `json:"system_id"`
+	Decision      string        `json:"decision"` // approved, rejected, escalated
+	Reasoning     string        `json:"reasoning"`
+	RulesChecked  []string      `json:"rules_checked"`
+	Score         float64       `json:"score"`
+	RequiresHuman bool          `json:"requires_human"`
+	Timeout       time.Duration `json:"timeout_ns,omitempty"`
 }
 
 // GeoLocation represents geographic coordinates.
@@ -173,7 +173,7 @@ type GeoLocation struct {
 type ControlCommand struct {
 	ID           uuid.UUID              `json:"id"`
 	Timestamp    time.Time              `json:"timestamp"`
-	Source       string                 `json:"source"`       // Who issued the command
+	Source       string                 `json:"source"` // Who issued the command
 	TargetDomain EventDomain            `json:"target_domain"`
 	TargetSystem string                 `json:"target_system,omitempty"`
 	CommandType  string                 `json:"command_type"`
@@ -184,12 +184,12 @@ type ControlCommand struct {
 
 // ControlResponse represents the response to a control command.
 type ControlResponse struct {
-	CommandID   uuid.UUID              `json:"command_id"`
-	Success     bool                   `json:"success"`
-	Error       string                 `json:"error,omitempty"`
-	Result      map[string]interface{} `json:"result,omitempty"`
-	ExecutedAt  time.Time              `json:"executed_at"`
-	Duration    time.Duration          `json:"duration_ns"`
+	CommandID  uuid.UUID              `json:"command_id"`
+	Success    bool                   `json:"success"`
+	Error      string                 `json:"error,omitempty"`
+	Result     map[string]interface{} `json:"result,omitempty"`
+	ExecutedAt time.Time              `json:"executed_at"`
+	Duration   time.Duration          `json:"duration_ns"`
 }
 
 // NewCrossDomainEvent creates a new cross-domain event with required fields.

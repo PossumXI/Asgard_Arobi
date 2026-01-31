@@ -73,8 +73,8 @@ func TestHealth_HTTPMethods(t *testing.T) {
 	methods := []string{
 		http.MethodGet,
 		http.MethodHead,
-		http.MethodPost,   // Typically not used but shouldn't crash
-		http.MethodPut,    // Typically not used but shouldn't crash
+		http.MethodPost, // Typically not used but shouldn't crash
+		http.MethodPut,  // Typically not used but shouldn't crash
 	}
 
 	for _, method := range methods {

@@ -62,16 +62,16 @@ type TelemetryMessage struct {
 	Alerts []Alert `json:"alerts,omitempty"`
 
 	// Additional telemetry
-	Airspeed        float64 `json:"airspeed,omitempty"`
-	GroundSpeed     float64 `json:"ground_speed,omitempty"`
-	AltitudeAGL     float64 `json:"altitude_agl,omitempty"`
-	AltitudeMSL     float64 `json:"altitude_msl,omitempty"`
-	Heading         float64 `json:"heading,omitempty"`
-	WindSpeed       float64 `json:"wind_speed,omitempty"`
-	WindDirection   float64 `json:"wind_direction,omitempty"`
-	GPSSatellites   int     `json:"gps_satellites,omitempty"`
-	GPSFix          string  `json:"gps_fix,omitempty"`
-	SignalStrength  float64 `json:"signal_strength,omitempty"`
+	Airspeed         float64 `json:"airspeed,omitempty"`
+	GroundSpeed      float64 `json:"ground_speed,omitempty"`
+	AltitudeAGL      float64 `json:"altitude_agl,omitempty"`
+	AltitudeMSL      float64 `json:"altitude_msl,omitempty"`
+	Heading          float64 `json:"heading,omitempty"`
+	WindSpeed        float64 `json:"wind_speed,omitempty"`
+	WindDirection    float64 `json:"wind_direction,omitempty"`
+	GPSSatellites    int     `json:"gps_satellites,omitempty"`
+	GPSFix           string  `json:"gps_fix,omitempty"`
+	SignalStrength   float64 `json:"signal_strength,omitempty"`
 	FusionConfidence float64 `json:"fusion_confidence,omitempty"`
 }
 
@@ -85,11 +85,11 @@ type Alert struct {
 
 // ClearanceLevel defines access tiers
 const (
-	ClearancePublic     = 0
-	ClearanceBasic      = 1
-	ClearanceOperator   = 2
-	ClearanceCommander  = 3
-	ClearanceAdmin      = 4
+	ClearancePublic    = 0
+	ClearanceBasic     = 1
+	ClearanceOperator  = 2
+	ClearanceCommander = 3
+	ClearanceAdmin     = 4
 )
 
 // NewLiveFeedStreamer creates a new streamer

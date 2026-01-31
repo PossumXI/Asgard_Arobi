@@ -26,9 +26,9 @@ type Metrics struct {
 	WebSocketMessages    *prometheus.CounterVec
 
 	// NATS metrics
-	NATSMessagesReceived *prometheus.CounterVec
+	NATSMessagesReceived  *prometheus.CounterVec
 	NATSMessagesPublished *prometheus.CounterVec
-	NATSConnectionStatus prometheus.Gauge
+	NATSConnectionStatus  prometheus.Gauge
 
 	// Event bus metrics
 	EventsProcessed *prometheus.CounterVec
@@ -36,9 +36,9 @@ type Metrics struct {
 	EventLatency    *prometheus.HistogramVec
 
 	// Database metrics
-	DBQueryDuration *prometheus.HistogramVec
+	DBQueryDuration  *prometheus.HistogramVec
 	DBConnectionPool *prometheus.GaugeVec
-	DBErrors        *prometheus.CounterVec
+	DBErrors         *prometheus.CounterVec
 
 	// Satellite metrics (Silenus)
 	SatelliteFramesProcessed prometheus.Counter

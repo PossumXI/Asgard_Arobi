@@ -32,9 +32,9 @@ var (
 	// Common timestamp patterns
 	timestampPatterns = []*regexp.Regexp{
 		regexp.MustCompile(`(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:?\d{2})?)`), // ISO 8601
-		regexp.MustCompile(`(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})`),                                 // YYYY-MM-DD HH:MM:SS
-		regexp.MustCompile(`(\d{2}/\w{3}/\d{4}:\d{2}:\d{2}:\d{2}\s+[+-]\d{4})`),                       // Apache format
-		regexp.MustCompile(`(\w{3}\s+\d{1,2}\s+\d{2}:\d{2}:\d{2})`),                                   // Syslog format
+		regexp.MustCompile(`(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})`),                                // YYYY-MM-DD HH:MM:SS
+		regexp.MustCompile(`(\d{2}/\w{3}/\d{4}:\d{2}:\d{2}:\d{2}\s+[+-]\d{4})`),                      // Apache format
+		regexp.MustCompile(`(\w{3}\s+\d{1,2}\s+\d{2}:\d{2}:\d{2})`),                                  // Syslog format
 	}
 )
 
@@ -206,18 +206,18 @@ func (lis *LogIngestionScanner) parseLogLine(line, logType string) *PacketInfo {
 
 // SyslogParsedData holds extracted syslog fields
 type SyslogParsedData struct {
-	Priority    int
-	Facility    int
-	Severity    int
-	Version     int
-	Timestamp   time.Time
-	Hostname    string
-	AppName     string
-	ProcID      string
-	MsgID       string
-	Message     string
-	SourceIP    net.IP
-	SourcePort  int
+	Priority   int
+	Facility   int
+	Severity   int
+	Version    int
+	Timestamp  time.Time
+	Hostname   string
+	AppName    string
+	ProcID     string
+	MsgID      string
+	Message    string
+	SourceIP   net.IP
+	SourcePort int
 }
 
 // parseSyslog parses RFC 5424/3164 syslog format.
@@ -484,13 +484,13 @@ func (lis *LogIngestionScanner) parseWebLog(line string) *PacketInfo {
 	}
 
 	return &PacketInfo{
-		SourceIP:   parsed.SourceIP,
-		DestPort:   destPort,
-		Protocol:   "HTTP",
-		Size:       parsed.Size,
-		Timestamp:  parsed.Timestamp,
-		Payload:    payload,
-		Flags:      flags,
+		SourceIP:  parsed.SourceIP,
+		DestPort:  destPort,
+		Protocol:  "HTTP",
+		Size:      parsed.Size,
+		Timestamp: parsed.Timestamp,
+		Payload:   payload,
+		Flags:     flags,
 	}
 }
 
@@ -540,13 +540,13 @@ func (lis *LogIngestionScanner) parseWebLogFallback(line string) *PacketInfo {
 	}
 
 	return &PacketInfo{
-		SourceIP:   sourceIP,
-		DestPort:   80,
-		Protocol:   "HTTP",
-		Size:       len(line),
-		Timestamp:  timestamp,
-		Payload:    []byte(line),
-		Flags:      fmt.Sprintf("method=%s,status=%d", method, statusCode),
+		SourceIP:  sourceIP,
+		DestPort:  80,
+		Protocol:  "HTTP",
+		Size:      len(line),
+		Timestamp: timestamp,
+		Payload:   []byte(line),
+		Flags:     fmt.Sprintf("method=%s,status=%d", method, statusCode),
 	}
 }
 
@@ -569,7 +569,7 @@ func (lis *LogIngestionScanner) detectSuspiciousWebRequest(parsed WebLogParsedDa
 	}
 
 	// Command injection
-	cmdPatterns := []string{";", "|", "`", "$("} 
+	cmdPatterns := []string{";", "|", "`", "$("}
 	for _, pattern := range cmdPatterns {
 		if strings.Contains(path, pattern) {
 			return true

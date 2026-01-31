@@ -14,7 +14,7 @@ import (
 
 // Version constants
 const (
-	BPv7Version uint8 = 7
+	BPv7Version uint8  = 7
 	MaxHopCount uint32 = 255
 )
 
@@ -31,14 +31,14 @@ type Bundle struct {
 	ID                uuid.UUID     `json:"id"`
 	Version           uint8         `json:"version"`
 	BundleFlags       uint64        `json:"bundleFlags"`
-	DestinationEID    string        `json:"destinationEid"`    // e.g., "dtn://earth/nysus"
-	SourceEID         string        `json:"sourceEid"`         // e.g., "dtn://mars/sat001"
-	ReportTo          string        `json:"reportTo"`          // Status report destination
+	DestinationEID    string        `json:"destinationEid"` // e.g., "dtn://earth/nysus"
+	SourceEID         string        `json:"sourceEid"`      // e.g., "dtn://mars/sat001"
+	ReportTo          string        `json:"reportTo"`       // Status report destination
 	CreationTimestamp time.Time     `json:"creationTimestamp"`
-	Lifetime          time.Duration `json:"lifetime"`          // Bundle validity period
+	Lifetime          time.Duration `json:"lifetime"` // Bundle validity period
 	Payload           []byte        `json:"payload"`
-	CRCType           uint8         `json:"crcType"`           // 0=none, 1=CRC16, 2=CRC32
-	PreviousNode      string        `json:"previousNode"`      // Last node that forwarded
+	CRCType           uint8         `json:"crcType"`      // 0=none, 1=CRC16, 2=CRC32
+	PreviousNode      string        `json:"previousNode"` // Last node that forwarded
 	HopCount          uint32        `json:"hopCount"`
 	Priority          uint8         `json:"priority"`
 	FragmentOffset    uint64        `json:"fragmentOffset,omitempty"`

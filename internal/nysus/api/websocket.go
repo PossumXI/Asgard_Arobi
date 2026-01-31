@@ -22,12 +22,12 @@ var upgrader = websocket.Upgrader{
 
 // WebSocketClient represents a connected WebSocket client.
 type WebSocketClient struct {
-	hub      *WebSocketHub
-	conn     *websocket.Conn
-	send     chan []byte
-	userID   string
-	subs     map[string]bool
-	subsMu   sync.RWMutex
+	hub    *WebSocketHub
+	conn   *websocket.Conn
+	send   chan []byte
+	userID string
+	subs   map[string]bool
+	subsMu sync.RWMutex
 }
 
 // WebSocketHub manages WebSocket connections and broadcasts.

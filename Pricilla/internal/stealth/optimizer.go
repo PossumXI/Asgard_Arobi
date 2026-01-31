@@ -139,7 +139,7 @@ func (s *StealthOptimizer) CalculateThermalSignature(wp guidance.Waypoint) float
 	speed := math.Sqrt(speedSq)
 
 	// Friction heating
-	frictionTemp := s.thermalModel.AmbientTemp + (speed*speed*0.001)
+	frictionTemp := s.thermalModel.AmbientTemp + (speed * speed * 0.001)
 
 	// Engine heat (if powered flight)
 	engineContribution := s.thermalModel.EngineTemp * 0.3

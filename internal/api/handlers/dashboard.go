@@ -209,12 +209,12 @@ func (h *DashboardHandler) GetHunoidTelemetry(w http.ResponseWriter, r *http.Req
 
 // TelemetryResponse describes telemetry payloads for Hubs.
 type TelemetryResponse struct {
-	EntityID       string            `json:"entityId"`
-	EntityType     string            `json:"entityType"`
-	Timestamp      string            `json:"timestamp"`
-	BatteryPercent float64           `json:"batteryPercent"`
-	Status         string            `json:"status"`
+	EntityID       string                    `json:"entityId"`
+	EntityType     string                    `json:"entityType"`
+	Timestamp      string                    `json:"timestamp"`
+	BatteryPercent float64                   `json:"batteryPercent"`
+	Status         string                    `json:"status"`
 	Location       *repositories.GeoLocation `json:"location,omitempty"`
-	Source         string            `json:"source,omitempty"`
+	Source         string                    `json:"source,omitempty"`
 	Metrics        map[string]float64        `json:"metrics"`
 }

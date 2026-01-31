@@ -24,74 +24,74 @@ type MAVLinkProtocol struct {
 
 // MAVLinkMessage represents a MAVLink message
 type MAVLinkMessage struct {
-	Magic      uint8
-	Length     uint8
-	Incompat   uint8
-	Compat     uint8
-	Sequence   uint8
-	SystemID   uint8
+	Magic       uint8
+	Length      uint8
+	Incompat    uint8
+	Compat      uint8
+	Sequence    uint8
+	SystemID    uint8
 	ComponentID uint8
-	MessageID  uint32
-	Payload    []byte
-	Checksum   uint16
+	MessageID   uint32
+	Payload     []byte
+	Checksum    uint16
 }
 
 // MAVLink message IDs
 const (
-	MAVLINK_MSG_ID_HEARTBEAT            = 0
-	MAVLINK_MSG_ID_SYS_STATUS           = 1
-	MAVLINK_MSG_ID_SYSTEM_TIME          = 2
-	MAVLINK_MSG_ID_PING                 = 4
-	MAVLINK_MSG_ID_CHANGE_OPERATOR_CONTROL = 5
-	MAVLINK_MSG_ID_CHANGE_OPERATOR_CONTROL_ACK = 6
-	MAVLINK_MSG_ID_ATTITUDE             = 30
-	MAVLINK_MSG_ID_ATTITUDE_QUATERNION  = 31
-	MAVLINK_MSG_ID_LOCAL_POSITION_NED   = 32
-	MAVLINK_MSG_ID_GLOBAL_POSITION_INT  = 33
-	MAVLINK_MSG_ID_RC_CHANNELS          = 65
-	MAVLINK_MSG_ID_REQUEST_DATA_STREAM  = 66
-	MAVLINK_MSG_ID_MISSION_REQUEST_LIST = 43
-	MAVLINK_MSG_ID_MISSION_COUNT        = 44
-	MAVLINK_MSG_ID_MISSION_REQUEST      = 40
-	MAVLINK_MSG_ID_MISSION_ACK          = 47
-	MAVLINK_MSG_ID_SET_MODE             = 11
-	MAVLINK_MSG_ID_PARAM_REQUEST_LIST   = 21
-	MAVLINK_MSG_ID_PARAM_VALUE          = 22
-	MAVLINK_MSG_ID_SET_PARAM            = 23
-	MAVLINK_MSG_ID_GPS_RAW_INT          = 24
-	MAVLINK_MSG_ID_GPS_STATUS           = 25
-	MAVLINK_MSG_ID_SCALED_IMU           = 26
-	MAVLINK_MSG_ID_RAW_IMU              = 27
-	MAVLINK_MSG_ID_RAW_PRESSURE         = 28
-	MAVLINK_MSG_ID_SCALED_PRESSURE      = 29
-	MAVLINK_MSG_ID_SET_ATTITUDE_TARGET  = 82
-	MAVLINK_MSG_ID_SET_POSITION_TARGET_LOCAL_NED = 84
+	MAVLINK_MSG_ID_HEARTBEAT                      = 0
+	MAVLINK_MSG_ID_SYS_STATUS                     = 1
+	MAVLINK_MSG_ID_SYSTEM_TIME                    = 2
+	MAVLINK_MSG_ID_PING                           = 4
+	MAVLINK_MSG_ID_CHANGE_OPERATOR_CONTROL        = 5
+	MAVLINK_MSG_ID_CHANGE_OPERATOR_CONTROL_ACK    = 6
+	MAVLINK_MSG_ID_ATTITUDE                       = 30
+	MAVLINK_MSG_ID_ATTITUDE_QUATERNION            = 31
+	MAVLINK_MSG_ID_LOCAL_POSITION_NED             = 32
+	MAVLINK_MSG_ID_GLOBAL_POSITION_INT            = 33
+	MAVLINK_MSG_ID_RC_CHANNELS                    = 65
+	MAVLINK_MSG_ID_REQUEST_DATA_STREAM            = 66
+	MAVLINK_MSG_ID_MISSION_REQUEST_LIST           = 43
+	MAVLINK_MSG_ID_MISSION_COUNT                  = 44
+	MAVLINK_MSG_ID_MISSION_REQUEST                = 40
+	MAVLINK_MSG_ID_MISSION_ACK                    = 47
+	MAVLINK_MSG_ID_SET_MODE                       = 11
+	MAVLINK_MSG_ID_PARAM_REQUEST_LIST             = 21
+	MAVLINK_MSG_ID_PARAM_VALUE                    = 22
+	MAVLINK_MSG_ID_SET_PARAM                      = 23
+	MAVLINK_MSG_ID_GPS_RAW_INT                    = 24
+	MAVLINK_MSG_ID_GPS_STATUS                     = 25
+	MAVLINK_MSG_ID_SCALED_IMU                     = 26
+	MAVLINK_MSG_ID_RAW_IMU                        = 27
+	MAVLINK_MSG_ID_RAW_PRESSURE                   = 28
+	MAVLINK_MSG_ID_SCALED_PRESSURE                = 29
+	MAVLINK_MSG_ID_SET_ATTITUDE_TARGET            = 82
+	MAVLINK_MSG_ID_SET_POSITION_TARGET_LOCAL_NED  = 84
 	MAVLINK_MSG_ID_SET_POSITION_TARGET_GLOBAL_INT = 86
-	MAVLINK_MSG_ID_COMMAND_LONG         = 76
-	MAVLINK_MSG_ID_COMMAND_ACK          = 77
+	MAVLINK_MSG_ID_COMMAND_LONG                   = 76
+	MAVLINK_MSG_ID_COMMAND_ACK                    = 77
 )
 
 // MAVLink commands
 const (
 	MAV_CMD_COMPONENT_ARM_DISARM = 400
-	MAV_CMD_NAV_RETURN_TO_LAUNCH  = 20
-	MAV_CMD_NAV_LAND              = 21
-	MAV_CMD_DO_SET_MODE           = 176
+	MAV_CMD_NAV_RETURN_TO_LAUNCH = 20
+	MAV_CMD_NAV_LAND             = 21
+	MAV_CMD_DO_SET_MODE          = 176
 )
 
 // MAVLink modes
 const (
-	MAV_MODE_PREFLIGHT            = 0
-	MAV_MODE_MANUAL_DISARMED      = 64
-	MAV_MODE_TEST_DISARMED        = 66
-	MAV_MODE_STABILIZE_DISARMED   = 80
-	MAV_MODE_GUIDED_DISARMED      = 88
-	MAV_MODE_AUTO_DISARMED        = 92
-	MAV_MODE_MANUAL_ARMED         = 192
-	MAV_MODE_TEST_ARMED           = 194
-	MAV_MODE_STABILIZE_ARMED      = 208
-	MAV_MODE_GUIDED_ARMED         = 216
-	MAV_MODE_AUTO_ARMED           = 220
+	MAV_MODE_PREFLIGHT          = 0
+	MAV_MODE_MANUAL_DISARMED    = 64
+	MAV_MODE_TEST_DISARMED      = 66
+	MAV_MODE_STABILIZE_DISARMED = 80
+	MAV_MODE_GUIDED_DISARMED    = 88
+	MAV_MODE_AUTO_DISARMED      = 92
+	MAV_MODE_MANUAL_ARMED       = 192
+	MAV_MODE_TEST_ARMED         = 194
+	MAV_MODE_STABILIZE_ARMED    = 208
+	MAV_MODE_GUIDED_ARMED       = 216
+	MAV_MODE_AUTO_ARMED         = 220
 )
 
 // MAVLink frame types
@@ -322,11 +322,11 @@ func (mp *MAVLinkProtocol) crcAccumulate(crc uint16, data []byte) uint16 {
 func (mp *MAVLinkProtocol) getCrcExtra(messageID uint32) uint8 {
 	// Simplified - in production, use full MAVLink CRC extra table
 	crcExtras := map[uint32]uint8{
-		MAVLINK_MSG_ID_HEARTBEAT:               50,
-		MAVLINK_MSG_ID_SET_ATTITUDE_TARGET:     49,
+		MAVLINK_MSG_ID_HEARTBEAT:                     50,
+		MAVLINK_MSG_ID_SET_ATTITUDE_TARGET:           49,
 		MAVLINK_MSG_ID_SET_POSITION_TARGET_LOCAL_NED: 143,
-		MAVLINK_MSG_ID_COMMAND_LONG:            152,
-		MAVLINK_MSG_ID_SET_MODE:                 89,
+		MAVLINK_MSG_ID_COMMAND_LONG:                  152,
+		MAVLINK_MSG_ID_SET_MODE:                      89,
 	}
 	if extra, ok := crcExtras[messageID]; ok {
 		return extra

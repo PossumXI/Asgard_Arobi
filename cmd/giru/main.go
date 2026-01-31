@@ -44,7 +44,7 @@ func findNetworkDevices() ([]NetworkDevice, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	var result []NetworkDevice
 	for _, dev := range devices {
 		nd := NetworkDevice{
@@ -84,14 +84,14 @@ func main() {
 	}
 
 	log.Println("=== ASGARD Giru - Security System ===")
-	
+
 	// API-only mode for demos
 	if *apiOnly {
 		log.Println("Running in API-only mode (no scanner)")
 		runAPIOnlyMode(*apiAddr, *metricsAddr)
 		return
 	}
-	
+
 	log.Printf("Monitoring interface: %s", *interfaceName)
 
 	shutdownTracing, err := observability.InitTracing(context.Background(), "giru")
@@ -430,13 +430,13 @@ func runAPIOnlyMode(apiAddr, metricsAddr string) {
 	// Wait for shutdown signal
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
-	
+
 	select {
 	case sig := <-sigChan:
 		log.Printf("Received signal %v, shutting down...", sig)
 	case <-ctx.Done():
 	}
-	
+
 	log.Println("Giru shutdown complete")
 }
 
@@ -575,14 +575,14 @@ var activeThreatZones = []ThreatZone{
 
 func startAPIServer(addr string) *http.Server {
 	mux := http.NewServeMux()
-	
+
 	// CORS middleware helper
 	setCORS := func(w http.ResponseWriter) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 	}
-	
+
 	// Health check
 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -595,17 +595,17 @@ func startAPIServer(addr string) *http.Server {
 			"uptime_sec": time.Since(startTime).Seconds(),
 		})
 	})
-	
+
 	// System status endpoint
 	mux.HandleFunc("/api/v1/status", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		setCORS(w)
-		
+
 		if r.Method == "OPTIONS" {
 			w.WriteHeader(http.StatusOK)
 			return
 		}
-		
+
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"service":         "GIRU",
 			"version":         "2.0.0",
@@ -623,17 +623,17 @@ func startAPIServer(addr string) *http.Server {
 			},
 		})
 	})
-	
+
 	// Threat zones endpoint for Pricilla/Valkyrie
 	mux.HandleFunc("/api/threat-zones", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		setCORS(w)
-		
+
 		if r.Method == "OPTIONS" {
 			w.WriteHeader(http.StatusOK)
 			return
 		}
-		
+
 		response := struct {
 			Zones []ThreatZone `json:"zones"`
 			Count int          `json:"count"`
@@ -641,21 +641,21 @@ func startAPIServer(addr string) *http.Server {
 			Zones: activeThreatZones,
 			Count: len(activeThreatZones),
 		}
-		
+
 		json.NewEncoder(w).Encode(response)
 		log.Printf("[GIRU] Served %d threat zones", len(activeThreatZones))
 	})
-	
+
 	// Active threats endpoint
 	mux.HandleFunc("/api/threats", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		setCORS(w)
-		
+
 		if r.Method == "OPTIONS" {
 			w.WriteHeader(http.StatusOK)
 			return
 		}
-		
+
 		threats := []map[string]interface{}{
 			{
 				"id":          "threat-001",
@@ -676,24 +676,24 @@ func startAPIServer(addr string) *http.Server {
 				"mitigated":   true,
 			},
 		}
-		
+
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"threats": threats,
 			"count":   len(threats),
 			"active":  1,
 		})
 	})
-	
+
 	// Security alerts endpoint
 	mux.HandleFunc("/api/alerts", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		setCORS(w)
-		
+
 		if r.Method == "OPTIONS" {
 			w.WriteHeader(http.StatusOK)
 			return
 		}
-		
+
 		alerts := []map[string]interface{}{
 			{
 				"id":        "alert-001",
@@ -712,24 +712,24 @@ func startAPIServer(addr string) *http.Server {
 				"acked":     true,
 			},
 		}
-		
+
 		json.NewEncoder(w).Encode(map[string]interface{}{
-			"alerts":       alerts,
-			"count":        len(alerts),
-			"unacked":      1,
+			"alerts":  alerts,
+			"count":   len(alerts),
+			"unacked": 1,
 		})
 	})
-	
+
 	// Security scan endpoint
 	mux.HandleFunc("/api/scans", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		setCORS(w)
-		
+
 		if r.Method == "OPTIONS" {
 			w.WriteHeader(http.StatusOK)
 			return
 		}
-		
+
 		if r.Method == "POST" {
 			json.NewEncoder(w).Encode(map[string]interface{}{
 				"scanId":    uuid.New().String(),
@@ -739,7 +739,7 @@ func startAPIServer(addr string) *http.Server {
 			})
 			return
 		}
-		
+
 		// GET - list recent scans
 		scans := []map[string]interface{}{
 			{
@@ -751,23 +751,23 @@ func startAPIServer(addr string) *http.Server {
 				"findings":  5,
 			},
 		}
-		
+
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"scans": scans,
 			"count": len(scans),
 		})
 	})
-	
+
 	// Shadow stack anomalies endpoint
 	mux.HandleFunc("/api/v1/shadow/anomalies", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		setCORS(w)
-		
+
 		if r.Method == "OPTIONS" {
 			w.WriteHeader(http.StatusOK)
 			return
 		}
-		
+
 		anomalies := []map[string]interface{}{
 			{
 				"id":          "anom-001",
@@ -779,66 +779,66 @@ func startAPIServer(addr string) *http.Server {
 				"mitigated":   true,
 			},
 		}
-		
+
 		json.NewEncoder(w).Encode(map[string]interface{}{
-			"anomalies":       anomalies,
-			"count":           len(anomalies),
-			"detection_rate":  0.97,
+			"anomalies":      anomalies,
+			"count":          len(anomalies),
+			"detection_rate": 0.97,
 		})
 	})
-	
+
 	// Red team status endpoint
 	mux.HandleFunc("/api/v1/redteam/status", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		setCORS(w)
-		
+
 		json.NewEncoder(w).Encode(map[string]interface{}{
-			"status":            "active",
-			"mode":              "safe",
-			"tests_completed":   24,
-			"vulnerabilities":   3,
-			"last_test":         time.Now().Add(-2 * time.Hour).UTC().Format(time.RFC3339),
-			"coverage_percent":  78.5,
+			"status":           "active",
+			"mode":             "safe",
+			"tests_completed":  24,
+			"vulnerabilities":  3,
+			"last_test":        time.Now().Add(-2 * time.Hour).UTC().Format(time.RFC3339),
+			"coverage_percent": 78.5,
 		})
 	})
-	
+
 	// Blue team status endpoint
 	mux.HandleFunc("/api/v1/blueteam/status", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		setCORS(w)
-		
+
 		json.NewEncoder(w).Encode(map[string]interface{}{
-			"status":              "monitoring",
-			"rules_active":        42,
-			"threats_detected":    156,
-			"threats_mitigated":   149,
-			"blocked_ips":         12,
-			"last_incident":       time.Now().Add(-30 * time.Minute).UTC().Format(time.RFC3339),
+			"status":            "monitoring",
+			"rules_active":      42,
+			"threats_detected":  156,
+			"threats_mitigated": 149,
+			"blocked_ips":       12,
+			"last_incident":     time.Now().Add(-30 * time.Minute).UTC().Format(time.RFC3339),
 		})
 	})
-	
+
 	// Gaga Chat (steganography) endpoint
 	mux.HandleFunc("/api/v1/gagachat/encode", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		setCORS(w)
-		
+
 		if r.Method != "POST" {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 			return
 		}
-		
+
 		var req struct {
 			Message   string `json:"message"`
 			CoverText string `json:"cover_text"`
 			Mode      string `json:"mode"`
 		}
-		
+
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			json.NewEncoder(w).Encode(map[string]string{"error": "Invalid request"})
 			return
 		}
-		
+
 		// Mock response - real implementation in gagachat package
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"encoded_text": req.CoverText + " [hidden message encoded]",
@@ -846,12 +846,12 @@ func startAPIServer(addr string) *http.Server {
 			"success":      true,
 		})
 	})
-	
+
 	// Integration endpoints for Jarvis
 	mux.HandleFunc("/api/v1/jarvis/query", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		setCORS(w)
-		
+
 		// Summary for Jarvis voice assistant
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"summary":       "All security systems operational",
@@ -897,7 +897,7 @@ func shutdownAPIServer(server *http.Server) {
 func listNetworkInterfaces() {
 	log.Println("=== Available Network Interfaces ===")
 	log.Println("")
-	
+
 	// Try to use pcap to find devices
 	devices, err := findNetworkDevices()
 	if err != nil {
@@ -906,13 +906,13 @@ func listNetworkInterfaces() {
 		log.Println("Make sure Npcap is installed: https://npcap.com/")
 		return
 	}
-	
+
 	if len(devices) == 0 {
 		log.Println("No network interfaces found.")
 		log.Println("Make sure Npcap is installed and you're running as Administrator.")
 		return
 	}
-	
+
 	for i, dev := range devices {
 		log.Printf("%d. %s", i+1, dev.Name)
 		if dev.Description != "" {
@@ -923,7 +923,7 @@ func listNetworkInterfaces() {
 		}
 		log.Println("")
 	}
-	
+
 	log.Println("To use an interface, run:")
 	log.Println("  giru.exe -interface \"<interface-name>\"")
 	log.Println("")

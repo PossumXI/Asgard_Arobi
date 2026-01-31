@@ -28,11 +28,11 @@ type ASGARDIntegration struct {
 	mu sync.RWMutex
 
 	// Subsystem clients
-	silenusClient  SilenusClient
-	hunoidClient   HunoidClient
-	satnetClient   SatNetClient
-	giruClient     GiruClient
-	nysusClient    NysusClient
+	silenusClient SilenusClient
+	hunoidClient  HunoidClient
+	satnetClient  SatNetClient
+	giruClient    GiruClient
+	nysusClient   NysusClient
 
 	// Event channels
 	alertChan     chan Alert
@@ -63,15 +63,15 @@ type SilenusClient interface {
 	// Imaging
 	GetLatestFrame(ctx context.Context, satelliteID string) ([]byte, error)
 	RequestTerrainMap(ctx context.Context, region GeoCoord, radiusKm float64) (*TerrainMap, error)
-	
+
 	// Tracking
 	GetSatellitePosition(ctx context.Context, satelliteID string) (*SatellitePosition, error)
 	GetAllSatellitePositions(ctx context.Context) ([]SatellitePosition, error)
-	
+
 	// Alerts
 	SubscribeAlerts(ctx context.Context) (<-chan Alert, error)
 	GetActiveAlerts(ctx context.Context) ([]Alert, error)
-	
+
 	// Telemetry
 	GetSatelliteTelemetry(ctx context.Context, satelliteID string) (*SatelliteTelemetry, error)
 }
@@ -101,13 +101,13 @@ type SatelliteTelemetry struct {
 
 // TerrainMap contains terrain elevation data
 type TerrainMap struct {
-	ID         string      `json:"id"`
-	Origin     GeoCoord    `json:"origin"`
-	Width      int         `json:"width"`      // cells
-	Height     int         `json:"height"`     // cells
-	CellSize   float64     `json:"cellSize"`   // meters
-	Elevation  [][]float64 `json:"elevation"`  // meters MSL
-	Timestamp  time.Time   `json:"timestamp"`
+	ID        string      `json:"id"`
+	Origin    GeoCoord    `json:"origin"`
+	Width     int         `json:"width"`     // cells
+	Height    int         `json:"height"`    // cells
+	CellSize  float64     `json:"cellSize"`  // meters
+	Elevation [][]float64 `json:"elevation"` // meters MSL
+	Timestamp time.Time   `json:"timestamp"`
 }
 
 // Alert represents a detection alert from Silenus
@@ -132,11 +132,11 @@ type HunoidClient interface {
 	SendCommand(ctx context.Context, hunoidID string, command HunoidCommand) error
 	NavigateTo(ctx context.Context, hunoidID string, destination Vector3D) error
 	ExecuteAction(ctx context.Context, hunoidID string, action string, params map[string]interface{}) error
-	
+
 	// Status
 	GetHunoidState(ctx context.Context, hunoidID string) (*HunoidState, error)
 	GetAllHunoidStates(ctx context.Context) ([]HunoidState, error)
-	
+
 	// Mission
 	AssignMission(ctx context.Context, hunoidID string, mission Mission) error
 	AbortMission(ctx context.Context, hunoidID string) error
@@ -146,7 +146,7 @@ type HunoidClient interface {
 type HunoidCommand struct {
 	ID         string                 `json:"id"`
 	HunoidID   string                 `json:"hunoidId"`
-	Type       string                 `json:"type"`       // navigate, pick_up, put_down, etc.
+	Type       string                 `json:"type"` // navigate, pick_up, put_down, etc.
 	Parameters map[string]interface{} `json:"parameters"`
 	Priority   int                    `json:"priority"`
 	Timestamp  time.Time              `json:"timestamp"`
@@ -154,16 +154,16 @@ type HunoidCommand struct {
 
 // HunoidState represents a Hunoid's current state
 type HunoidState struct {
-	HunoidID     string    `json:"hunoidId"`
-	Position     Vector3D  `json:"position"`
-	Orientation  float64   `json:"orientation"` // heading in radians
-	Velocity     Vector3D  `json:"velocity"`
-	Battery      float64   `json:"battery"`     // percentage
-	Status       string    `json:"status"`      // idle, moving, working, charging
-	CurrentTask  string    `json:"currentTask"`
-	Health       float64   `json:"health"`      // 0.0-1.0
-	IsMoving     bool      `json:"isMoving"`
-	Timestamp    time.Time `json:"timestamp"`
+	HunoidID    string    `json:"hunoidId"`
+	Position    Vector3D  `json:"position"`
+	Orientation float64   `json:"orientation"` // heading in radians
+	Velocity    Vector3D  `json:"velocity"`
+	Battery     float64   `json:"battery"` // percentage
+	Status      string    `json:"status"`  // idle, moving, working, charging
+	CurrentTask string    `json:"currentTask"`
+	Health      float64   `json:"health"` // 0.0-1.0
+	IsMoving    bool      `json:"isMoving"`
+	Timestamp   time.Time `json:"timestamp"`
 }
 
 // ============================================================================
@@ -175,15 +175,15 @@ type SatNetClient interface {
 	// Messaging
 	SendBundle(ctx context.Context, destination string, payload []byte, priority int) error
 	ReceiveBundles(ctx context.Context) (<-chan Bundle, error)
-	
+
 	// Commands
 	SendCommand(ctx context.Context, payloadID string, command Command) error
 	SendTrajectory(ctx context.Context, payloadID string, trajectory []Waypoint) error
-	
+
 	// Telemetry
 	GetTelemetry(ctx context.Context, payloadID string) (*Telemetry, error)
 	SubscribeTelemetry(ctx context.Context, payloadID string) (<-chan Telemetry, error)
-	
+
 	// Contact Windows
 	GetContactWindows(ctx context.Context, satelliteID string, horizon time.Duration) ([]ContactWindow, error)
 }
@@ -218,14 +218,14 @@ type Waypoint struct {
 
 // Telemetry represents payload telemetry data
 type Telemetry struct {
-	PayloadID    string    `json:"payloadId"`
-	Position     Vector3D  `json:"position"`
-	Velocity     Vector3D  `json:"velocity"`
-	Fuel         float64   `json:"fuel"`     // percentage
-	Battery      float64   `json:"battery"`  // percentage
-	Status       string    `json:"status"`
-	Health       float64   `json:"health"`   // 0.0-1.0
-	Timestamp    time.Time `json:"timestamp"`
+	PayloadID string    `json:"payloadId"`
+	Position  Vector3D  `json:"position"`
+	Velocity  Vector3D  `json:"velocity"`
+	Fuel      float64   `json:"fuel"`    // percentage
+	Battery   float64   `json:"battery"` // percentage
+	Status    string    `json:"status"`
+	Health    float64   `json:"health"` // 0.0-1.0
+	Timestamp time.Time `json:"timestamp"`
 }
 
 // ContactWindow represents a communication opportunity
@@ -249,10 +249,10 @@ type GiruClient interface {
 	GetActiveThreats(ctx context.Context) ([]Threat, error)
 	SubscribeThreats(ctx context.Context) (<-chan Threat, error)
 	GetThreatZones(ctx context.Context) ([]ThreatZone, error)
-	
+
 	// Security Scanning
 	RequestSecurityScan(ctx context.Context, target string) (*SecurityScanResult, error)
-	
+
 	// Anomaly Detection
 	ReportAnomaly(ctx context.Context, anomaly Anomaly) error
 }
@@ -260,34 +260,34 @@ type GiruClient interface {
 // Threat represents a detected threat
 type Threat struct {
 	ID          string    `json:"id"`
-	Type        string    `json:"type"`       // sql_injection, ddos, port_scan, etc.
-	Severity    string    `json:"severity"`   // low, medium, high, critical
+	Type        string    `json:"type"`     // sql_injection, ddos, port_scan, etc.
+	Severity    string    `json:"severity"` // low, medium, high, critical
 	SourceIP    string    `json:"sourceIP"`
 	Target      string    `json:"target"`
 	Description string    `json:"description"`
 	Confidence  float64   `json:"confidence"` // 0.0-1.0
 	DetectedAt  time.Time `json:"detectedAt"`
-	Status      string    `json:"status"`     // new, analyzing, mitigating, resolved
+	Status      string    `json:"status"` // new, analyzing, mitigating, resolved
 }
 
 // ThreatZone represents a geographic threat zone
 type ThreatZone struct {
-	ID          string   `json:"id"`
-	Center      GeoCoord `json:"center"`
-	RadiusKm    float64  `json:"radiusKm"`
-	ThreatType  string   `json:"threatType"`  // radar, sam, air_defense
-	ThreatLevel float64  `json:"threatLevel"` // 0.0-1.0
-	Active      bool     `json:"active"`
+	ID          string    `json:"id"`
+	Center      GeoCoord  `json:"center"`
+	RadiusKm    float64   `json:"radiusKm"`
+	ThreatType  string    `json:"threatType"`  // radar, sam, air_defense
+	ThreatLevel float64   `json:"threatLevel"` // 0.0-1.0
+	Active      bool      `json:"active"`
 	ValidUntil  time.Time `json:"validUntil"`
 }
 
 // SecurityScanResult contains security scan results
 type SecurityScanResult struct {
-	ID             string    `json:"id"`
-	Target         string    `json:"target"`
+	ID              string          `json:"id"`
+	Target          string          `json:"target"`
 	Vulnerabilities []Vulnerability `json:"vulnerabilities"`
-	RiskScore      float64   `json:"riskScore"` // 0.0-10.0
-	CompletedAt    time.Time `json:"completedAt"`
+	RiskScore       float64         `json:"riskScore"` // 0.0-10.0
+	CompletedAt     time.Time       `json:"completedAt"`
 }
 
 // Vulnerability represents a discovered vulnerability
@@ -320,28 +320,28 @@ type NysusClient interface {
 	GetMission(ctx context.Context, missionID string) (*Mission, error)
 	GetActiveMissions(ctx context.Context) ([]Mission, error)
 	UpdateMissionStatus(ctx context.Context, missionID string, status string) error
-	
+
 	// Events
 	PublishEvent(ctx context.Context, event Event) error
 	SubscribeEvents(ctx context.Context, eventTypes []string) (<-chan Event, error)
-	
+
 	// Dashboard
 	GetDashboardStats(ctx context.Context) (*DashboardStats, error)
 }
 
 // Mission represents an ASGARD mission
 type Mission struct {
-	ID              string    `json:"id"`
-	Type            string    `json:"type"`       // search_rescue, aid_delivery, reconnaissance
-	Priority        int       `json:"priority"`   // 1-10
-	Status          string    `json:"status"`     // pending, active, completed, aborted
-	Description     string    `json:"description"`
-	AssignedPayloads []string `json:"assignedPayloads"`
-	TargetLocation  GeoCoord  `json:"targetLocation"`
-	CreatedBy       string    `json:"createdBy"`
-	CreatedAt       time.Time `json:"createdAt"`
-	StartedAt       *time.Time `json:"startedAt,omitempty"`
-	CompletedAt     *time.Time `json:"completedAt,omitempty"`
+	ID               string     `json:"id"`
+	Type             string     `json:"type"`     // search_rescue, aid_delivery, reconnaissance
+	Priority         int        `json:"priority"` // 1-10
+	Status           string     `json:"status"`   // pending, active, completed, aborted
+	Description      string     `json:"description"`
+	AssignedPayloads []string   `json:"assignedPayloads"`
+	TargetLocation   GeoCoord   `json:"targetLocation"`
+	CreatedBy        string     `json:"createdBy"`
+	CreatedAt        time.Time  `json:"createdAt"`
+	StartedAt        *time.Time `json:"startedAt,omitempty"`
+	CompletedAt      *time.Time `json:"completedAt,omitempty"`
 }
 
 // Event represents a system event
@@ -355,13 +355,13 @@ type Event struct {
 
 // DashboardStats contains dashboard statistics
 type DashboardStats struct {
-	ActiveMissions     int       `json:"activeMissions"`
-	OnlineSatellites   int       `json:"onlineSatellites"`
-	OnlineHunoids      int       `json:"onlineHunoids"`
-	ActiveAlerts       int       `json:"activeAlerts"`
-	ThreatLevel        float64   `json:"threatLevel"` // 0.0-1.0
-	SystemHealth       float64   `json:"systemHealth"` // 0.0-1.0
-	Timestamp          time.Time `json:"timestamp"`
+	ActiveMissions   int       `json:"activeMissions"`
+	OnlineSatellites int       `json:"onlineSatellites"`
+	OnlineHunoids    int       `json:"onlineHunoids"`
+	ActiveAlerts     int       `json:"activeAlerts"`
+	ThreatLevel      float64   `json:"threatLevel"`  // 0.0-1.0
+	SystemHealth     float64   `json:"systemHealth"` // 0.0-1.0
+	Timestamp        time.Time `json:"timestamp"`
 }
 
 // ============================================================================
@@ -526,17 +526,17 @@ func (ai *ASGARDIntegration) GetMissions() <-chan Mission {
 
 // GuidanceMission represents a guidance-specific mission
 type GuidanceMission struct {
-	ID           string     `json:"id"`
-	MissionType  string     `json:"missionType"`
-	PayloadID    string     `json:"payloadId"`
-	PayloadType  string     `json:"payloadType"`
-	StartPoint   Vector3D   `json:"startPoint"`
-	Destination  Vector3D   `json:"destination"`
-	Waypoints    []Waypoint `json:"waypoints"`
-	Priority     int        `json:"priority"`
-	StealthMode  bool       `json:"stealthMode"`
-	Status       string     `json:"status"`
-	CreatedAt    time.Time  `json:"createdAt"`
+	ID          string     `json:"id"`
+	MissionType string     `json:"missionType"`
+	PayloadID   string     `json:"payloadId"`
+	PayloadType string     `json:"payloadType"`
+	StartPoint  Vector3D   `json:"startPoint"`
+	Destination Vector3D   `json:"destination"`
+	Waypoints   []Waypoint `json:"waypoints"`
+	Priority    int        `json:"priority"`
+	StealthMode bool       `json:"stealthMode"`
+	Status      string     `json:"status"`
+	CreatedAt   time.Time  `json:"createdAt"`
 }
 
 // CreateGuidanceMission creates a new guidance mission with full ASGARD integration
@@ -623,10 +623,18 @@ func (ai *ASGARDIntegration) GetTerrainForRoute(ctx context.Context, route []Vec
 	minX, maxX := route[0].X, route[0].X
 	minY, maxY := route[0].Y, route[0].Y
 	for _, p := range route {
-		if p.X < minX { minX = p.X }
-		if p.X > maxX { maxX = p.X }
-		if p.Y < minY { minY = p.Y }
-		if p.Y > maxY { maxY = p.Y }
+		if p.X < minX {
+			minX = p.X
+		}
+		if p.X > maxX {
+			maxX = p.X
+		}
+		if p.Y < minY {
+			minY = p.Y
+		}
+		if p.Y > maxY {
+			maxY = p.Y
+		}
 	}
 
 	center := GeoCoord{

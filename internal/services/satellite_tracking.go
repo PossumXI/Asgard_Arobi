@@ -13,19 +13,19 @@ import (
 // SatelliteTrackingService provides real-time satellite tracking for the ASGARD system.
 // Integrates with N2YO API and TLE propagation for orbital awareness.
 type SatelliteTrackingService struct {
-	client     *satellite.Client
-	cache      *trackingCache
-	observer   satellite.Observer
-	mu         sync.RWMutex
-	fleetTLEs  map[int]*satellite.TLE
+	client      *satellite.Client
+	cache       *trackingCache
+	observer    satellite.Observer
+	mu          sync.RWMutex
+	fleetTLEs   map[int]*satellite.TLE
 	propagators map[int]*satellite.Propagator
 }
 
 // SatelliteTrackingConfig holds configuration for the tracking service.
 type SatelliteTrackingConfig struct {
-	N2YOAPIKey string
-	Observer   satellite.Observer
-	FleetIDs   []int // NORAD IDs of satellites to track
+	N2YOAPIKey     string
+	Observer       satellite.Observer
+	FleetIDs       []int // NORAD IDs of satellites to track
 	UpdateInterval time.Duration
 }
 
@@ -33,7 +33,7 @@ type SatelliteTrackingConfig struct {
 func DefaultTrackingConfig() SatelliteTrackingConfig {
 	return SatelliteTrackingConfig{
 		Observer: satellite.Observer{
-			Latitude:  40.7128,  // NYC default
+			Latitude:  40.7128, // NYC default
 			Longitude: -74.0060,
 			Altitude:  10,
 		},
@@ -91,15 +91,15 @@ func (s *SatelliteTrackingService) Initialize(ctx context.Context, fleetIDs []in
 
 // TrackedSatellite represents a satellite with current position.
 type TrackedSatellite struct {
-	NoradID     int       `json:"norad_id"`
-	Name        string    `json:"name"`
-	Latitude    float64   `json:"latitude"`
-	Longitude   float64   `json:"longitude"`
-	Altitude    float64   `json:"altitude_km"`
-	Velocity    float64   `json:"velocity_kmh,omitempty"`
-	Timestamp   time.Time `json:"timestamp"`
-	Source      string    `json:"source"` // "propagated" or "realtime"
-	IsEclipsed  bool      `json:"is_eclipsed,omitempty"`
+	NoradID    int       `json:"norad_id"`
+	Name       string    `json:"name"`
+	Latitude   float64   `json:"latitude"`
+	Longitude  float64   `json:"longitude"`
+	Altitude   float64   `json:"altitude_km"`
+	Velocity   float64   `json:"velocity_kmh,omitempty"`
+	Timestamp  time.Time `json:"timestamp"`
+	Source     string    `json:"source"` // "propagated" or "realtime"
+	IsEclipsed bool      `json:"is_eclipsed,omitempty"`
 }
 
 // GetPosition returns the current position of a satellite.
@@ -206,10 +206,10 @@ func (s *SatelliteTrackingService) GetFleetPositions(ctx context.Context) []Trac
 
 // GroundTrack represents a satellite's ground track over time.
 type GroundTrack struct {
-	NoradID   int                           `json:"norad_id"`
-	Name      string                        `json:"name"`
-	StartTime time.Time                     `json:"start_time"`
-	EndTime   time.Time                     `json:"end_time"`
+	NoradID   int                            `json:"norad_id"`
+	Name      string                         `json:"name"`
+	StartTime time.Time                      `json:"start_time"`
+	EndTime   time.Time                      `json:"end_time"`
 	Points    []satellite.PropagatedPosition `json:"points"`
 }
 
@@ -248,12 +248,12 @@ func (s *SatelliteTrackingService) GetGroundTrack(ctx context.Context, noradID i
 
 // ContactWindow represents a time window when a satellite is visible.
 type ContactWindow struct {
-	NoradID        int       `json:"norad_id"`
-	Name           string    `json:"name"`
-	StartTime      time.Time `json:"start_time"`
-	EndTime        time.Time `json:"end_time"`
-	MaxElevation   float64   `json:"max_elevation_deg"`
-	DurationSec    int       `json:"duration_seconds"`
+	NoradID      int       `json:"norad_id"`
+	Name         string    `json:"name"`
+	StartTime    time.Time `json:"start_time"`
+	EndTime      time.Time `json:"end_time"`
+	MaxElevation float64   `json:"max_elevation_deg"`
+	DurationSec  int       `json:"duration_seconds"`
 }
 
 // GetContactWindows returns upcoming contact windows for a satellite.

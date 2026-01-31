@@ -301,7 +301,7 @@ func startEventPublisher(ctx context.Context, eventBus *events.EventBus, pgDB *d
 			case <-ticker.C:
 				// Check for new alerts in the last 5 seconds
 				publishNewAlerts(eventBus, pgDB)
-				
+
 				// Check for telemetry updates
 				publishTelemetryUpdates(eventBus, pgDB)
 			}

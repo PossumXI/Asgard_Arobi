@@ -19,17 +19,17 @@ import (
 
 // AIGuidanceEngine implements intelligent trajectory planning with MARL and PINN
 type AIGuidanceEngine struct {
-	modelVersion    string
-	learningRate    float64
-	trajectoryDB    map[string]*Trajectory
-	mu              sync.RWMutex
-	stealthModule   StealthOptimizer
-	threatDB        map[string]ThreatLocation
-	agentPool       *MARLAgentPool
-	pinnOptimizer   *PINNTrajectoryOptimizer
-	threatAdapter   *RealTimeThreatAdapter
-	payloadProfiles map[PayloadType]*PayloadProfile
-	scoringEngine   *MultiCriteriaScorer
+	modelVersion     string
+	learningRate     float64
+	trajectoryDB     map[string]*Trajectory
+	mu               sync.RWMutex
+	stealthModule    StealthOptimizer
+	threatDB         map[string]ThreatLocation
+	agentPool        *MARLAgentPool
+	pinnOptimizer    *PINNTrajectoryOptimizer
+	threatAdapter    *RealTimeThreatAdapter
+	payloadProfiles  map[PayloadType]*PayloadProfile
+	scoringEngine    *MultiCriteriaScorer
 	experienceReplay *ExperienceBuffer
 }
 
@@ -49,17 +49,17 @@ type MARLAgentPool struct {
 
 // RLAgent represents a single reinforcement learning agent
 type RLAgent struct {
-	ID              string
-	PolicyNetwork   *NeuralPolicy
-	ValueNetwork    *NeuralValue
-	Specialization  AgentSpecialization
-	TotalReward     float64
-	EpisodeCount    int
-	LearningRate    float64
-	EntropyCoeff    float64
-	ClipRange       float64
-	lastAction      TrajectoryAction
-	lastState       AgentState
+	ID             string
+	PolicyNetwork  *NeuralPolicy
+	ValueNetwork   *NeuralValue
+	Specialization AgentSpecialization
+	TotalReward    float64
+	EpisodeCount   int
+	LearningRate   float64
+	EntropyCoeff   float64
+	ClipRange      float64
+	lastAction     TrajectoryAction
+	lastState      AgentState
 }
 
 // AgentSpecialization defines what the agent optimizes for
@@ -88,16 +88,16 @@ type AgentMessage struct {
 
 // AgentState represents the state observed by an RL agent
 type AgentState struct {
-	Position         Vector3D
-	Velocity         Vector3D
-	TargetDistance   float64
-	ThreatProximity  float64
-	FuelRemaining    float64
-	TimeRemaining    float64
-	StealthScore     float64
-	TerrainFeatures  []float64
+	Position          Vector3D
+	Velocity          Vector3D
+	TargetDistance    float64
+	ThreatProximity   float64
+	FuelRemaining     float64
+	TimeRemaining     float64
+	StealthScore      float64
+	TerrainFeatures   []float64
 	WeatherConditions []float64
-	PayloadStatus    []float64
+	PayloadStatus     []float64
 }
 
 // TrajectoryAction represents an action taken by an RL agent
@@ -137,13 +137,13 @@ type ExperienceBuffer struct {
 
 // Experience represents a single experience tuple
 type Experience struct {
-	State      AgentState
-	Action     TrajectoryAction
-	Reward     float64
-	NextState  AgentState
-	Done       bool
-	AgentID    string
-	Timestamp  time.Time
+	State     AgentState
+	Action    TrajectoryAction
+	Reward    float64
+	NextState AgentState
+	Done      bool
+	AgentID   string
+	Timestamp time.Time
 }
 
 // ================================================================================
@@ -152,66 +152,66 @@ type Experience struct {
 
 // PINNTrajectoryOptimizer uses physics constraints in neural optimization
 type PINNTrajectoryOptimizer struct {
-	physicsLayers     []PhysicsLayer
-	collocationPoints int
+	physicsLayers      []PhysicsLayer
+	collocationPoints  int
 	boundaryConditions []BoundaryCondition
-	pdeResidualWeight float64
-	dataLossWeight    float64
-	physicsModels     map[PayloadType]*PhysicsModel
-	adaptiveWeights   *AdaptiveWeightScheduler
+	pdeResidualWeight  float64
+	dataLossWeight     float64
+	physicsModels      map[PayloadType]*PhysicsModel
+	adaptiveWeights    *AdaptiveWeightScheduler
 }
 
 // PhysicsLayer represents a layer that enforces physics constraints
 type PhysicsLayer struct {
-	LayerType       string
-	EquationType    string // "navier_stokes", "orbital_mechanics", "aerodynamics"
-	Coefficients    []float64
-	Residuals       []float64
+	LayerType    string
+	EquationType string // "navier_stokes", "orbital_mechanics", "aerodynamics"
+	Coefficients []float64
+	Residuals    []float64
 }
 
 // BoundaryCondition defines physics boundary conditions
 type BoundaryCondition struct {
-	Type       string // "dirichlet", "neumann", "periodic"
-	Location   string // "start", "end", "boundary"
-	Value      float64
-	Variable   string // "position", "velocity", "acceleration"
+	Type     string // "dirichlet", "neumann", "periodic"
+	Location string // "start", "end", "boundary"
+	Value    float64
+	Variable string // "position", "velocity", "acceleration"
 }
 
 // PhysicsModel contains physics equations for a payload type
 type PhysicsModel struct {
-	PayloadType        PayloadType
-	Mass               float64
-	DragCoefficient    float64
-	LiftCoefficient    float64
-	ThrustCapacity     float64
+	PayloadType         PayloadType
+	Mass                float64
+	DragCoefficient     float64
+	LiftCoefficient     float64
+	ThrustCapacity      float64
 	FuelConsumptionRate float64
-	GravityModel       string // "flat", "spherical", "j2_perturbation"
-	AtmosphereModel    string // "none", "exponential", "us_standard"
-	EquationsOfMotion  []MotionEquation
-	Constraints        []PhysicsConstraint
+	GravityModel        string // "flat", "spherical", "j2_perturbation"
+	AtmosphereModel     string // "none", "exponential", "us_standard"
+	EquationsOfMotion   []MotionEquation
+	Constraints         []PhysicsConstraint
 }
 
 // MotionEquation represents a differential equation of motion
 type MotionEquation struct {
-	Variable    string // "x", "y", "z", "vx", "vy", "vz"
-	Expression  string // Symbolic representation
+	Variable     string // "x", "y", "z", "vx", "vy", "vz"
+	Expression   string // Symbolic representation
 	Coefficients []float64
 }
 
 // PhysicsConstraint defines a physical constraint
 type PhysicsConstraint struct {
-	Type       string // "max_acceleration", "max_q", "thermal_limit"
-	Value      float64
-	Penalty    float64
+	Type    string // "max_acceleration", "max_q", "thermal_limit"
+	Value   float64
+	Penalty float64
 }
 
 // AdaptiveWeightScheduler adjusts PINN loss weights during training
 type AdaptiveWeightScheduler struct {
-	DataWeight         float64
-	PhysicsWeight      float64
-	BoundaryWeight     float64
-	AdaptationRate     float64
-	HistoricalLosses   []LossRecord
+	DataWeight       float64
+	PhysicsWeight    float64
+	BoundaryWeight   float64
+	AdaptationRate   float64
+	HistoricalLosses []LossRecord
 }
 
 // LossRecord stores loss values for adaptive scheduling
@@ -230,30 +230,30 @@ type LossRecord struct {
 
 // MultiCriteriaScorer implements sophisticated trajectory scoring
 type MultiCriteriaScorer struct {
-	criteria      map[string]*ScoringCriterion
-	weights       map[string]float64
-	paretoFront   []*Trajectory
-	mu            sync.RWMutex
+	criteria    map[string]*ScoringCriterion
+	weights     map[string]float64
+	paretoFront []*Trajectory
+	mu          sync.RWMutex
 }
 
 // ScoringCriterion defines a single scoring dimension
 type ScoringCriterion struct {
-	Name            string
-	Weight          float64
-	MinimizeGoal    bool // true = lower is better, false = higher is better
-	Normalize       bool
-	ThresholdLow    float64
-	ThresholdHigh   float64
-	ScoreFunc       func(*Trajectory, TrajectoryRequest) float64
+	Name          string
+	Weight        float64
+	MinimizeGoal  bool // true = lower is better, false = higher is better
+	Normalize     bool
+	ThresholdLow  float64
+	ThresholdHigh float64
+	ScoreFunc     func(*Trajectory, TrajectoryRequest) float64
 }
 
 // TrajectoryScore contains detailed scoring breakdown
 type TrajectoryScore struct {
-	TotalScore      float64
-	CriteriaScores  map[string]float64
-	ParetoRank      int
-	DominatedBy     int
-	Dominates       int
+	TotalScore       float64
+	CriteriaScores   map[string]float64
+	ParetoRank       int
+	DominatedBy      int
+	Dominates        int
 	CrowdingDistance float64
 }
 
@@ -286,21 +286,21 @@ type ThreatEvent struct {
 
 // ThreatPredictor predicts threat movements
 type ThreatPredictor struct {
-	ModelType       string // "kalman", "particle_filter", "neural"
-	StateEstimate   []float64
-	Covariance      [][]float64
-	ProcessNoise    [][]float64
+	ModelType        string // "kalman", "particle_filter", "neural"
+	StateEstimate    []float64
+	Covariance       [][]float64
+	ProcessNoise     [][]float64
 	MeasurementNoise [][]float64
 }
 
 // EvasionStrategy defines how to evade a specific threat type
 type EvasionStrategy struct {
-	ThreatType      string
+	ThreatType        string
 	PreferredAltitude float64
-	PreferredSpeed  float64
-	ManeuverType    string // "terrain_mask", "high_altitude", "speed_burst", "decoy"
-	SuccessRate     float64
-	FuelCost        float64
+	PreferredSpeed    float64
+	ManeuverType      string // "terrain_mask", "high_altitude", "speed_burst", "decoy"
+	SuccessRate       float64
+	FuelCost          float64
 }
 
 // AlertLevel defines system alert state
@@ -320,20 +320,20 @@ const (
 
 // PayloadProfile contains payload-specific characteristics
 type PayloadProfile struct {
-	Type              PayloadType
-	MaxSpeed          float64
-	MinSpeed          float64
-	MaxAcceleration   float64
-	MaxAltitude       float64
-	MinAltitude       float64
-	MaxTurnRate       float64
-	FuelCapacity      float64
-	FuelEfficiency    float64
-	StealthCapability float64
-	SensorRange       float64
+	Type               PayloadType
+	MaxSpeed           float64
+	MinSpeed           float64
+	MaxAcceleration    float64
+	MaxAltitude        float64
+	MinAltitude        float64
+	MaxTurnRate        float64
+	FuelCapacity       float64
+	FuelEfficiency     float64
+	StealthCapability  float64
+	SensorRange        float64
 	CommunicationRange float64
-	OperatingDomain   string // "air", "space", "ground", "underwater", "interstellar"
-	PhysicsModel      *PhysicsModel
+	OperatingDomain    string // "air", "space", "ground", "underwater", "interstellar"
+	PhysicsModel       *PhysicsModel
 }
 
 // StealthOptimizer interface for stealth optimization
@@ -350,12 +350,12 @@ type StealthOptimizer interface {
 // NewAIGuidanceEngine creates a new AI guidance engine with all advanced features
 func NewAIGuidanceEngine(stealth StealthOptimizer) *AIGuidanceEngine {
 	engine := &AIGuidanceEngine{
-		modelVersion:    "PRICILLA-v3.0.0-MARL-PINN",
-		learningRate:    0.0003,
-		trajectoryDB:    make(map[string]*Trajectory),
-		stealthModule:   stealth,
-		threatDB:        make(map[string]ThreatLocation),
-		payloadProfiles: initializePayloadProfiles(),
+		modelVersion:     "PRICILLA-v3.0.0-MARL-PINN",
+		learningRate:     0.0003,
+		trajectoryDB:     make(map[string]*Trajectory),
+		stealthModule:    stealth,
+		threatDB:         make(map[string]ThreatLocation),
+		payloadProfiles:  initializePayloadProfiles(),
 		experienceReplay: newExperienceBuffer(100000),
 	}
 
@@ -373,155 +373,155 @@ func initializePayloadProfiles() map[PayloadType]*PayloadProfile {
 
 	// Hunoid (humanoid robot)
 	profiles[PayloadHunoid] = &PayloadProfile{
-		Type:              PayloadHunoid,
-		MaxSpeed:          15.0, // m/s (running speed)
-		MinSpeed:          0.0,
-		MaxAcceleration:   5.0,
-		MaxAltitude:       100.0, // climbing/jumping
-		MinAltitude:       -10.0, // underground
-		MaxTurnRate:       math.Pi, // rad/s
-		FuelCapacity:      100.0,
-		FuelEfficiency:    0.95,
-		StealthCapability: 0.7,
-		SensorRange:       500.0,
+		Type:               PayloadHunoid,
+		MaxSpeed:           15.0, // m/s (running speed)
+		MinSpeed:           0.0,
+		MaxAcceleration:    5.0,
+		MaxAltitude:        100.0,   // climbing/jumping
+		MinAltitude:        -10.0,   // underground
+		MaxTurnRate:        math.Pi, // rad/s
+		FuelCapacity:       100.0,
+		FuelEfficiency:     0.95,
+		StealthCapability:  0.7,
+		SensorRange:        500.0,
 		CommunicationRange: 10000.0,
-		OperatingDomain:   "ground",
+		OperatingDomain:    "ground",
 	}
 
 	// UAV (Unmanned Aerial Vehicle)
 	profiles[PayloadUAV] = &PayloadProfile{
-		Type:              PayloadUAV,
-		MaxSpeed:          150.0, // m/s
-		MinSpeed:          20.0,
-		MaxAcceleration:   15.0,
-		MaxAltitude:       15000.0,
-		MinAltitude:       50.0,
-		MaxTurnRate:       math.Pi / 2,
-		FuelCapacity:      500.0,
-		FuelEfficiency:    0.85,
-		StealthCapability: 0.6,
-		SensorRange:       30000.0,
+		Type:               PayloadUAV,
+		MaxSpeed:           150.0, // m/s
+		MinSpeed:           20.0,
+		MaxAcceleration:    15.0,
+		MaxAltitude:        15000.0,
+		MinAltitude:        50.0,
+		MaxTurnRate:        math.Pi / 2,
+		FuelCapacity:       500.0,
+		FuelEfficiency:     0.85,
+		StealthCapability:  0.6,
+		SensorRange:        30000.0,
 		CommunicationRange: 200000.0,
-		OperatingDomain:   "air",
+		OperatingDomain:    "air",
 	}
 
 	// Rocket
 	profiles[PayloadRocket] = &PayloadProfile{
-		Type:              PayloadRocket,
-		MaxSpeed:          8000.0, // m/s
-		MinSpeed:          100.0,
-		MaxAcceleration:   100.0, // 10g
-		MaxAltitude:       400000.0, // orbital
-		MinAltitude:       0.0,
-		MaxTurnRate:       0.1,
-		FuelCapacity:      10000.0,
-		FuelEfficiency:    0.3,
-		StealthCapability: 0.1,
-		SensorRange:       1000.0,
+		Type:               PayloadRocket,
+		MaxSpeed:           8000.0, // m/s
+		MinSpeed:           100.0,
+		MaxAcceleration:    100.0,    // 10g
+		MaxAltitude:        400000.0, // orbital
+		MinAltitude:        0.0,
+		MaxTurnRate:        0.1,
+		FuelCapacity:       10000.0,
+		FuelEfficiency:     0.3,
+		StealthCapability:  0.1,
+		SensorRange:        1000.0,
 		CommunicationRange: 1000000.0,
-		OperatingDomain:   "space",
+		OperatingDomain:    "space",
 	}
 
 	// Missile
 	profiles[PayloadMissile] = &PayloadProfile{
-		Type:              PayloadMissile,
-		MaxSpeed:          2000.0, // m/s (hypersonic)
-		MinSpeed:          200.0,
-		MaxAcceleration:   300.0, // 30g
-		MaxAltitude:       50000.0,
-		MinAltitude:       10.0,
-		MaxTurnRate:       math.Pi,
-		FuelCapacity:      200.0,
-		FuelEfficiency:    0.4,
-		StealthCapability: 0.5,
-		SensorRange:       50000.0,
+		Type:               PayloadMissile,
+		MaxSpeed:           2000.0, // m/s (hypersonic)
+		MinSpeed:           200.0,
+		MaxAcceleration:    300.0, // 30g
+		MaxAltitude:        50000.0,
+		MinAltitude:        10.0,
+		MaxTurnRate:        math.Pi,
+		FuelCapacity:       200.0,
+		FuelEfficiency:     0.4,
+		StealthCapability:  0.5,
+		SensorRange:        50000.0,
 		CommunicationRange: 500000.0,
-		OperatingDomain:   "air",
+		OperatingDomain:    "air",
 	}
 
 	// Spacecraft
 	profiles[PayloadSpacecraft] = &PayloadProfile{
-		Type:              PayloadSpacecraft,
-		MaxSpeed:          30000.0, // m/s (orbital velocity)
-		MinSpeed:          0.0,
-		MaxAcceleration:   50.0,
-		MaxAltitude:       math.MaxFloat64, // deep space
-		MinAltitude:       200000.0, // LEO
-		MaxTurnRate:       0.05,
+		Type:               PayloadSpacecraft,
+		MaxSpeed:           30000.0, // m/s (orbital velocity)
+		MinSpeed:           0.0,
+		MaxAcceleration:    50.0,
+		MaxAltitude:        math.MaxFloat64, // deep space
+		MinAltitude:        200000.0,        // LEO
+		MaxTurnRate:        0.05,
 		FuelCapacity:       50000.0,
-		FuelEfficiency:    0.95,
-		StealthCapability: 0.2,
-		SensorRange:       1000000.0,
+		FuelEfficiency:     0.95,
+		StealthCapability:  0.2,
+		SensorRange:        1000000.0,
 		CommunicationRange: math.MaxFloat64,
-		OperatingDomain:   "space",
+		OperatingDomain:    "space",
 	}
 
 	// Drone (small quadcopter)
 	profiles[PayloadDrone] = &PayloadProfile{
-		Type:              PayloadDrone,
-		MaxSpeed:          30.0, // m/s
-		MinSpeed:          0.0,
-		MaxAcceleration:   20.0,
-		MaxAltitude:       500.0,
-		MinAltitude:       1.0,
-		MaxTurnRate:       math.Pi * 2,
-		FuelCapacity:      50.0, // battery
-		FuelEfficiency:    0.9,
-		StealthCapability: 0.8,
-		SensorRange:       1000.0,
+		Type:               PayloadDrone,
+		MaxSpeed:           30.0, // m/s
+		MinSpeed:           0.0,
+		MaxAcceleration:    20.0,
+		MaxAltitude:        500.0,
+		MinAltitude:        1.0,
+		MaxTurnRate:        math.Pi * 2,
+		FuelCapacity:       50.0, // battery
+		FuelEfficiency:     0.9,
+		StealthCapability:  0.8,
+		SensorRange:        1000.0,
 		CommunicationRange: 5000.0,
-		OperatingDomain:   "air",
+		OperatingDomain:    "air",
 	}
 
 	// Ground Robot
 	profiles[PayloadGroundRobot] = &PayloadProfile{
-		Type:              PayloadGroundRobot,
-		MaxSpeed:          10.0, // m/s
-		MinSpeed:          0.0,
-		MaxAcceleration:   3.0,
-		MaxAltitude:       0.0,
-		MinAltitude:       -5.0, // tunnels
-		MaxTurnRate:       math.Pi,
-		FuelCapacity:      200.0,
-		FuelEfficiency:    0.92,
-		StealthCapability: 0.75,
-		SensorRange:       300.0,
+		Type:               PayloadGroundRobot,
+		MaxSpeed:           10.0, // m/s
+		MinSpeed:           0.0,
+		MaxAcceleration:    3.0,
+		MaxAltitude:        0.0,
+		MinAltitude:        -5.0, // tunnels
+		MaxTurnRate:        math.Pi,
+		FuelCapacity:       200.0,
+		FuelEfficiency:     0.92,
+		StealthCapability:  0.75,
+		SensorRange:        300.0,
 		CommunicationRange: 8000.0,
-		OperatingDomain:   "ground",
+		OperatingDomain:    "ground",
 	}
 
 	// Submarine
 	profiles[PayloadSubmarine] = &PayloadProfile{
-		Type:              PayloadSubmarine,
-		MaxSpeed:          20.0, // m/s (~40 knots)
-		MinSpeed:          0.0,
-		MaxAcceleration:   2.0,
-		MaxAltitude:       0.0,
-		MinAltitude:       -1000.0, // depth
-		MaxTurnRate:       0.1,
-		FuelCapacity:      100000.0,
-		FuelEfficiency:    0.98, // nuclear
-		StealthCapability: 0.95,
-		SensorRange:       50000.0, // sonar
-		CommunicationRange: 100.0, // underwater limited
-		OperatingDomain:   "underwater",
+		Type:               PayloadSubmarine,
+		MaxSpeed:           20.0, // m/s (~40 knots)
+		MinSpeed:           0.0,
+		MaxAcceleration:    2.0,
+		MaxAltitude:        0.0,
+		MinAltitude:        -1000.0, // depth
+		MaxTurnRate:        0.1,
+		FuelCapacity:       100000.0,
+		FuelEfficiency:     0.98, // nuclear
+		StealthCapability:  0.95,
+		SensorRange:        50000.0, // sonar
+		CommunicationRange: 100.0,   // underwater limited
+		OperatingDomain:    "underwater",
 	}
 
 	// Interstellar probe
 	profiles[PayloadInterstellar] = &PayloadProfile{
-		Type:              PayloadInterstellar,
-		MaxSpeed:          150000.0, // m/s (0.05% c)
-		MinSpeed:          0.0,
-		MaxAcceleration:   0.1, // gentle for long duration
-		MaxAltitude:       math.MaxFloat64,
-		MinAltitude:       0.0,
-		MaxTurnRate:       0.001,
-		FuelCapacity:      1000000.0,
-		FuelEfficiency:    0.99,
-		StealthCapability: 0.0,
-		SensorRange:       math.MaxFloat64,
+		Type:               PayloadInterstellar,
+		MaxSpeed:           150000.0, // m/s (0.05% c)
+		MinSpeed:           0.0,
+		MaxAcceleration:    0.1, // gentle for long duration
+		MaxAltitude:        math.MaxFloat64,
+		MinAltitude:        0.0,
+		MaxTurnRate:        0.001,
+		FuelCapacity:       1000000.0,
+		FuelEfficiency:     0.99,
+		StealthCapability:  0.0,
+		SensorRange:        math.MaxFloat64,
 		CommunicationRange: math.MaxFloat64,
-		OperatingDomain:   "interstellar",
+		OperatingDomain:    "interstellar",
 	}
 
 	return profiles
@@ -657,10 +657,10 @@ func initializePhysicsModels() map[PayloadType]*PhysicsModel {
 
 	// Air domain physics
 	airModel := &PhysicsModel{
-		DragCoefficient:    0.3,
-		LiftCoefficient:    0.5,
-		GravityModel:       "spherical",
-		AtmosphereModel:    "us_standard",
+		DragCoefficient:     0.3,
+		LiftCoefficient:     0.5,
+		GravityModel:        "spherical",
+		AtmosphereModel:     "us_standard",
 		FuelConsumptionRate: 0.1,
 		EquationsOfMotion: []MotionEquation{
 			{Variable: "x", Expression: "vx"},
@@ -682,9 +682,9 @@ func initializePhysicsModels() map[PayloadType]*PhysicsModel {
 
 	// Space domain physics
 	spaceModel := &PhysicsModel{
-		DragCoefficient:    0.0,
-		GravityModel:       "j2_perturbation",
-		AtmosphereModel:    "none",
+		DragCoefficient:     0.0,
+		GravityModel:        "j2_perturbation",
+		AtmosphereModel:     "none",
 		FuelConsumptionRate: 0.01,
 		EquationsOfMotion: []MotionEquation{
 			{Variable: "x", Expression: "vx"},
@@ -702,9 +702,9 @@ func initializePhysicsModels() map[PayloadType]*PhysicsModel {
 
 	// Ground domain physics
 	groundModel := &PhysicsModel{
-		DragCoefficient:    0.5,
-		GravityModel:       "flat",
-		AtmosphereModel:    "none",
+		DragCoefficient:     0.5,
+		GravityModel:        "flat",
+		AtmosphereModel:     "none",
 		FuelConsumptionRate: 0.05,
 		EquationsOfMotion: []MotionEquation{
 			{Variable: "x", Expression: "vx"},
@@ -719,9 +719,9 @@ func initializePhysicsModels() map[PayloadType]*PhysicsModel {
 
 	// Underwater physics
 	underwaterModel := &PhysicsModel{
-		DragCoefficient:    1.0,
-		GravityModel:       "flat",
-		AtmosphereModel:    "none",
+		DragCoefficient:     1.0,
+		GravityModel:        "flat",
+		AtmosphereModel:     "none",
 		FuelConsumptionRate: 0.001,
 		EquationsOfMotion: []MotionEquation{
 			{Variable: "x", Expression: "vx"},
@@ -757,35 +757,35 @@ func newThreatAdapter() *RealTimeThreatAdapter {
 
 	// Initialize evasion strategies
 	adapter.evasionStrategies["radar"] = &EvasionStrategy{
-		ThreatType:      "radar",
+		ThreatType:        "radar",
 		PreferredAltitude: 50.0, // terrain masking
-		ManeuverType:    "terrain_mask",
-		SuccessRate:     0.85,
-		FuelCost:        1.2,
+		ManeuverType:      "terrain_mask",
+		SuccessRate:       0.85,
+		FuelCost:          1.2,
 	}
 
 	adapter.evasionStrategies["sam"] = &EvasionStrategy{
-		ThreatType:      "sam",
+		ThreatType:        "sam",
 		PreferredAltitude: 100.0,
-		PreferredSpeed:  500.0, // high speed
-		ManeuverType:    "speed_burst",
-		SuccessRate:     0.7,
-		FuelCost:        2.0,
+		PreferredSpeed:    500.0, // high speed
+		ManeuverType:      "speed_burst",
+		SuccessRate:       0.7,
+		FuelCost:          2.0,
 	}
 
 	adapter.evasionStrategies["interceptor"] = &EvasionStrategy{
-		ThreatType:      "interceptor",
+		ThreatType:        "interceptor",
 		PreferredAltitude: 15000.0, // high altitude
-		ManeuverType:    "high_altitude",
-		SuccessRate:     0.6,
-		FuelCost:        1.5,
+		ManeuverType:      "high_altitude",
+		SuccessRate:       0.6,
+		FuelCost:          1.5,
 	}
 
 	adapter.evasionStrategies["jamming"] = &EvasionStrategy{
-		ThreatType:      "jamming",
-		ManeuverType:    "decoy",
-		SuccessRate:     0.9,
-		FuelCost:        0.5,
+		ThreatType:   "jamming",
+		ManeuverType: "decoy",
+		SuccessRate:  0.9,
+		FuelCost:     0.5,
 	}
 
 	adapter.predictionModel = &ThreatPredictor{
@@ -992,16 +992,16 @@ func (e *AIGuidanceEngine) createAgentState(req TrajectoryRequest, profile *Payl
 	}
 
 	return AgentState{
-		Position:        req.StartPosition,
-		Velocity:        Vector3D{X: 0, Y: 0, Z: 0},
-		TargetDistance:  targetDist,
-		ThreatProximity: threatProximity,
-		FuelRemaining:   profile.FuelCapacity,
-		TimeRemaining:   float64(req.MaxTime.Seconds()),
-		StealthScore:    profile.StealthCapability,
-		TerrainFeatures: make([]float64, 8),
+		Position:          req.StartPosition,
+		Velocity:          Vector3D{X: 0, Y: 0, Z: 0},
+		TargetDistance:    targetDist,
+		ThreatProximity:   threatProximity,
+		FuelRemaining:     profile.FuelCapacity,
+		TimeRemaining:     float64(req.MaxTime.Seconds()),
+		StealthScore:      profile.StealthCapability,
+		TerrainFeatures:   make([]float64, 8),
 		WeatherConditions: make([]float64, 4),
-		PayloadStatus:   make([]float64, 6),
+		PayloadStatus:     make([]float64, 6),
 	}
 }
 
@@ -1114,10 +1114,10 @@ func (agent *RLAgent) selectAction(state AgentState, explorationRate float64) Tr
 
 	// Convert output to action
 	return TrajectoryAction{
-		DeltaHeading:    output[0] * math.Pi / 4,  // Max 45 degree turn
-		DeltaPitch:      output[1] * math.Pi / 8,  // Max 22.5 degree pitch
-		ThrustLevel:     sigmoid(output[2]),       // 0-1 thrust
-		AltitudeChange:  output[3] * 100.0,        // Max 100m altitude change
+		DeltaHeading:    output[0] * math.Pi / 4, // Max 45 degree turn
+		DeltaPitch:      output[1] * math.Pi / 8, // Max 22.5 degree pitch
+		ThrustLevel:     sigmoid(output[2]),      // 0-1 thrust
+		AltitudeChange:  output[3] * 100.0,       // Max 100m altitude change
 		WaypointSkip:    int(math.Max(0, output[4])),
 		StealthActivate: output[5] > 0,
 	}
@@ -1312,7 +1312,7 @@ func (pool *MARLAgentPool) reachConsensus(proposals map[string]*Trajectory, req 
 	// Create consensus trajectory
 	consensusWaypoints := make([]Waypoint, targetWaypointCount)
 	baseTime := time.Now()
-	
+
 	for i := 0; i < targetWaypointCount; i++ {
 		wp := weightedWaypoints[i]
 		consensusWaypoints[i] = Waypoint{
@@ -2212,7 +2212,7 @@ func (e *AIGuidanceEngine) storeExperience(req TrajectoryRequest, traj *Trajecto
 	reward := traj.Confidence * (1.0 - traj.ThreatExposure) * traj.StealthScore
 
 	experience := Experience{
-		State: e.createAgentState(req, e.payloadProfiles[req.PayloadType]),
+		State:     e.createAgentState(req, e.payloadProfiles[req.PayloadType]),
 		Reward:    reward,
 		Done:      true,
 		Timestamp: time.Now(),
@@ -2595,8 +2595,8 @@ func (e *AIGuidanceEngine) generateWaypoints(req TrajectoryRequest, variant int)
 				Y: req.StartPosition.Y + (req.TargetPosition.Y-req.StartPosition.Y)*progress,
 				Z: altitude,
 			},
-			Velocity:  Vector3D{X: maxSpeed / 2, Y: maxSpeed / 2, Z: 0},
-			Timestamp: startWP.Timestamp.Add(time.Duration(progress*60) * time.Second),
+			Velocity:    Vector3D{X: maxSpeed / 2, Y: maxSpeed / 2, Z: 0},
+			Timestamp:   startWP.Timestamp.Add(time.Duration(progress*60) * time.Second),
 			Constraints: startWP.Constraints,
 		}
 		waypoints = append(waypoints, midWP)

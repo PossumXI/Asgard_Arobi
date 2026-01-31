@@ -11,19 +11,19 @@ import (
 
 // SFU implements a Selective Forwarding Unit for WebRTC streaming.
 type SFU struct {
-	mu        sync.RWMutex
-	sessions  map[string]*Session
-	peers     map[string]*Peer
-	api       *webrtc.API
-	config    webrtc.Configuration
+	mu       sync.RWMutex
+	sessions map[string]*Session
+	peers    map[string]*Peer
+	api      *webrtc.API
+	config   webrtc.Configuration
 }
 
 // Session represents a streaming session with multiple peers.
 type Session struct {
-	ID        string
-	StreamID  string
-	Peers     map[string]*Peer
-	mu        sync.RWMutex
+	ID         string
+	StreamID   string
+	Peers      map[string]*Peer
+	mu         sync.RWMutex
 	audioTrack *webrtc.TrackLocalStaticSample
 	videoTrack *webrtc.TrackLocalStaticSample
 }
@@ -42,7 +42,7 @@ type Peer struct {
 // NewSFU creates a new SFU instance.
 func NewSFU(config webrtc.Configuration) *SFU {
 	mediaEngine := &webrtc.MediaEngine{}
-	
+
 	// Register codecs
 	if err := mediaEngine.RegisterCodec(webrtc.RTPCodecParameters{
 		RTPCodecCapability: webrtc.RTPCodecCapability{
@@ -135,7 +135,7 @@ func (sfu *SFU) AddPeer(sessionID, peerID string, pc *webrtc.PeerConnection) (*P
 
 	// Set up track forwarding
 	pc.OnTrack(func(track *webrtc.TrackRemote, receiver *webrtc.RTPReceiver) {
-			if track.Kind() == webrtc.RTPCodecTypeAudio {
+		if track.Kind() == webrtc.RTPCodecTypeAudio {
 			peer.AudioTrack = track
 		} else if track.Kind() == webrtc.RTPCodecTypeVideo {
 			peer.VideoTrack = track
@@ -260,7 +260,7 @@ func (sfu *SFU) GetOrCreateSession(streamID string) *Session {
 	// Create new session
 	sfu.mu.Lock()
 	defer sfu.mu.Unlock()
-	
+
 	sessionID := streamID // Use streamID as sessionID
 	session := &Session{
 		ID:       sessionID,
@@ -274,7 +274,7 @@ func (sfu *SFU) GetOrCreateSession(streamID string) *Session {
 // AddPeerToSession adds a peer to a session by streamID, creating peer connection.
 func (sfu *SFU) AddPeerToSession(streamID, peerID string) (*Peer, error) {
 	session := sfu.GetOrCreateSession(streamID)
-	
+
 	// Create peer connection
 	pc, err := sfu.api.NewPeerConnection(sfu.config)
 	if err != nil {

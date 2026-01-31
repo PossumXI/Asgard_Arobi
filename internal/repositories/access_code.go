@@ -213,21 +213,21 @@ func (r *AccessCodeRepository) List(ctx context.Context, limit int) ([]map[strin
 			continue
 		}
 		results = append(results, map[string]interface{}{
-			"id":                   id.String,
-			"codeLast4":            last4,
-			"clearanceLevel":       clearance,
-			"scope":                scope,
-			"issuedAt":             issuedAt.UTC().Format(time.RFC3339),
-			"expiresAt":            expiresAt.UTC().Format(time.RFC3339),
-			"revokedAt":            timePtrToString(revokedAt),
-			"lastUsedAt":           timePtrToString(lastUsedAt),
-			"usageCount":           usageCount,
-			"maxUses":              int32PtrToValue(maxUses),
+			"id":                    id.String,
+			"codeLast4":             last4,
+			"clearanceLevel":        clearance,
+			"scope":                 scope,
+			"issuedAt":              issuedAt.UTC().Format(time.RFC3339),
+			"expiresAt":             expiresAt.UTC().Format(time.RFC3339),
+			"revokedAt":             timePtrToString(revokedAt),
+			"lastUsedAt":            timePtrToString(lastUsedAt),
+			"usageCount":            usageCount,
+			"maxUses":               int32PtrToValue(maxUses),
 			"rotationIntervalHours": rotationInterval,
-			"nextRotationAt":       nextRotationAt.UTC().Format(time.RFC3339),
-			"userId":               userID.String,
-			"userEmail":            email.String,
-			"userFullName":         fullName.String,
+			"nextRotationAt":        nextRotationAt.UTC().Format(time.RFC3339),
+			"userId":                userID.String,
+			"userEmail":             email.String,
+			"userFullName":          fullName.String,
 		})
 	}
 	return results, nil

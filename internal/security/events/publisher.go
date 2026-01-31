@@ -12,9 +12,9 @@ import (
 
 // Publisher publishes security events to NATS.
 type Publisher struct {
-	nc     *nats.Conn
-	mu     sync.RWMutex
-	stats  PublisherStats
+	nc    *nats.Conn
+	mu    sync.RWMutex
+	stats PublisherStats
 }
 
 // PublisherStats tracks publishing statistics.
@@ -28,9 +28,9 @@ type PublisherStats struct {
 
 // PublisherConfig holds publisher configuration.
 type PublisherConfig struct {
-	NATSURL        string
-	ReconnectWait  time.Duration
-	MaxReconnects  int
+	NATSURL       string
+	ReconnectWait time.Duration
+	MaxReconnects int
 }
 
 // DefaultPublisherConfig returns default configuration.
@@ -132,7 +132,7 @@ func (p *Publisher) PublishResponse(response ResponseEvent) error {
 	p.stats.LastPublished = time.Now()
 	p.mu.Unlock()
 
-	log.Printf("[Giru Publisher] Published response: %s (%s)", response.ActionType, 
+	log.Printf("[Giru Publisher] Published response: %s (%s)", response.ActionType,
 		map[bool]string{true: "success", false: "failed"}[response.Success])
 	return nil
 }

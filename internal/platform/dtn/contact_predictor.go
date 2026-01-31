@@ -12,20 +12,20 @@ import (
 
 // ContactPredictor uses real orbital data to predict communication windows.
 type ContactPredictor struct {
-	client       *satellite.Client
-	propagators  map[int]*satellite.Propagator
+	client         *satellite.Client
+	propagators    map[int]*satellite.Propagator
 	groundStations []GroundStation
-	satellites   []SatelliteNode
-	mu           sync.RWMutex
+	satellites     []SatelliteNode
+	mu             sync.RWMutex
 }
 
 // GroundStation represents a ground-based communication station.
 type GroundStation struct {
-	ID        string  `json:"id"`
-	Name      string  `json:"name"`
-	Latitude  float64 `json:"latitude"`
-	Longitude float64 `json:"longitude"`
-	Altitude  float64 `json:"altitude_m"`
+	ID           string  `json:"id"`
+	Name         string  `json:"name"`
+	Latitude     float64 `json:"latitude"`
+	Longitude    float64 `json:"longitude"`
+	Altitude     float64 `json:"altitude_m"`
 	MinElevation float64 `json:"min_elevation_deg"` // Minimum elevation for contact
 }
 
@@ -50,9 +50,9 @@ type PredictedContact struct {
 
 // ContactPredictorConfig holds configuration.
 type ContactPredictorConfig struct {
-	N2YOAPIKey    string
+	N2YOAPIKey     string
 	GroundStations []GroundStation
-	Satellites    []SatelliteNode
+	Satellites     []SatelliteNode
 }
 
 // DefaultContactPredictorConfig returns a default configuration.
@@ -98,10 +98,10 @@ func NewContactPredictor(cfg ContactPredictorConfig) *ContactPredictor {
 	clientCfg.N2YOAPIKey = cfg.N2YOAPIKey
 
 	return &ContactPredictor{
-		client:        satellite.NewClient(clientCfg),
-		propagators:   make(map[int]*satellite.Propagator),
+		client:         satellite.NewClient(clientCfg),
+		propagators:    make(map[int]*satellite.Propagator),
 		groundStations: cfg.GroundStations,
-		satellites:    cfg.Satellites,
+		satellites:     cfg.Satellites,
 	}
 }
 
@@ -214,39 +214,39 @@ func (cp *ContactPredictor) predictContactsForPair(
 func (cp *ContactPredictor) calculateElevation(satLat, satLon, satAlt float64, gs GroundStation) float64 {
 	// Simplified elevation calculation
 	// In production, use proper geodetic calculations
-	
+
 	const earthRadius = 6371.0 // km
 	const deg2rad = 0.017453292519943295
-	
+
 	// Great circle distance
 	dLat := (satLat - gs.Latitude) * deg2rad
 	dLon := (satLon - gs.Longitude) * deg2rad
-	
+
 	a := sin(dLat/2)*sin(dLat/2) +
 		cos(gs.Latitude*deg2rad)*cos(satLat*deg2rad)*
-		sin(dLon/2)*sin(dLon/2)
+			sin(dLon/2)*sin(dLon/2)
 	c := 2 * atan2(sqrt(a), sqrt(1-a))
-	
+
 	groundDistance := earthRadius * c // km
-	
+
 	// Satellite height above ground station
 	height := satAlt // km (approximate, ignoring Earth curvature for simplicity)
-	
+
 	// Elevation angle
 	if groundDistance < 0.001 {
 		return 90.0 // Directly overhead
 	}
-	
+
 	elevation := atan(height/groundDistance) * 180.0 / 3.14159265358979
-	
+
 	// Account for Earth curvature (simplified)
 	curvatureCorrection := groundDistance / (2 * earthRadius) * 180.0 / 3.14159265358979
 	elevation -= curvatureCorrection
-	
+
 	if elevation < 0 {
 		elevation = -10 // Below horizon
 	}
-	
+
 	return elevation
 }
 
@@ -266,21 +266,21 @@ func (cp *ContactPredictor) calculateLinkQuality(elevation float64) float64 {
 // GetNextContact returns the next contact opportunity for a satellite.
 func (cp *ContactPredictor) GetNextContact(ctx context.Context, noradID int) (*PredictedContact, error) {
 	contacts := cp.PredictContacts(ctx, 24*time.Hour, time.Minute)
-	
+
 	now := time.Now().UTC()
 	for _, c := range contacts {
 		if c.SatelliteID == noradID && c.StartTime.After(now) {
 			return &c, nil
 		}
 	}
-	
+
 	return nil, nil
 }
 
 // UpdateRouterContactGraph updates the DTN router with predicted contacts.
 func (cp *ContactPredictor) UpdateRouterContactGraph(router *EnergyAwareRouter) {
 	contacts := cp.PredictContacts(context.Background(), 4*time.Hour, time.Minute)
-	
+
 	for _, contact := range contacts {
 		neighbor := &Neighbor{
 			ID:           contact.GroundStation,

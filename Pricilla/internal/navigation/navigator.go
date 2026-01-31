@@ -13,13 +13,13 @@ import (
 type NavigationMode string
 
 const (
-	ModeDirectPath     NavigationMode = "direct"       // Straight line, fastest
-	ModeTerrainFollow  NavigationMode = "terrain"      // Follow terrain contours
-	ModeStealthPath    NavigationMode = "stealth"      // Minimize detection
-	ModeEvasive        NavigationMode = "evasive"      // Active threat evasion
-	ModeEnergySaving   NavigationMode = "energy"       // Minimize fuel/power
-	ModeBallisticArc   NavigationMode = "ballistic"    // Ballistic trajectory
-	ModeOrbitalInsert  NavigationMode = "orbital"      // Orbital insertion
+	ModeDirectPath     NavigationMode = "direct"         // Straight line, fastest
+	ModeTerrainFollow  NavigationMode = "terrain"        // Follow terrain contours
+	ModeStealthPath    NavigationMode = "stealth"        // Minimize detection
+	ModeEvasive        NavigationMode = "evasive"        // Active threat evasion
+	ModeEnergySaving   NavigationMode = "energy"         // Minimize fuel/power
+	ModeBallisticArc   NavigationMode = "ballistic"      // Ballistic trajectory
+	ModeOrbitalInsert  NavigationMode = "orbital"        // Orbital insertion
 	ModeInterplanetary NavigationMode = "interplanetary" // Deep space navigation
 )
 
@@ -39,14 +39,14 @@ type GeoCoord struct {
 
 // Waypoint represents a navigation point with timing
 type Waypoint struct {
-	ID          string    `json:"id"`
-	Position    Vector3D  `json:"position"`
-	GeoPosition *GeoCoord `json:"geoPosition,omitempty"`
-	Velocity    Vector3D  `json:"velocity"`
-	Heading     float64   `json:"heading"`     // radians
-	Timestamp   time.Time `json:"timestamp"`
-	Tolerance   float64   `json:"tolerance"`   // meters
-	Hold        bool      `json:"hold"`        // hold at waypoint
+	ID          string        `json:"id"`
+	Position    Vector3D      `json:"position"`
+	GeoPosition *GeoCoord     `json:"geoPosition,omitempty"`
+	Velocity    Vector3D      `json:"velocity"`
+	Heading     float64       `json:"heading"` // radians
+	Timestamp   time.Time     `json:"timestamp"`
+	Tolerance   float64       `json:"tolerance"` // meters
+	Hold        bool          `json:"hold"`      // hold at waypoint
 	HoldTime    time.Duration `json:"holdTime"`
 }
 
@@ -61,7 +61,7 @@ type NavigationState struct {
 	DistanceToTarget float64        `json:"distanceToTarget"`
 	ETA              time.Duration  `json:"eta"`
 	Mode             NavigationMode `json:"mode"`
-	Status           string         `json:"status"` // navigating, holding, arrived, error
+	Status           string         `json:"status"`        // navigating, holding, arrived, error
 	FuelRemaining    float64        `json:"fuelRemaining"` // percentage
 	BatteryLevel     float64        `json:"batteryLevel"`  // percentage
 	LastUpdate       time.Time      `json:"lastUpdate"`
@@ -91,29 +91,29 @@ type ThreatZone struct {
 // NavigationConfig holds navigation parameters
 type NavigationConfig struct {
 	Mode               NavigationMode `json:"mode"`
-	MaxSpeed           float64        `json:"maxSpeed"`           // m/s
-	MaxAcceleration    float64        `json:"maxAcceleration"`    // m/s²
-	MaxTurnRate        float64        `json:"maxTurnRate"`        // rad/s
-	MinAltitude        float64        `json:"minAltitude"`        // meters AGL
-	MaxAltitude        float64        `json:"maxAltitude"`        // meters MSL
-	TerrainClearance   float64        `json:"terrainClearance"`   // meters above terrain
-	WaypointTolerance  float64        `json:"waypointTolerance"`  // meters
+	MaxSpeed           float64        `json:"maxSpeed"`          // m/s
+	MaxAcceleration    float64        `json:"maxAcceleration"`   // m/s²
+	MaxTurnRate        float64        `json:"maxTurnRate"`       // rad/s
+	MinAltitude        float64        `json:"minAltitude"`       // meters AGL
+	MaxAltitude        float64        `json:"maxAltitude"`       // meters MSL
+	TerrainClearance   float64        `json:"terrainClearance"`  // meters above terrain
+	WaypointTolerance  float64        `json:"waypointTolerance"` // meters
 	EnableTerrainAvoid bool           `json:"enableTerrainAvoid"`
 	EnableThreatAvoid  bool           `json:"enableThreatAvoid"`
-	StealthPriority    float64        `json:"stealthPriority"`    // 0.0-1.0
+	StealthPriority    float64        `json:"stealthPriority"` // 0.0-1.0
 }
 
 // Navigator provides advanced navigation capabilities
 type Navigator struct {
 	mu sync.RWMutex
 
-	id           string
-	config       NavigationConfig
-	waypoints    []Waypoint
-	currentIdx   int
-	state        NavigationState
-	terrain      *TerrainData
-	threatZones  []ThreatZone
+	id          string
+	config      NavigationConfig
+	waypoints   []Waypoint
+	currentIdx  int
+	state       NavigationState
+	terrain     *TerrainData
+	threatZones []ThreatZone
 
 	// Callbacks
 	onWaypointReached func(wp Waypoint)
@@ -471,8 +471,8 @@ func (n *Navigator) GenerateEvasionPath(target Vector3D) []Waypoint {
 
 		// Create waypoint offset from threat center
 		evasionWP := Waypoint{
-			ID: uuid.New().String(),
-			Position: Add(threat.Center, perpendicular),
+			ID:        uuid.New().String(),
+			Position:  Add(threat.Center, perpendicular),
 			Tolerance: n.config.WaypointTolerance,
 		}
 		evasionPath = append(evasionPath, evasionWP)

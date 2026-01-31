@@ -18,12 +18,12 @@ import (
 
 // AuditService handles audit logging business logic.
 type AuditService struct {
-	auditRepo    *repositories.AuditLogRepository
-	ethicsRepo   *repositories.EthicalDecisionRepository
-	logger       *utils.Logger
-	fileLogger   *FileAuditLogger
-	enableFile   bool
-	mu           sync.RWMutex
+	auditRepo  *repositories.AuditLogRepository
+	ethicsRepo *repositories.EthicalDecisionRepository
+	logger     *utils.Logger
+	fileLogger *FileAuditLogger
+	enableFile bool
+	mu         sync.RWMutex
 }
 
 // FileAuditLogger handles file-based audit logging.

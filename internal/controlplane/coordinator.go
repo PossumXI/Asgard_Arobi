@@ -36,9 +36,9 @@ type Coordinator struct {
 
 // CoordinatorConfig holds coordinator configuration.
 type CoordinatorConfig struct {
-	ResponseTimeout     time.Duration
+	ResponseTimeout      time.Duration
 	MaxConcurrentActions int
-	PolicyEvalInterval  time.Duration
+	PolicyEvalInterval   time.Duration
 }
 
 // DefaultCoordinatorConfig returns sensible defaults.
@@ -53,26 +53,26 @@ func DefaultCoordinatorConfig() CoordinatorConfig {
 // CoordinatorMetrics tracks coordinator performance.
 type CoordinatorMetrics struct {
 	mu                sync.RWMutex
-	PoliciesEvaluated int64 `json:"policies_evaluated"`
-	PoliciesTriggered int64 `json:"policies_triggered"`
-	ActionsExecuted   int64 `json:"actions_executed"`
-	ActionsSucceeded  int64 `json:"actions_succeeded"`
-	ActionsFailed     int64 `json:"actions_failed"`
+	PoliciesEvaluated int64     `json:"policies_evaluated"`
+	PoliciesTriggered int64     `json:"policies_triggered"`
+	ActionsExecuted   int64     `json:"actions_executed"`
+	ActionsSucceeded  int64     `json:"actions_succeeded"`
+	ActionsFailed     int64     `json:"actions_failed"`
 	LastEvaluation    time.Time `json:"last_evaluation"`
 }
 
 // CoordinationPolicy defines rules for cross-domain coordination.
 type CoordinationPolicy struct {
-	ID          string                  `json:"id"`
-	Name        string                  `json:"name"`
-	Description string                  `json:"description"`
-	Priority    int                     `json:"priority"` // Higher = more urgent
-	Enabled     bool                    `json:"enabled"`
-	TriggerType CrossDomainEventType    `json:"trigger_type,omitempty"`
-	Condition   PolicyCondition         `json:"-"`
-	Actions     []PolicyAction          `json:"actions"`
-	Cooldown    time.Duration           `json:"cooldown_ns"`
-	LastTriggered time.Time             `json:"last_triggered"`
+	ID            string               `json:"id"`
+	Name          string               `json:"name"`
+	Description   string               `json:"description"`
+	Priority      int                  `json:"priority"` // Higher = more urgent
+	Enabled       bool                 `json:"enabled"`
+	TriggerType   CrossDomainEventType `json:"trigger_type,omitempty"`
+	Condition     PolicyCondition      `json:"-"`
+	Actions       []PolicyAction       `json:"actions"`
+	Cooldown      time.Duration        `json:"cooldown_ns"`
+	LastTriggered time.Time            `json:"last_triggered"`
 }
 
 // PolicyCondition evaluates whether a policy should trigger.
@@ -97,13 +97,13 @@ type PolicyContext struct {
 
 // CoordinationResponse tracks an ongoing coordination response.
 type CoordinationResponse struct {
-	ID          uuid.UUID              `json:"id"`
-	PolicyID    string                 `json:"policy_id"`
-	TriggerEvent CrossDomainEvent      `json:"trigger_event"`
-	Actions     []ActionStatus         `json:"actions"`
-	StartTime   time.Time              `json:"start_time"`
-	EndTime     time.Time              `json:"end_time,omitempty"`
-	Status      string                 `json:"status"` // pending, executing, completed, failed
+	ID           uuid.UUID        `json:"id"`
+	PolicyID     string           `json:"policy_id"`
+	TriggerEvent CrossDomainEvent `json:"trigger_event"`
+	Actions      []ActionStatus   `json:"actions"`
+	StartTime    time.Time        `json:"start_time"`
+	EndTime      time.Time        `json:"end_time,omitempty"`
+	Status       string           `json:"status"` // pending, executing, completed, failed
 }
 
 // ActionStatus tracks the status of an individual action.
@@ -479,9 +479,9 @@ func (c *Coordinator) registerDefaultPolicies() {
 				TargetDomain: DomainDTN,
 				CommandType:  "adjust_priority",
 				Parameters: map[string]interface{}{
-					"mode":                "congestion_relief",
-					"drop_low_priority":   true,
-					"expedite_critical":   true,
+					"mode":              "congestion_relief",
+					"drop_low_priority": true,
+					"expedite_critical": true,
 				},
 			},
 		},
@@ -504,7 +504,7 @@ func (c *Coordinator) registerDefaultPolicies() {
 				TargetDomain: DomainAutonomy,
 				CommandType:  "halt",
 				Parameters: map[string]interface{}{
-					"reason": "ethics_review_required",
+					"reason":              "ethics_review_required",
 					"wait_for_resolution": true,
 				},
 			},
@@ -512,7 +512,7 @@ func (c *Coordinator) registerDefaultPolicies() {
 				TargetDomain: DomainSecurity,
 				CommandType:  "escalate_threat",
 				Parameters: map[string]interface{}{
-					"type":        "ethics_escalation",
+					"type":         "ethics_escalation",
 					"notify_human": true,
 				},
 			},
@@ -590,7 +590,7 @@ func (c *Coordinator) registerDefaultPolicies() {
 				TargetDomain: DomainAutonomy,
 				CommandType:  "emergency_stop",
 				Parameters: map[string]interface{}{
-					"reason": "multi_threat_emergency",
+					"reason":         "multi_threat_emergency",
 					"preserve_state": true,
 				},
 			},
@@ -598,7 +598,7 @@ func (c *Coordinator) registerDefaultPolicies() {
 				TargetDomain: DomainDTN,
 				CommandType:  "adjust_priority",
 				Parameters: map[string]interface{}{
-					"mode":        "emergency",
+					"mode":          "emergency",
 					"critical_only": true,
 				},
 			},

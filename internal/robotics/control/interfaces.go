@@ -96,8 +96,8 @@ type NavigationController interface {
 
 // NavigationStatus represents navigation state
 type NavigationStatus struct {
-	Active         bool
-	DistanceToGoal float64
-	EstimatedTime  time.Duration
+	Active          bool
+	DistanceToGoal  float64
+	EstimatedTime   time.Duration
 	CurrentVelocity Vector3
 }

@@ -21,15 +21,15 @@ type WebSocketHub struct {
 
 // WebSocketClient represents a connected WebSocket client
 type WebSocketClient struct {
-	ID           string
-	UserID       string
-	Clearance    ClearanceLevel
-	FeedID       string
-	Conn         interface{} // WebSocket connection (would be *websocket.Conn in production)
-	Send         chan []byte
-	Hub          *WebSocketHub
-	ConnectedAt  time.Time
-	LastPing     time.Time
+	ID          string
+	UserID      string
+	Clearance   ClearanceLevel
+	FeedID      string
+	Conn        interface{} // WebSocket connection (would be *websocket.Conn in production)
+	Send        chan []byte
+	Hub         *WebSocketHub
+	ConnectedAt time.Time
+	LastPing    time.Time
 }
 
 // WebSocketMessage represents a WebSocket message
@@ -66,7 +66,7 @@ func (h *WebSocketHub) Run() {
 			if _, ok := h.clients[client.ID]; ok {
 				delete(h.clients, client.ID)
 				close(client.Send)
-				
+
 				// Unsubscribe from feed
 				if client.FeedID != "" {
 					h.feedManager.Unsubscribe(client.FeedID, client.ID)
@@ -107,11 +107,11 @@ func (h *WebSocketHub) HandleSubscribe(client *WebSocketClient, feedID string) e
 
 	// Create subscriber
 	subscriber := &Subscriber{
-		ID:          client.ID,
-		UserID:      client.UserID,
-		Clearance:   client.Clearance,
-		FeedID:      feedID,
-		ConnectedAt: time.Now(),
+		ID:           client.ID,
+		UserID:       client.UserID,
+		Clearance:    client.Clearance,
+		FeedID:       feedID,
+		ConnectedAt:  time.Now(),
 		LastActivity: time.Now(),
 	}
 
@@ -323,4 +323,3 @@ func (h *LiveFeedHTTPHandler) handleGetStats(w http.ResponseWriter, r *http.Requ
 
 	json.NewEncoder(w).Encode(stats)
 }
-

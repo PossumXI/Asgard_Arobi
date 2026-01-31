@@ -48,16 +48,16 @@ type WaypointConstraints struct {
 
 // Trajectory represents a complete flight path
 type Trajectory struct {
-	ID              string
-	PayloadType     PayloadType
-	Waypoints       []Waypoint
-	TotalDistance   float64
-	EstimatedTime   time.Duration
-	FuelRequired    float64
-	StealthScore    float64 // 0.0-1.0 (higher = more stealth)
-	ThreatExposure  float64 // 0.0-1.0 (lower = safer)
-	Confidence      float64 // AI confidence in trajectory
-	CreatedAt       time.Time
+	ID             string
+	PayloadType    PayloadType
+	Waypoints      []Waypoint
+	TotalDistance  float64
+	EstimatedTime  time.Duration
+	FuelRequired   float64
+	StealthScore   float64 // 0.0-1.0 (higher = more stealth)
+	ThreatExposure float64 // 0.0-1.0 (lower = safer)
+	Confidence     float64 // AI confidence in trajectory
+	CreatedAt      time.Time
 }
 
 // GuidanceComputer plans and updates trajectories
@@ -72,14 +72,14 @@ type GuidanceComputer interface {
 
 // TrajectoryRequest contains mission parameters
 type TrajectoryRequest struct {
-	PayloadType     PayloadType
-	PayloadID       string
-	StartPosition   Vector3D
-	TargetPosition  Vector3D
-	MaxTime         time.Duration
-	Priority        Priority
-	Constraints     MissionConstraints
-	StealthMode     StealthMode
+	PayloadType    PayloadType
+	PayloadID      string
+	StartPosition  Vector3D
+	TargetPosition Vector3D
+	MaxTime        time.Duration
+	Priority       Priority
+	Constraints    MissionConstraints
+	StealthMode    StealthMode
 }
 
 // Priority defines mission urgency
@@ -105,12 +105,12 @@ const (
 
 // MissionConstraints defines mission limits
 type MissionConstraints struct {
-	StealthRequired   bool
-	MaxDetectionRisk  float64
-	NoFlyZones        []Zone
-	MustAvoidThreats  []ThreatLocation
+	StealthRequired    bool
+	MaxDetectionRisk   float64
+	NoFlyZones         []Zone
+	MustAvoidThreats   []ThreatLocation
 	WeatherConstraints bool
-	TimeWindow        *TimeWindow
+	TimeWindow         *TimeWindow
 }
 
 // Zone represents a geographic area

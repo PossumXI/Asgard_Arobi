@@ -33,7 +33,7 @@ type Neighbor struct {
 	ID           string
 	EID          string
 	Address      string
-	LinkQuality  float64   // 0.0 to 1.0
+	LinkQuality  float64 // 0.0 to 1.0
 	LastContact  time.Time
 	IsActive     bool
 	Latency      time.Duration

@@ -15,8 +15,8 @@ import (
 
 // SignInRequest represents a sign in request.
 type SignInRequest struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Email      string `json:"email"`
+	Password   string `json:"password"`
 	AccessCode string `json:"accessCode,omitempty"`
 }
 
@@ -272,13 +272,13 @@ func generateTokenForUser(userID, email, tier string, isGovernment bool) (string
 	}
 
 	claims := jwt.MapClaims{
-		"user_id":          userID,
-		"email":            email,
+		"user_id":           userID,
+		"email":             email,
 		"subscription_tier": tier,
-		"is_government":    isGovernment,
-		"role":             role,
-		"iat":              now.Unix(),
-		"exp":              now.Add(24 * time.Hour).Unix(),
+		"is_government":     isGovernment,
+		"role":              role,
+		"iat":               now.Unix(),
+		"exp":               now.Add(24 * time.Hour).Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	signed, err := token.SignedString(getJWTSecret())

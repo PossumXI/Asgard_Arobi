@@ -33,44 +33,44 @@ type YOLOConfig struct {
 	// Model settings
 	ModelPath    string `json:"modelPath"`    // Path to ONNX/TensorRT model
 	ModelVersion string `json:"modelVersion"` // e.g., "yolov8n", "yolov8s", "yolov8m"
-	
+
 	// Remote inference settings
 	InferenceURL string `json:"inferenceUrl"` // e.g., "http://triton:8000/v2/models/yolov8"
 	APIKey       string `json:"apiKey"`       // For authenticated endpoints
-	
+
 	// Detection settings
 	ConfidenceThreshold float64  `json:"confidenceThreshold"` // 0.0-1.0
 	NMSThreshold        float64  `json:"nmsThreshold"`        // Non-max suppression threshold
 	MaxDetections       int      `json:"maxDetections"`
-	Classes             []string `json:"classes"`             // Filter to specific classes
-	
+	Classes             []string `json:"classes"` // Filter to specific classes
+
 	// Input settings
 	InputWidth  int `json:"inputWidth"`  // Model input width
 	InputHeight int `json:"inputHeight"` // Model input height
-	
+
 	// Performance settings
-	BatchSize     int  `json:"batchSize"`
-	UseGPU        bool `json:"useGpu"`
-	GPUDeviceID   int  `json:"gpuDeviceId"`
-	NumThreads    int  `json:"numThreads"`
-	
+	BatchSize   int  `json:"batchSize"`
+	UseGPU      bool `json:"useGpu"`
+	GPUDeviceID int  `json:"gpuDeviceId"`
+	NumThreads  int  `json:"numThreads"`
+
 	// Satellite-specific
 	SatelliteID string `json:"satelliteId"`
 }
 
 // Detection represents a detected object
 type Detection struct {
-	Class       string      `json:"class"`
-	Confidence  float64     `json:"confidence"`
-	BoundingBox BoundingBox `json:"boundingBox"`
-	Timestamp   int64       `json:"timestamp"`
+	Class       string                 `json:"class"`
+	Confidence  float64                `json:"confidence"`
+	BoundingBox BoundingBox            `json:"boundingBox"`
+	Timestamp   int64                  `json:"timestamp"`
 	Attributes  map[string]interface{} `json:"attributes,omitempty"`
 }
 
 // BoundingBox represents object location
 type BoundingBox struct {
-	X      int `json:"x"`      // Top-left X
-	Y      int `json:"y"`      // Top-left Y
+	X      int `json:"x"` // Top-left X
+	Y      int `json:"y"` // Top-left Y
 	Width  int `json:"width"`
 	Height int `json:"height"`
 }
@@ -379,11 +379,11 @@ func (p *YOLOProcessor) preprocessImage(frame []byte) ([]float32, int, int, erro
 
 	// Convert to float32 tensor in NCHW format
 	data := make([]float32, 3*p.config.InputHeight*p.config.InputWidth)
-	
+
 	for y := 0; y < p.config.InputHeight; y++ {
 		for x := 0; x < p.config.InputWidth; x++ {
 			r, g, b, _ := resized.At(x, y).RGBA()
-			
+
 			// Normalize to 0-1
 			idx := y*p.config.InputWidth + x
 			data[0*p.config.InputHeight*p.config.InputWidth+idx] = float32(r>>8) / 255.0 // R channel
@@ -431,16 +431,16 @@ func (p *YOLOProcessor) postprocessDetections(outputs []InferenceOutput, origina
 	}
 
 	output := outputs[0]
-	
+
 	// YOLOv8 output shape: [1, 84, 8400]
 	// 84 = 4 (bbox) + 80 (classes)
 	// 8400 = number of predictions
-	
+
 	numClasses := len(p.config.Classes)
 	if numClasses == 0 {
 		numClasses = 80 // Default COCO classes
 	}
-	
+
 	numPredictions := 8400
 	if len(output.Shape) >= 3 {
 		numPredictions = output.Shape[2]
@@ -590,7 +590,7 @@ func (p *YOLOProcessor) GetModelInfo() ModelInfo {
 func (p *YOLOProcessor) Shutdown() error {
 	p.mu.Lock()
 	defer p.mu.Unlock()
-	
+
 	p.initialized = false
 	return nil
 }

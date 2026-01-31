@@ -98,13 +98,13 @@ type ResponderConfig struct {
 
 // EmailConfig holds email alerting configuration
 type EmailConfig struct {
-	SMTPHost     string
-	SMTPPort     int
-	Username     string
-	Password     string
-	From         string
-	To           []string
-	UseTLS       bool
+	SMTPHost string
+	SMTPPort int
+	Username string
+	Password string
+	From     string
+	To       []string
+	UseTLS   bool
 }
 
 // Responder handles threat mitigation
@@ -260,7 +260,7 @@ func (r *Responder) MitigateThreat(ctx context.Context, t threat.Threat) error {
 
 		select {
 		case r.actionChan <- *action:
-			log.Printf("Mitigation action executed: %s for threat %s (success: %t)", 
+			log.Printf("Mitigation action executed: %s for threat %s (success: %t)",
 				action.ActionType, action.ThreatID, action.Success)
 			observability.RecordMitigation(action.ActionType, action.Success)
 		default:
@@ -510,7 +510,7 @@ func (r *Responder) CheckRateLimit(ip string) (bool, error) {
 		r.mu.Lock()
 		r.mitigationStats.RateLimited++
 		r.mu.Unlock()
-		log.Printf("Rate limit exceeded for IP %s (%d requests in %v)", 
+		log.Printf("Rate limit exceeded for IP %s (%d requests in %v)",
 			ip, len(entry.requests), r.rateLimiter.window)
 		return true, nil
 	}
@@ -629,7 +629,7 @@ This is an automated alert from the Asgard Security System.
 		cfg.From, cfg.To[0], subject, body)
 
 	addr := fmt.Sprintf("%s:%d", cfg.SMTPHost, cfg.SMTPPort)
-	
+
 	var auth smtp.Auth
 	if cfg.Username != "" {
 		auth = smtp.PlainAuth("", cfg.Username, cfg.Password, cfg.SMTPHost)

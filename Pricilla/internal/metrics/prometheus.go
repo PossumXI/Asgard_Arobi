@@ -33,16 +33,16 @@ type Metrics struct {
 	CountermeasuresActive *prometheus.GaugeVec
 
 	// Payload metrics
-	PayloadsRegistered prometheus.Gauge
-	PayloadsActive     prometheus.Gauge
-	PayloadsByType     *prometheus.GaugeVec
-	PayloadDeployments *prometheus.CounterVec
+	PayloadsRegistered   prometheus.Gauge
+	PayloadsActive       prometheus.Gauge
+	PayloadsByType       *prometheus.GaugeVec
+	PayloadDeployments   *prometheus.CounterVec
 	PayloadStatusChanges *prometheus.CounterVec
 
 	// Integration metrics (ASGARD services)
-	ServiceLatency      *prometheus.HistogramVec
-	ServiceRequestsTotal *prometheus.CounterVec
-	ServiceErrors       *prometheus.CounterVec
+	ServiceLatency          *prometheus.HistogramVec
+	ServiceRequestsTotal    *prometheus.CounterVec
+	ServiceErrors           *prometheus.CounterVec
 	ServiceConnectionStatus *prometheus.GaugeVec
 
 	// Prediction metrics
@@ -53,16 +53,16 @@ type Metrics struct {
 	ThreatAssessments      *prometheus.CounterVec
 
 	// Navigation metrics
-	PositionUpdates      prometheus.Counter
-	NavigationFixes      *prometheus.CounterVec
-	GPSSignalStrength    *prometheus.GaugeVec
-	InertialDrift        *prometheus.GaugeVec
+	PositionUpdates   prometheus.Counter
+	NavigationFixes   *prometheus.CounterVec
+	GPSSignalStrength *prometheus.GaugeVec
+	InertialDrift     *prometheus.GaugeVec
 
 	// AI Guidance metrics
-	AIInferenceDuration  prometheus.Histogram
-	AIDecisionsTotal     *prometheus.CounterVec
-	AIModelConfidence    *prometheus.GaugeVec
-	AIOverridesManual    *prometheus.CounterVec
+	AIInferenceDuration prometheus.Histogram
+	AIDecisionsTotal    *prometheus.CounterVec
+	AIModelConfidence   *prometheus.GaugeVec
+	AIOverridesManual   *prometheus.CounterVec
 }
 
 var (

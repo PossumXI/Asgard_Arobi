@@ -29,17 +29,17 @@ const (
 
 // AttackResult holds the outcome of an attack attempt
 type AttackResult struct {
-	ID          string
-	AttackType  AttackType
-	Target      string
-	Success     bool
-	Blocked     bool
-	BlockedBy   string
-	StartTime   time.Time
-	EndTime     time.Time
-	Evidence    []string
-	Findings    []Finding
-	MITRE       []string // MITRE ATT&CK technique IDs
+	ID         string
+	AttackType AttackType
+	Target     string
+	Success    bool
+	Blocked    bool
+	BlockedBy  string
+	StartTime  time.Time
+	EndTime    time.Time
+	Evidence   []string
+	Findings   []Finding
+	MITRE      []string // MITRE ATT&CK technique IDs
 }
 
 // Finding represents a discovered vulnerability
@@ -185,7 +185,7 @@ func (a *Agent) ExecuteCampaign(ctx context.Context, campaignID string) error {
 				}
 
 				result := a.executeAttack(ctx, t, at)
-				
+
 				a.mu.Lock()
 				campaign.Results = append(campaign.Results, result)
 				a.results = append(a.results, result)
@@ -213,7 +213,7 @@ func (a *Agent) ExecuteAttack(ctx context.Context, target string, attackType Att
 	}
 
 	result := a.executeAttack(ctx, target, attackType)
-	
+
 	a.mu.Lock()
 	a.results = append(a.results, result)
 	a.mu.Unlock()
@@ -470,7 +470,7 @@ func (a *Agent) GetResults() []AttackResult {
 func (a *Agent) GetCampaign(campaignID string) (*Campaign, error) {
 	a.mu.RLock()
 	defer a.mu.RUnlock()
-	
+
 	campaign, exists := a.campaigns[campaignID]
 	if !exists {
 		return nil, fmt.Errorf("campaign not found: %s", campaignID)
@@ -495,13 +495,13 @@ func (a *Agent) GetStatistics() map[string]interface{} {
 	}
 
 	return map[string]interface{}{
-		"agent_id":            a.id,
-		"agent_name":          a.name,
-		"total_campaigns":     len(a.campaigns),
-		"total_attacks":       len(a.results),
-		"successful_attacks":  successful,
-		"blocked_attacks":     blocked,
-		"safe_mode":           a.config.SafeMode,
+		"agent_id":           a.id,
+		"agent_name":         a.name,
+		"total_campaigns":    len(a.campaigns),
+		"total_attacks":      len(a.results),
+		"successful_attacks": successful,
+		"blocked_attacks":    blocked,
+		"safe_mode":          a.config.SafeMode,
 	}
 }
 

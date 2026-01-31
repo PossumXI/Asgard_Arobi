@@ -59,7 +59,7 @@ func Paginated(w http.ResponseWriter, data interface{}, total, page, pageSize in
 		Total:    total,
 		Page:     page,
 		PageSize: pageSize,
-		HasMore:  (page*pageSize) < total,
+		HasMore:  (page * pageSize) < total,
 	}
 	sendJSON(w, http.StatusOK, response)
 }

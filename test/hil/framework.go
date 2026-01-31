@@ -25,10 +25,10 @@ type HardwareConfig struct {
 	Mode HardwareMode
 
 	// Silenus configuration
-	SilenusEnabled    bool
-	CameraDevice      string // e.g., "/dev/video0" or "COM3"
-	GPSDevice         string // e.g., "/dev/ttyUSB0"
-	PowerMonitorAddr  string // e.g., "192.168.1.10:502"
+	SilenusEnabled   bool
+	CameraDevice     string // e.g., "/dev/video0" or "COM3"
+	GPSDevice        string // e.g., "/dev/ttyUSB0"
+	PowerMonitorAddr string // e.g., "192.168.1.10:502"
 
 	// Hunoid configuration
 	HunoidEnabled     bool
@@ -37,9 +37,9 @@ type HardwareConfig struct {
 	ManipulatorAddr   string // e.g., "192.168.1.21:50051"
 
 	// Timeouts
-	InitTimeout     time.Duration
+	InitTimeout      time.Duration
 	OperationTimeout time.Duration
-	ShutdownTimeout time.Duration
+	ShutdownTimeout  time.Duration
 
 	// Test behavior
 	SkipSlowTests    bool
@@ -51,17 +51,17 @@ type HardwareConfig struct {
 // DefaultConfig returns a default HIL configuration using real hardware.
 func DefaultConfig() *HardwareConfig {
 	return &HardwareConfig{
-		Mode:              HardwareModeAuto,
-		SilenusEnabled:    true,
-		HunoidEnabled:     true,
-		HunoidID:          "test-hunoid-001",
-		InitTimeout:       30 * time.Second,
-		OperationTimeout:  10 * time.Second,
-		ShutdownTimeout:   5 * time.Second,
-		SkipSlowTests:     false,
-		VerboseLogging:    false,
-		RecordMetrics:     false,
-		MetricsOutputDir:  "./test_metrics",
+		Mode:             HardwareModeAuto,
+		SilenusEnabled:   true,
+		HunoidEnabled:    true,
+		HunoidID:         "test-hunoid-001",
+		InitTimeout:      30 * time.Second,
+		OperationTimeout: 10 * time.Second,
+		ShutdownTimeout:  5 * time.Second,
+		SkipSlowTests:    false,
+		VerboseLogging:   false,
+		RecordMetrics:    false,
+		MetricsOutputDir: "./test_metrics",
 	}
 }
 
@@ -77,15 +77,15 @@ type TestResult struct {
 
 // HILTestSuite manages Hardware-in-the-Loop test execution
 type HILTestSuite struct {
-	mu              sync.RWMutex
-	config          *HardwareConfig
-	silenusAdapter  *SilenusAdapter
-	hunoidAdapter   *HunoidAdapter
-	initialized     bool
-	results         []*TestResult
-	startTime       time.Time
-	ctx             context.Context
-	cancel          context.CancelFunc
+	mu             sync.RWMutex
+	config         *HardwareConfig
+	silenusAdapter *SilenusAdapter
+	hunoidAdapter  *HunoidAdapter
+	initialized    bool
+	results        []*TestResult
+	startTime      time.Time
+	ctx            context.Context
+	cancel         context.CancelFunc
 }
 
 // NewHILTestSuite creates a new HIL test suite
@@ -97,10 +97,10 @@ func NewHILTestSuite(config *HardwareConfig) *HILTestSuite {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	return &HILTestSuite{
-		config:    config,
-		results:   make([]*TestResult, 0),
-		ctx:       ctx,
-		cancel:    cancel,
+		config:  config,
+		results: make([]*TestResult, 0),
+		ctx:     ctx,
+		cancel:  cancel,
 	}
 }
 
@@ -365,16 +365,16 @@ func (s *HILTestSuite) Close() error {
 // SetupAndRun is a convenience function for running tests with setup/teardown
 func SetupAndRun(t *testing.T, config *HardwareConfig, testFunc func(t *testing.T, suite *HILTestSuite)) {
 	suite := NewHILTestSuite(config)
-	
+
 	if err := suite.SetupHardware(); err != nil {
 		t.Fatalf("Failed to setup hardware: %v", err)
 	}
-	
+
 	defer func() {
 		if err := suite.Close(); err != nil {
 			t.Errorf("Failed to teardown hardware: %v", err)
 		}
 	}()
-	
+
 	testFunc(t, suite)
 }

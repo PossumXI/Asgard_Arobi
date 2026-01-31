@@ -154,11 +154,11 @@ func (c *HTTPSilenusClient) SubscribeAlerts(ctx context.Context) (<-chan Alert, 
 
 	// Connect to WebSocket
 	wsURL := c.wsURL + "/ws/alerts"
-	
+
 	dialer := websocket.Dialer{
 		HandshakeTimeout: 10 * time.Second,
 	}
-	
+
 	headers := http.Header{}
 	if c.apiKey != "" {
 		headers.Set("Authorization", "Bearer "+c.apiKey)
@@ -496,11 +496,11 @@ func (c *HTTPSatNetClient) ReceiveBundles(ctx context.Context) (<-chan Bundle, e
 	bundleChan := make(chan Bundle, 100)
 
 	wsURL := c.wsURL + "/ws/bundles"
-	
+
 	dialer := websocket.Dialer{
 		HandshakeTimeout: 10 * time.Second,
 	}
-	
+
 	headers := http.Header{}
 	if c.apiKey != "" {
 		headers.Set("Authorization", "Bearer "+c.apiKey)
@@ -600,11 +600,11 @@ func (c *HTTPSatNetClient) SubscribeTelemetry(ctx context.Context, payloadID str
 	telemChan := make(chan Telemetry, 100)
 
 	wsURL := c.wsURL + fmt.Sprintf("/ws/telemetry/%s", payloadID)
-	
+
 	dialer := websocket.Dialer{
 		HandshakeTimeout: 10 * time.Second,
 	}
-	
+
 	headers := http.Header{}
 	if c.apiKey != "" {
 		headers.Set("Authorization", "Bearer "+c.apiKey)
@@ -742,11 +742,11 @@ func (c *HTTPGiruClient) SubscribeThreats(ctx context.Context) (<-chan Threat, e
 	threatChan := make(chan Threat, 100)
 
 	wsURL := c.wsURL + "/ws/threats"
-	
+
 	dialer := websocket.Dialer{
 		HandshakeTimeout: 10 * time.Second,
 	}
-	
+
 	headers := http.Header{}
 	if c.apiKey != "" {
 		headers.Set("Authorization", "Bearer "+c.apiKey)
@@ -1009,11 +1009,11 @@ func (c *HTTPNysusClient) SubscribeEvents(ctx context.Context, eventTypes []stri
 	if query != "" {
 		wsURL += "?types=" + query
 	}
-	
+
 	dialer := websocket.Dialer{
 		HandshakeTimeout: 10 * time.Second,
 	}
-	
+
 	headers := http.Header{}
 	if c.apiKey != "" {
 		headers.Set("Authorization", "Bearer "+c.apiKey)

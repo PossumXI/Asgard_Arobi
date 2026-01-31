@@ -28,15 +28,15 @@ type HardwareAdapter interface {
 
 // SilenusAdapter wraps Silenus hardware components
 type SilenusAdapter struct {
-	mu       sync.RWMutex
-	config   *HardwareConfig
-	mode     HardwareMode
-	
+	mu     sync.RWMutex
+	config *HardwareConfig
+	mode   HardwareMode
+
 	// Hardware interfaces
-	camera   hal.CameraController
-	power    hal.PowerController
-	gps      hal.GPSController
-	
+	camera hal.CameraController
+	power  hal.PowerController
+	gps    hal.GPSController
+
 	// State
 	initialized bool
 }
@@ -228,16 +228,16 @@ func (a *SilenusAdapter) GPS() hal.GPSController {
 
 // HunoidAdapter wraps Hunoid hardware components
 type HunoidAdapter struct {
-	mu       sync.RWMutex
-	config   *HardwareConfig
-	mode     HardwareMode
-	
+	mu     sync.RWMutex
+	config *HardwareConfig
+	mode   HardwareMode
+
 	// Hardware interfaces
-	motion       control.MotionController
-	manipulator  control.ManipulatorController
-	ethics       *ethics.EthicalKernel
-	vla          vla.VLAModel
-	
+	motion      control.MotionController
+	manipulator control.ManipulatorController
+	ethics      *ethics.EthicalKernel
+	vla         vla.VLAModel
+
 	// State
 	initialized bool
 }
@@ -497,5 +497,3 @@ func getEnvDefault(key, fallback string) string {
 	}
 	return fallback
 }
-
-

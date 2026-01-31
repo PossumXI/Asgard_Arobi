@@ -8,24 +8,24 @@ import (
 
 // WiFiRouter represents a WiFi access point used for CSI imaging.
 type WiFiRouter struct {
-	ID           string  `json:"id"`
+	ID           string   `json:"id"`
 	Position     Vector3D `json:"position"`
-	FrequencyGHz float64 `json:"frequencyGhz"`
-	TxPowerDbm   float64 `json:"txPowerDbm"`
+	FrequencyGHz float64  `json:"frequencyGhz"`
+	TxPowerDbm   float64  `json:"txPowerDbm"`
 }
 
 // WiFiImagingFrame represents CSI-based propagation data.
 type WiFiImagingFrame struct {
-	RouterID        string     `json:"routerId"`
-	ReceiverID      string     `json:"receiverId"`
-	PathLossDb      float64    `json:"pathLossDb"`
-	MultipathSpread float64    `json:"multipathSpread"`
-	RSSIDbm         float64    `json:"rssiDbm,omitempty"`
-	NoiseFloorDbm   float64    `json:"noiseFloorDbm,omitempty"`
-	CsiMagnitudes   []float64  `json:"csiMagnitudes,omitempty"`
-	CsiPhases       []float64  `json:"csiPhases,omitempty"`
-	Timestamp       time.Time  `json:"timestamp"`
-	Confidence      float64    `json:"confidence"`
+	RouterID        string    `json:"routerId"`
+	ReceiverID      string    `json:"receiverId"`
+	PathLossDb      float64   `json:"pathLossDb"`
+	MultipathSpread float64   `json:"multipathSpread"`
+	RSSIDbm         float64   `json:"rssiDbm,omitempty"`
+	NoiseFloorDbm   float64   `json:"noiseFloorDbm,omitempty"`
+	CsiMagnitudes   []float64 `json:"csiMagnitudes,omitempty"`
+	CsiPhases       []float64 `json:"csiPhases,omitempty"`
+	Timestamp       time.Time `json:"timestamp"`
+	Confidence      float64   `json:"confidence"`
 }
 
 // ThroughWallObservation describes estimated obstructions and target cues.

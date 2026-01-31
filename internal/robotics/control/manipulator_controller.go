@@ -39,10 +39,10 @@ type ManipulatorConfig struct {
 	Port    int    `json:"port"`
 
 	// Arm configuration
-	ArmModel     string  `json:"armModel"`     // e.g., "ur5e", "kinova-gen3", "franka"
-	NumJoints    int     `json:"numJoints"`
-	ReachRadius  float64 `json:"reachRadius"`  // meters
-	PayloadMax   float64 `json:"payloadMax"`   // kg
+	ArmModel    string  `json:"armModel"` // e.g., "ur5e", "kinova-gen3", "franka"
+	NumJoints   int     `json:"numJoints"`
+	ReachRadius float64 `json:"reachRadius"` // meters
+	PayloadMax  float64 `json:"payloadMax"`  // kg
 
 	// Gripper configuration
 	GripperModel    string  `json:"gripperModel"`    // e.g., "robotiq-2f85", "wsg50"
@@ -55,8 +55,8 @@ type ManipulatorConfig struct {
 	Acceleration     float64 `json:"acceleration"`     // m/s^2
 
 	// Safety settings
-	ForceLimit   float64 `json:"forceLimit"`   // Newtons
-	TorqueLimit  float64 `json:"torqueLimit"`  // Nm
+	ForceLimit  float64 `json:"forceLimit"`  // Newtons
+	TorqueLimit float64 `json:"torqueLimit"` // Nm
 }
 
 // GripperState represents the current gripper state
@@ -134,7 +134,7 @@ func (m *RealManipulator) initUR(ctx context.Context) error {
 	// 30004: RTDE (Real-Time Data Exchange)
 
 	addr := net.JoinHostPort(m.config.Address, strconv.Itoa(30003)) // Real-time interface
-	
+
 	conn, err := net.DialTimeout("tcp", addr, 5*time.Second)
 	if err != nil {
 		return fmt.Errorf("failed to connect to UR robot: %w", err)
@@ -147,7 +147,7 @@ func (m *RealManipulator) initUR(ctx context.Context) error {
 func (m *RealManipulator) initROS2(ctx context.Context) error {
 	// Connect to ROS2 bridge
 	addr := net.JoinHostPort(m.config.Address, strconv.Itoa(m.config.Port))
-	
+
 	conn, err := net.DialTimeout("tcp", addr, 5*time.Second)
 	if err != nil {
 		return fmt.Errorf("failed to connect to ROS2 bridge: %w", err)
@@ -164,7 +164,7 @@ func (m *RealManipulator) initModbus(ctx context.Context) error {
 		port = 502 // Default Modbus port
 	}
 	addr := net.JoinHostPort(m.config.Address, strconv.Itoa(port))
-	
+
 	conn, err := net.DialTimeout("tcp", addr, 5*time.Second)
 	if err != nil {
 		return fmt.Errorf("failed to connect via Modbus: %w", err)
@@ -176,7 +176,7 @@ func (m *RealManipulator) initModbus(ctx context.Context) error {
 
 func (m *RealManipulator) initHTTP(ctx context.Context) error {
 	url := fmt.Sprintf("http://%s:%d/api/status", m.config.Address, m.config.Port)
-	
+
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
 		return err
@@ -303,7 +303,7 @@ func (m *RealManipulator) updateStateModbus() {
 
 func (m *RealManipulator) updateStateHTTP() {
 	url := fmt.Sprintf("http://%s:%d/api/state", m.config.Address, m.config.Port)
-	
+
 	resp, err := m.httpClient.Get(url)
 	if err != nil {
 		return
@@ -328,13 +328,13 @@ func (m *RealManipulator) updateStateHTTP() {
 func (m *RealManipulator) calculateForwardKinematics() Vector3 {
 	// Simplified forward kinematics for 6-DOF arm
 	// Real implementation would use DH parameters and proper FK
-	
+
 	// UR5 DH parameters (simplified)
 	d := []float64{0.089, 0, 0, 0.109, 0.094, 0.082}
 	a := []float64{0, -0.425, -0.392, 0, 0, 0}
 
 	x, y, z := 0.0, 0.0, 0.0
-	
+
 	for i, q := range m.jointStates {
 		if i >= len(d) {
 			break
@@ -440,7 +440,7 @@ func (m *RealManipulator) gripperCommandModbus(position byte) error {
 
 func (m *RealManipulator) gripperCommandHTTP(position float64) error {
 	url := fmt.Sprintf("http://%s:%d/api/gripper/position", m.config.Address, m.config.Port)
-	
+
 	payload := map[string]float64{"position": position}
 	body, _ := json.Marshal(payload)
 
@@ -550,7 +550,7 @@ func (m *RealManipulator) moveToROS2(ctx context.Context, position Vector3) erro
 
 func (m *RealManipulator) moveToHTTP(ctx context.Context, position Vector3) error {
 	url := fmt.Sprintf("http://%s:%d/api/arm/moveto", m.config.Address, m.config.Port)
-	
+
 	payload := map[string]interface{}{
 		"position": map[string]float64{
 			"x": position.X,
@@ -580,7 +580,7 @@ func (m *RealManipulator) moveToHTTP(ctx context.Context, position Vector3) erro
 func (m *RealManipulator) GetJointStates() []float64 {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
-	
+
 	result := make([]float64, len(m.jointStates))
 	copy(result, m.jointStates)
 	return result

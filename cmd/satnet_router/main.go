@@ -108,11 +108,11 @@ func main() {
 }
 
 type neighborConfig struct {
-	id       string
-	eid      string
-	address  string
-	quality  float64
-	latency  time.Duration
+	id        string
+	eid       string
+	address   string
+	quality   float64
+	latency   time.Duration
 	bandwidth int64
 }
 
@@ -132,11 +132,11 @@ func parseNeighborConfig(raw string) []neighborConfig {
 		}
 
 		neighbors = append(neighbors, neighborConfig{
-			id:       parts[0],
-			eid:      parts[1],
-			address:  parts[2],
-			quality:  0.9,
-			latency:  50 * time.Millisecond,
+			id:        parts[0],
+			eid:       parts[1],
+			address:   parts[2],
+			quality:   0.9,
+			latency:   50 * time.Millisecond,
 			bandwidth: 5_000_000,
 		})
 	}

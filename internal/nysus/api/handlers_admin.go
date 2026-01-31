@@ -34,13 +34,13 @@ type adminUserUpdate struct {
 }
 
 type adminUserCreate struct {
-	Email             string `json:"email"`
-	FullName          string `json:"fullName"`
-	Password          string `json:"password,omitempty"`
-	SubscriptionTier  string `json:"subscriptionTier,omitempty"`
-	IsGovernment      bool   `json:"isGovernment,omitempty"`
-	CreateAccessCode  bool   `json:"createAccessCode,omitempty"`
-	ClearanceLevel     string `json:"clearanceLevel,omitempty"`
+	Email            string `json:"email"`
+	FullName         string `json:"fullName"`
+	Password         string `json:"password,omitempty"`
+	SubscriptionTier string `json:"subscriptionTier,omitempty"`
+	IsGovernment     bool   `json:"isGovernment,omitempty"`
+	CreateAccessCode bool   `json:"createAccessCode,omitempty"`
+	ClearanceLevel   string `json:"clearanceLevel,omitempty"`
 }
 
 type controlCommandRequest struct {
@@ -161,10 +161,10 @@ func (s *Server) handleAdminUsers(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 			codeResult, err := s.accessCodeService.IssueForUser(r.Context(), services.AccessCodeIssueRequest{
-				UserID:        userID.String(),
-				CreatedBy:     s.getRequesterID(r),
+				UserID:         userID.String(),
+				CreatedBy:      s.getRequesterID(r),
 				ClearanceLevel: clearance,
-				Scope:         "all",
+				Scope:          "all",
 			})
 			if err == nil {
 				response["accessCode"] = codeResult.Code

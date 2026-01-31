@@ -31,7 +31,7 @@ func bootstrapAccessCode(
 	result, err := accessCodeService.IssueForUser(context.Background(), services.AccessCodeIssueRequest{
 		UserID:                admin.UserID,
 		CreatedBy:             admin.UserID,
-		ClearanceLevel:         "government",
+		ClearanceLevel:        "government",
 		Scope:                 "all",
 		RotationIntervalHours: 24,
 	})

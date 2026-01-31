@@ -46,54 +46,54 @@ type SecurityEvent struct {
 // AlertEvent represents a security alert from threat detection.
 type AlertEvent struct {
 	SecurityEvent
-	ThreatType string `json:"threat_type"`
-	SourceIP   string `json:"source_ip"`
-	TargetIP   string `json:"target_ip,omitempty"`
-	Protocol   string `json:"protocol,omitempty"`
-	Port       int    `json:"port,omitempty"`
+	ThreatType string  `json:"threat_type"`
+	SourceIP   string  `json:"source_ip"`
+	TargetIP   string  `json:"target_ip,omitempty"`
+	Protocol   string  `json:"protocol,omitempty"`
+	Port       int     `json:"port,omitempty"`
 	Confidence float64 `json:"confidence"`
 }
 
 // FindingEvent represents a security finding from scanning or analysis.
 type FindingEvent struct {
 	SecurityEvent
-	Category     string   `json:"category"`
-	Affected     []string `json:"affected"`
-	Remediation  string   `json:"remediation,omitempty"`
-	CVE          string   `json:"cve,omitempty"`
-	CVSS         float64  `json:"cvss,omitempty"`
+	Category    string   `json:"category"`
+	Affected    []string `json:"affected"`
+	Remediation string   `json:"remediation,omitempty"`
+	CVE         string   `json:"cve,omitempty"`
+	CVSS        float64  `json:"cvss,omitempty"`
 }
 
 // ResponseEvent represents a response action taken.
 type ResponseEvent struct {
 	SecurityEvent
-	ThreatID     uuid.UUID `json:"threat_id"`
-	ActionType   string    `json:"action_type"`
-	ActionTarget string    `json:"action_target"`
-	Success      bool      `json:"success"`
+	ThreatID     uuid.UUID     `json:"threat_id"`
+	ActionType   string        `json:"action_type"`
+	ActionTarget string        `json:"action_target"`
+	Success      bool          `json:"success"`
 	Duration     time.Duration `json:"duration_ns"`
-	Automated    bool      `json:"automated"`
+	Automated    bool          `json:"automated"`
 }
 
 // IncidentEvent represents a security incident that requires investigation.
 type IncidentEvent struct {
 	SecurityEvent
-	Status       string       `json:"status"`
-	AssignedTo   string       `json:"assigned_to,omitempty"`
-	RelatedAlerts []uuid.UUID `json:"related_alerts"`
-	Resolved     bool        `json:"resolved"`
-	ResolutionNote string    `json:"resolution_note,omitempty"`
+	Status         string      `json:"status"`
+	AssignedTo     string      `json:"assigned_to,omitempty"`
+	RelatedAlerts  []uuid.UUID `json:"related_alerts"`
+	Resolved       bool        `json:"resolved"`
+	ResolutionNote string      `json:"resolution_note,omitempty"`
 }
 
 // AuditEvent represents a security audit log entry.
 type AuditEvent struct {
 	SecurityEvent
-	Actor      string `json:"actor"`
-	Action     string `json:"action"`
-	Resource   string `json:"resource"`
-	Outcome    string `json:"outcome"`
-	ClientIP   string `json:"client_ip,omitempty"`
-	UserAgent  string `json:"user_agent,omitempty"`
+	Actor     string `json:"actor"`
+	Action    string `json:"action"`
+	Resource  string `json:"resource"`
+	Outcome   string `json:"outcome"`
+	ClientIP  string `json:"client_ip,omitempty"`
+	UserAgent string `json:"user_agent,omitempty"`
 }
 
 // NewSecurityEvent creates a new security event with required fields.

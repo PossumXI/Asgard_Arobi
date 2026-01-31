@@ -44,15 +44,15 @@ func isDevelopmentMode() bool {
 
 // AuthService handles authentication and authorization.
 type AuthService struct {
-	userRepo         *repositories.UserRepository
-	tokenRepo        *repositories.AuthTokenRepository
-	webauthnRepo     *repositories.WebAuthnRepository
-	emailTokenRepo   *repositories.EmailTokenRepository
-	emailService     *EmailService
-	jwtSecret        []byte
-	tokenExpiry      time.Duration
-	refreshExpiry    time.Duration
-	webAuthn         *webauthn.WebAuthn
+	userRepo       *repositories.UserRepository
+	tokenRepo      *repositories.AuthTokenRepository
+	webauthnRepo   *repositories.WebAuthnRepository
+	emailTokenRepo *repositories.EmailTokenRepository
+	emailService   *EmailService
+	jwtSecret      []byte
+	tokenExpiry    time.Duration
+	refreshExpiry  time.Duration
+	webAuthn       *webauthn.WebAuthn
 }
 
 // TokenClaims represents validated JWT claims.

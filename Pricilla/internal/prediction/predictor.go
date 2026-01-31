@@ -13,13 +13,13 @@ import (
 type PredictionType string
 
 const (
-	PredictTrajectory    PredictionType = "trajectory"     // Future path prediction
-	PredictIntercept     PredictionType = "intercept"      // Intercept point calculation
-	PredictThreat        PredictionType = "threat"         // Threat movement prediction
-	PredictWeather       PredictionType = "weather"        // Weather impact prediction
-	PredictContact       PredictionType = "contact"        // Satellite contact windows
-	PredictFuel          PredictionType = "fuel"           // Fuel consumption prediction
-	PredictArrival       PredictionType = "arrival"        // ETA prediction
+	PredictTrajectory PredictionType = "trajectory" // Future path prediction
+	PredictIntercept  PredictionType = "intercept"  // Intercept point calculation
+	PredictThreat     PredictionType = "threat"     // Threat movement prediction
+	PredictWeather    PredictionType = "weather"    // Weather impact prediction
+	PredictContact    PredictionType = "contact"    // Satellite contact windows
+	PredictFuel       PredictionType = "fuel"       // Fuel consumption prediction
+	PredictArrival    PredictionType = "arrival"    // ETA prediction
 )
 
 // Vector3D represents 3D coordinates
@@ -40,86 +40,86 @@ type State struct {
 
 // Prediction represents a predicted future state
 type Prediction struct {
-	ID          string         `json:"id"`
-	Type        PredictionType `json:"type"`
-	TargetID    string         `json:"targetId"`
-	PredictedAt time.Time      `json:"predictedAt"`
-	Horizon     time.Duration  `json:"horizon"`
-	States      []State        `json:"states"`
-	Confidence  float64        `json:"confidence"`
+	ID          string                 `json:"id"`
+	Type        PredictionType         `json:"type"`
+	TargetID    string                 `json:"targetId"`
+	PredictedAt time.Time              `json:"predictedAt"`
+	Horizon     time.Duration          `json:"horizon"`
+	States      []State                `json:"states"`
+	Confidence  float64                `json:"confidence"`
 	Metadata    map[string]interface{} `json:"metadata"`
 }
 
 // InterceptSolution represents an intercept calculation
 type InterceptSolution struct {
-	ID               string    `json:"id"`
-	TargetID         string    `json:"targetId"`
-	InterceptPoint   Vector3D  `json:"interceptPoint"`
-	InterceptTime    time.Time `json:"interceptTime"`
+	ID               string        `json:"id"`
+	TargetID         string        `json:"targetId"`
+	InterceptPoint   Vector3D      `json:"interceptPoint"`
+	InterceptTime    time.Time     `json:"interceptTime"`
 	TimeToIntercept  time.Duration `json:"timeToIntercept"`
-	RequiredVelocity Vector3D  `json:"requiredVelocity"`
-	ClosingSpeed     float64   `json:"closingSpeed"`
-	Feasibility      float64   `json:"feasibility"` // 0.0-1.0
-	DeltaV           float64   `json:"deltaV"`      // Required velocity change
+	RequiredVelocity Vector3D      `json:"requiredVelocity"`
+	ClosingSpeed     float64       `json:"closingSpeed"`
+	Feasibility      float64       `json:"feasibility"` // 0.0-1.0
+	DeltaV           float64       `json:"deltaV"`      // Required velocity change
 }
 
 // ContactWindow represents a communication opportunity
 type ContactWindow struct {
-	ID             string    `json:"id"`
-	SatelliteID    string    `json:"satelliteId"`
-	GroundStation  string    `json:"groundStation"`
-	StartTime      time.Time `json:"startTime"`
-	EndTime        time.Time `json:"endTime"`
+	ID             string        `json:"id"`
+	SatelliteID    string        `json:"satelliteId"`
+	GroundStation  string        `json:"groundStation"`
+	StartTime      time.Time     `json:"startTime"`
+	EndTime        time.Time     `json:"endTime"`
 	Duration       time.Duration `json:"duration"`
-	MaxElevation   float64   `json:"maxElevation"`    // degrees
-	AvgLinkQuality float64   `json:"avgLinkQuality"`  // 0.0-1.0
+	MaxElevation   float64       `json:"maxElevation"`   // degrees
+	AvgLinkQuality float64       `json:"avgLinkQuality"` // 0.0-1.0
 }
 
 // WeatherPrediction represents weather impact on operations
 type WeatherPrediction struct {
-	ID           string    `json:"id"`
-	Location     Vector3D  `json:"location"`
-	ValidFrom    time.Time `json:"validFrom"`
-	ValidUntil   time.Time `json:"validUntil"`
-	WindSpeed    float64   `json:"windSpeed"`     // m/s
-	WindHeading  float64   `json:"windHeading"`   // radians
-	Visibility   float64   `json:"visibility"`    // meters
-	Precipitation float64  `json:"precipitation"` // mm/hr
-	CloudCeiling float64   `json:"cloudCeiling"`  // meters
-	OperationalImpact float64 `json:"operationalImpact"` // 0.0-1.0
+	ID                string    `json:"id"`
+	Location          Vector3D  `json:"location"`
+	ValidFrom         time.Time `json:"validFrom"`
+	ValidUntil        time.Time `json:"validUntil"`
+	WindSpeed         float64   `json:"windSpeed"`         // m/s
+	WindHeading       float64   `json:"windHeading"`       // radians
+	Visibility        float64   `json:"visibility"`        // meters
+	Precipitation     float64   `json:"precipitation"`     // mm/hr
+	CloudCeiling      float64   `json:"cloudCeiling"`      // meters
+	OperationalImpact float64   `json:"operationalImpact"` // 0.0-1.0
 }
 
 // FuelPrediction represents fuel consumption forecast
 type FuelPrediction struct {
-	ID              string    `json:"id"`
-	PayloadID       string    `json:"payloadId"`
-	CurrentFuel     float64   `json:"currentFuel"`     // percentage
-	FuelAtArrival   float64   `json:"fuelAtArrival"`   // percentage
-	ConsumptionRate float64   `json:"consumptionRate"` // %/minute
-	RangeRemaining  float64   `json:"rangeRemaining"`  // meters
-	SafetyMargin    float64   `json:"safetyMargin"`    // percentage
-	CanReachTarget  bool      `json:"canReachTarget"`
-	OptimalSpeed    float64   `json:"optimalSpeed"`    // m/s for fuel efficiency
+	ID              string  `json:"id"`
+	PayloadID       string  `json:"payloadId"`
+	CurrentFuel     float64 `json:"currentFuel"`     // percentage
+	FuelAtArrival   float64 `json:"fuelAtArrival"`   // percentage
+	ConsumptionRate float64 `json:"consumptionRate"` // %/minute
+	RangeRemaining  float64 `json:"rangeRemaining"`  // meters
+	SafetyMargin    float64 `json:"safetyMargin"`    // percentage
+	CanReachTarget  bool    `json:"canReachTarget"`
+	OptimalSpeed    float64 `json:"optimalSpeed"` // m/s for fuel efficiency
 }
 
 // PredictorConfig holds predictor configuration
 type PredictorConfig struct {
-	DefaultHorizon    time.Duration `json:"defaultHorizon"`
-	UpdateInterval    time.Duration `json:"updateInterval"`
-	MinConfidence     float64       `json:"minConfidence"`
-	MaxPredictions    int           `json:"maxPredictions"`
-	EnableKalman      bool          `json:"enableKalman"`
-	EnableML          bool          `json:"enableML"`          // Machine learning predictions
-	HistorySize       int           `json:"historySize"`       // States to keep for ML
+	DefaultHorizon time.Duration `json:"defaultHorizon"`
+	UpdateInterval time.Duration `json:"updateInterval"`
+	MinConfidence  float64       `json:"minConfidence"`
+	MaxPredictions int           `json:"maxPredictions"`
+	EnableKalman   bool          `json:"enableKalman"`
+	EnableML       bool          `json:"enableML"`    // Machine learning predictions
+	HistorySize    int           `json:"historySize"` // States to keep for ML
 }
 
 // Predictor provides AI-powered prediction capabilities
 type Predictor struct {
 	mu sync.RWMutex
 
-	id          string
-	config      PredictorConfig
-	stateHistory map[string][]State        // History per target
+	id           string
+	config       PredictorConfig
+	stateHistory map[string][]State // History per target
 	predictions  map[string]*Prediction
 	contactCache []ContactWindow
 	weatherCache map[string]*WeatherPrediction
@@ -130,8 +130,8 @@ type Predictor struct {
 
 // KalmanState holds Kalman filter state for a target
 type KalmanState struct {
-	X       []float64   // State vector [x, y, z, vx, vy, vz, ax, ay, az]
-	P       [][]float64 // Covariance matrix
+	X          []float64   // State vector [x, y, z, vx, vy, vz, ax, ay, az]
+	P          [][]float64 // Covariance matrix
 	LastUpdate time.Time
 }
 

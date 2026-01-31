@@ -74,13 +74,13 @@ func NewClient(cfg Config) *Client {
 
 // TLE represents Two-Line Element set for satellite orbit prediction.
 type TLE struct {
-	SatelliteID   int       `json:"satelliteId"`
-	Name          string    `json:"name"`
-	Line1         string    `json:"line1"`
-	Line2         string    `json:"line2"`
-	Epoch         time.Time `json:"epoch,omitempty"`
-	RetrievedAt   time.Time `json:"retrievedAt"`
-	Source        string    `json:"source"`
+	SatelliteID int       `json:"satelliteId"`
+	Name        string    `json:"name"`
+	Line1       string    `json:"line1"`
+	Line2       string    `json:"line2"`
+	Epoch       time.Time `json:"epoch,omitempty"`
+	RetrievedAt time.Time `json:"retrievedAt"`
+	Source      string    `json:"source"`
 }
 
 // Position represents a satellite's position at a given time.
@@ -100,28 +100,28 @@ type Position struct {
 
 // VisualPass represents a predicted visible satellite pass.
 type VisualPass struct {
-	StartTime     time.Time `json:"startTime"`
-	StartAzimuth  float64   `json:"startAz"`
+	StartTime      time.Time `json:"startTime"`
+	StartAzimuth   float64   `json:"startAz"`
 	StartElevation float64   `json:"startEl"`
-	MaxTime       time.Time `json:"maxTime"`
-	MaxAzimuth    float64   `json:"maxAz"`
-	MaxElevation  float64   `json:"maxEl"`
-	EndTime       time.Time `json:"endTime"`
-	EndAzimuth    float64   `json:"endAz"`
-	EndElevation  float64   `json:"endEl"`
-	Magnitude     float64   `json:"mag"`
-	Duration      int       `json:"duration"` // seconds
+	MaxTime        time.Time `json:"maxTime"`
+	MaxAzimuth     float64   `json:"maxAz"`
+	MaxElevation   float64   `json:"maxEl"`
+	EndTime        time.Time `json:"endTime"`
+	EndAzimuth     float64   `json:"endAz"`
+	EndElevation   float64   `json:"endEl"`
+	Magnitude      float64   `json:"mag"`
+	Duration       int       `json:"duration"` // seconds
 }
 
 // SatelliteAbove represents a satellite currently above a location.
 type SatelliteAbove struct {
-	SatelliteID int     `json:"satid"`
-	Name        string  `json:"satname"`
-	IntDesignator string `json:"intDesignator"`
-	LaunchDate  string  `json:"launchDate"`
-	Latitude    float64 `json:"satlat"`
-	Longitude   float64 `json:"satlng"`
-	Altitude    float64 `json:"satalt"` // km
+	SatelliteID   int     `json:"satid"`
+	Name          string  `json:"satname"`
+	IntDesignator string  `json:"intDesignator"`
+	LaunchDate    string  `json:"launchDate"`
+	Latitude      float64 `json:"satlat"`
+	Longitude     float64 `json:"satlng"`
+	Altitude      float64 `json:"satalt"` // km
 }
 
 // Observer represents a ground observer's location.
@@ -133,13 +133,13 @@ type Observer struct {
 
 // Common NORAD IDs for testing
 const (
-	NoradISS        = 25544 // International Space Station
-	NoradHubble     = 20580 // Hubble Space Telescope
-	NoradTIROS1     = 29 // First weather satellite
-	NoradLandsat8   = 39084 // Landsat 8
-	NoradTerra      = 25994 // Terra (EOS AM-1)
-	NoradAqua       = 27424 // Aqua (EOS PM-1)
-	NoradNOAA19     = 33591 // NOAA-19
+	NoradISS           = 25544 // International Space Station
+	NoradHubble        = 20580 // Hubble Space Telescope
+	NoradTIROS1        = 29    // First weather satellite
+	NoradLandsat8      = 39084 // Landsat 8
+	NoradTerra         = 25994 // Terra (EOS AM-1)
+	NoradAqua          = 27424 // Aqua (EOS PM-1)
+	NoradNOAA19        = 33591 // NOAA-19
 	NoradStarlinkFirst = 44235 // First operational Starlink
 )
 
@@ -374,17 +374,17 @@ func (c *Client) GetVisualPasses(ctx context.Context, noradID int, observer Obse
 
 	var result struct {
 		Passes []struct {
-			StartUTC   int64   `json:"startUTC"`
-			StartAz    float64 `json:"startAz"`
-			StartEl    float64 `json:"startEl"`
-			MaxUTC     int64   `json:"maxUTC"`
-			MaxAz      float64 `json:"maxAz"`
-			MaxEl      float64 `json:"maxEl"`
-			EndUTC     int64   `json:"endUTC"`
-			EndAz      float64 `json:"endAz"`
-			EndEl      float64 `json:"endEl"`
-			Mag        float64 `json:"mag"`
-			Duration   int     `json:"duration"`
+			StartUTC int64   `json:"startUTC"`
+			StartAz  float64 `json:"startAz"`
+			StartEl  float64 `json:"startEl"`
+			MaxUTC   int64   `json:"maxUTC"`
+			MaxAz    float64 `json:"maxAz"`
+			MaxEl    float64 `json:"maxEl"`
+			EndUTC   int64   `json:"endUTC"`
+			EndAz    float64 `json:"endAz"`
+			EndEl    float64 `json:"endEl"`
+			Mag      float64 `json:"mag"`
+			Duration int     `json:"duration"`
 		} `json:"passes"`
 	}
 

@@ -121,7 +121,7 @@ type ConsentRule struct {
 // ConsentRecord tracks consent status for a person/entity
 type ConsentRecord struct {
 	EntityID    string
-	ConsentType string    // "explicit", "implicit", "emergency_override"
+	ConsentType string // "explicit", "implicit", "emergency_override"
 	GrantedAt   time.Time
 	ExpiresAt   time.Time
 	Scope       []string // Actions covered by this consent

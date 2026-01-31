@@ -15,10 +15,10 @@ import (
 type MAVLinkController struct {
 	mu sync.RWMutex
 
-	port     string
-	baudRate int
+	port      string
+	baudRate  int
 	connected bool
-	protocol *MAVLinkProtocol
+	protocol  *MAVLinkProtocol
 
 	// Command channels
 	attitudeCmd chan AttitudeCommand
@@ -26,11 +26,11 @@ type MAVLinkController struct {
 	velocityCmd chan VelocityCommand
 
 	// Current state from telemetry
-	currentAttitude  [3]float64
-	currentPosition  [3]float64
-	currentVelocity  [3]float64
-	armed            bool
-	flightMode       string
+	currentAttitude [3]float64
+	currentPosition [3]float64
+	currentVelocity [3]float64
+	armed           bool
+	flightMode      string
 
 	// Configuration
 	config MAVLinkConfig
@@ -46,12 +46,12 @@ type MAVLinkController struct {
 
 // MAVLinkConfig holds MAVLink configuration
 type MAVLinkConfig struct {
-	Port          string
-	BaudRate      int
-	SystemID      uint8
-	ComponentID   uint8
-	HeartbeatHz   float64
-	CommandHz     float64
+	Port           string
+	BaudRate       int
+	SystemID       uint8
+	ComponentID    uint8
+	HeartbeatHz    float64
+	CommandHz      float64
 	SimulationMode bool
 }
 

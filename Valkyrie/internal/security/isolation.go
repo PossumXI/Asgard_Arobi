@@ -23,25 +23,25 @@ func (sm *ShadowMonitor) isolateProcess(pid int) error {
 // isolateProcessLinux isolates process using cgroups on Linux
 func (sm *ShadowMonitor) isolateProcessLinux(pid int) error {
 	// Use systemd-run or cgroup-tools to create isolated cgroup
-	cmd := exec.Command("systemd-run", "--scope", "--slice=isolated", 
+	cmd := exec.Command("systemd-run", "--scope", "--slice=isolated",
 		fmt.Sprintf("--property=CPUQuota=10%%"),
 		fmt.Sprintf("--property=MemoryLimit=100M"),
 		fmt.Sprintf("--property=IOWeight=10"),
 		fmt.Sprintf("--property=NetworkNamespacePath=/var/run/netns/isolated_%d", pid),
 		"true")
-	
+
 	if err := cmd.Run(); err != nil {
 		// Fallback: use cgcreate
 		cmd = exec.Command("cgcreate", "-g", fmt.Sprintf("cpu,memory,blkio:isolated_%d", pid))
 		if err := cmd.Run(); err != nil {
 			return fmt.Errorf("failed to create cgroup: %w", err)
 		}
-		
+
 		// Move process to cgroup
 		cmd = exec.Command("cgclassify", "-g", fmt.Sprintf("cpu,memory,blkio:isolated_%d", pid), fmt.Sprintf("%d", pid))
 		return cmd.Run()
 	}
-	
+
 	return nil
 }
 
@@ -55,7 +55,7 @@ func (sm *ShadowMonitor) isolateProcessWindows(pid int) error {
 		$job.CPUAffinity = 1
 		$job.MaxMemory = 100MB
 	`, pid)
-	
+
 	cmd := exec.Command("powershell", "-Command", psScript)
 	return cmd.Run()
 }

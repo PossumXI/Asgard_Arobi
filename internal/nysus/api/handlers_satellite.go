@@ -19,9 +19,9 @@ type SatelliteHandlers struct {
 func NewSatelliteHandlers(apiKey string) *SatelliteHandlers {
 	cfg := services.DefaultTrackingConfig()
 	cfg.N2YOAPIKey = apiKey
-	
+
 	service := services.NewSatelliteTrackingService(cfg)
-	
+
 	return &SatelliteHandlers{
 		trackingService: service,
 	}

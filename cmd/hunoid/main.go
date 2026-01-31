@@ -1511,7 +1511,9 @@ func (m *mockHunoidController) Stop() error {
 	m.mu.Unlock()
 	return nil
 }
-func (m *mockHunoidController) GetJointStates() ([]control.Joint, error) { return []control.Joint{}, nil }
+func (m *mockHunoidController) GetJointStates() ([]control.Joint, error) {
+	return []control.Joint{}, nil
+}
 func (m *mockHunoidController) SetJointPositions(positions map[string]float64) error {
 	return nil
 }

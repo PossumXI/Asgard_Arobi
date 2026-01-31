@@ -61,7 +61,7 @@ func (s *Server) handleAccessCodeValidate(w http.ResponseWriter, r *http.Request
 type adminAccessCodeRequest struct {
 	UserID                string `json:"userId,omitempty"`
 	Email                 string `json:"email,omitempty"`
-	ClearanceLevel         string `json:"clearanceLevel,omitempty"`
+	ClearanceLevel        string `json:"clearanceLevel,omitempty"`
 	Scope                 string `json:"scope,omitempty"`
 	ExpiresInHours        int    `json:"expiresInHours,omitempty"`
 	MaxUses               *int   `json:"maxUses,omitempty"`
@@ -115,7 +115,7 @@ func (s *Server) handleAdminAccessCodes(w http.ResponseWriter, r *http.Request) 
 		result, err := s.accessCodeService.IssueForUser(r.Context(), services.AccessCodeIssueRequest{
 			UserID:                userID,
 			CreatedBy:             s.getRequesterID(r),
-			ClearanceLevel:         req.ClearanceLevel,
+			ClearanceLevel:        req.ClearanceLevel,
 			Scope:                 req.Scope,
 			ExpiresAt:             expiresAt,
 			MaxUses:               req.MaxUses,

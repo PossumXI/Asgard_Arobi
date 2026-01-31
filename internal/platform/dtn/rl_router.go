@@ -85,8 +85,8 @@ func (r *RLRoutingAgent) SelectNextHop(ctx context.Context, b *bundle.Bundle, ne
 	minEnergy := r.model.MinEnergyByPriority[priorityKey]
 
 	type scored struct {
-		id     string
-		score  float64
+		id      string
+		score   float64
 		latency time.Duration
 	}
 
@@ -104,8 +104,8 @@ func (r *RLRoutingAgent) SelectNextHop(ctx context.Context, b *bundle.Bundle, ne
 		features := r.buildFeatures(neighbor, b, energyScore)
 		score := dot(weights, features)
 		candidates = append(candidates, scored{
-			id:     id,
-			score:  score,
+			id:      id,
+			score:   score,
 			latency: neighbor.Latency,
 		})
 	}
@@ -143,12 +143,12 @@ func (r *RLRoutingAgent) buildFeatures(neighbor *Neighbor, b *bundle.Bundle, ene
 	}
 
 	featureMap := map[string]float64{
-		"link_quality":  neighbor.LinkQuality,
-		"latency_score": latencyScore,
-		"bandwidth":     bandwidthScore,
+		"link_quality":   neighbor.LinkQuality,
+		"latency_score":  latencyScore,
+		"bandwidth":      bandwidthScore,
 		"contact_active": contactActive,
-		"path_match":    pathMatch,
-		"energy_score":  energyScore,
+		"path_match":     pathMatch,
+		"energy_score":   energyScore,
 	}
 
 	features := make([]float64, 0, len(r.model.FeatureOrder))

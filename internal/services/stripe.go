@@ -269,7 +269,7 @@ func (s *StripeService) handleCheckoutCompleted(event stripe.Event) error {
 	dbSub := &db.Subscription{
 		ID:                   uuid.New(),
 		UserID:               uid,
-		StripeSubscriptionID:  sql.NullString{String: subscriptionID, Valid: true},
+		StripeSubscriptionID: sql.NullString{String: subscriptionID, Valid: true},
 		StripeCustomerID:     sql.NullString{String: sess.Customer.ID, Valid: true},
 		Tier:                 sql.NullString{String: tier, Valid: true},
 		Status:               string(sub.Status),
@@ -302,18 +302,18 @@ func (s *StripeService) handleSubscriptionUpdated(event stripe.Event) error {
 		if subscription.Customer == nil {
 			return fmt.Errorf("subscription has no customer")
 		}
-		
+
 		// Find user by Stripe customer ID
 		userSub, err := s.subscriptionRepo.GetByStripeCustomerID(subscription.Customer.ID)
 		if err != nil {
 			return fmt.Errorf("subscription not found: %w", err)
 		}
-		
+
 		uid, _ := uuid.Parse(userSub.UserID.String())
 		dbSub := &db.Subscription{
 			ID:                   uuid.New(),
 			UserID:               uid,
-			StripeSubscriptionID:  sql.NullString{String: subscription.ID, Valid: true},
+			StripeSubscriptionID: sql.NullString{String: subscription.ID, Valid: true},
 			StripeCustomerID:     sql.NullString{String: subscription.Customer.ID, Valid: true},
 			Tier:                 sql.NullString{String: extractTierFromSubscription(&subscription), Valid: true},
 			Status:               string(subscription.Status),
@@ -330,7 +330,7 @@ func (s *StripeService) handleSubscriptionUpdated(event stripe.Event) error {
 	sub.CurrentPeriodStart = sql.NullTime{Time: time.Unix(subscription.CurrentPeriodStart, 0), Valid: true}
 	sub.CurrentPeriodEnd = sql.NullTime{Time: time.Unix(subscription.CurrentPeriodEnd, 0), Valid: true}
 	sub.UpdatedAt = time.Now()
-	
+
 	// Update tier if changed
 	if tier := extractTierFromSubscription(&subscription); tier != "" {
 		sub.Tier = sql.NullString{String: tier, Valid: true}

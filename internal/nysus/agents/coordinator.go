@@ -36,17 +36,17 @@ const (
 
 // Agent represents a specialized AI agent
 type Agent struct {
-	ID          string
-	Name        string
-	Type        AgentType
-	Description string
-	Status      AgentStatus
+	ID           string
+	Name         string
+	Type         AgentType
+	Description  string
+	Status       AgentStatus
 	Capabilities []string
-	LastActive  time.Time
-	TaskQueue   chan *Task
-	handler     AgentHandler
-	stopCh      chan struct{}
-	wg          sync.WaitGroup
+	LastActive   time.Time
+	TaskQueue    chan *Task
+	handler      AgentHandler
+	stopCh       chan struct{}
+	wg           sync.WaitGroup
 }
 
 // AgentHandler processes tasks for an agent
@@ -443,10 +443,10 @@ func securityHandler(ctx context.Context, task *Task) (*TaskResult, error) {
 	return &TaskResult{
 		Success: true,
 		Data: map[string]interface{}{
-			"threat_level":     "low",
-			"vulnerabilities":  0,
-			"recommendations":  []string{"Continue monitoring"},
-			"next_scan":        time.Now().Add(5 * time.Minute).Format(time.RFC3339),
+			"threat_level":    "low",
+			"vulnerabilities": 0,
+			"recommendations": []string{"Continue monitoring"},
+			"next_scan":       time.Now().Add(5 * time.Minute).Format(time.RFC3339),
 		},
 		Metrics: map[string]float64{
 			"scan_duration_ms": 100,
@@ -461,10 +461,10 @@ func emergencyHandler(ctx context.Context, task *Task) (*TaskResult, error) {
 	return &TaskResult{
 		Success: true,
 		Data: map[string]interface{}{
-			"response_type":   "rapid",
-			"resources_allocated": []string{"hunoid-001", "hunoid-002"},
+			"response_type":                   "rapid",
+			"resources_allocated":             []string{"hunoid-001", "hunoid-002"},
 			"estimated_response_time_seconds": 120,
-			"status": "dispatched",
+			"status":                          "dispatched",
 		},
 		Metrics: map[string]float64{
 			"response_time_ms": 50,

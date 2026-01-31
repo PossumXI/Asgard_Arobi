@@ -55,22 +55,22 @@ type FileAccessEvent struct {
 
 // NetworkAccessEvent tracks network activity
 type NetworkAccessEvent struct {
-	Timestamp   time.Time
-	RemoteAddr  string
-	RemotePort  int
-	Protocol    string
-	Direction   string // inbound, outbound
-	BytesSent   uint64
-	BytesRecv   uint64
-	Blocked     bool
+	Timestamp  time.Time
+	RemoteAddr string
+	RemotePort int
+	Protocol   string
+	Direction  string // inbound, outbound
+	BytesSent  uint64
+	BytesRecv  uint64
+	Blocked    bool
 }
 
 // SyscallEvent tracks system calls
 type SyscallEvent struct {
-	Timestamp time.Time
-	Name      string
-	Args      []interface{}
-	RetVal    int
+	Timestamp  time.Time
+	Name       string
+	Args       []interface{}
+	RetVal     int
 	Suspicious bool
 }
 
@@ -89,13 +89,13 @@ type Anomaly struct {
 type AnomalyType string
 
 const (
-	AnomalyTypeProcessInjection   AnomalyType = "process_injection"
+	AnomalyTypeProcessInjection    AnomalyType = "process_injection"
 	AnomalyTypePrivilegeEscalation AnomalyType = "privilege_escalation"
-	AnomalyTypeSuspiciousSyscall  AnomalyType = "suspicious_syscall"
+	AnomalyTypeSuspiciousSyscall   AnomalyType = "suspicious_syscall"
 	AnomalyTypeNetworkExfiltration AnomalyType = "network_exfiltration"
-	AnomalyTypeFileIntegrity      AnomalyType = "file_integrity"
-	AnomalyTypeBehaviorDeviation  AnomalyType = "behavior_deviation"
-	AnomalyTypeMemoryCorruption   AnomalyType = "memory_corruption"
+	AnomalyTypeFileIntegrity       AnomalyType = "file_integrity"
+	AnomalyTypeBehaviorDeviation   AnomalyType = "behavior_deviation"
+	AnomalyTypeMemoryCorruption    AnomalyType = "memory_corruption"
 )
 
 // BehaviorProfile represents expected behavior for a process
@@ -112,24 +112,24 @@ type BehaviorProfile struct {
 
 // ShadowStack manages parallel execution monitoring
 type ShadowStack struct {
-	mu              sync.RWMutex
-	executions      map[string]*Execution
-	profiles        map[string]*BehaviorProfile
-	anomalies       []Anomaly
-	anomalyChan     chan Anomaly
-	config          Config
-	stopCh          chan struct{}
-	wg              sync.WaitGroup
+	mu          sync.RWMutex
+	executions  map[string]*Execution
+	profiles    map[string]*BehaviorProfile
+	anomalies   []Anomaly
+	anomalyChan chan Anomaly
+	config      Config
+	stopCh      chan struct{}
+	wg          sync.WaitGroup
 }
 
 // Config holds shadow stack configuration
 type Config struct {
-	MaxExecutions      int
-	AnomalyThreshold   float64
-	ProfileStrictness  string // strict, moderate, permissive
-	EnableHeuristics   bool
-	MonitorInterval    time.Duration
-	RetentionDuration  time.Duration
+	MaxExecutions     int
+	AnomalyThreshold  float64
+	ProfileStrictness string // strict, moderate, permissive
+	EnableHeuristics  bool
+	MonitorInterval   time.Duration
+	RetentionDuration time.Duration
 }
 
 // DefaultConfig returns default configuration
@@ -533,11 +533,11 @@ func (s *ShadowStack) isNetworkAllowed(addr string, allowedNetworks []string) bo
 
 func (s *ShadowStack) isSyscallSuspicious(name string, args []interface{}) bool {
 	suspiciousCalls := map[string]bool{
-		"ptrace":      true,
-		"mprotect":    true,
+		"ptrace":            true,
+		"mprotect":          true,
 		"process_vm_writev": true,
-		"process_vm_readv": true,
-		"memfd_create": true,
+		"process_vm_readv":  true,
+		"memfd_create":      true,
 	}
 	return suspiciousCalls[name]
 }

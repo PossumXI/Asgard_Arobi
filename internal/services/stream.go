@@ -211,12 +211,12 @@ func (s *StreamService) CreateStreamSession(streamID, userID string) (map[string
 	}
 
 	return map[string]interface{}{
-		"streamId":      streamID,
-		"sessionId":     sessionID,
-		"iceServers":    iceServers,
-		"signalingUrl":  s.sessionConfig.SignalingURL,
-		"authToken":     authToken,
-		"expiresAt":     expiresAt.Format(time.RFC3339),
+		"streamId":     streamID,
+		"sessionId":    sessionID,
+		"iceServers":   iceServers,
+		"signalingUrl": s.sessionConfig.SignalingURL,
+		"authToken":    authToken,
+		"expiresAt":    expiresAt.Format(time.RFC3339),
 	}, nil
 }
 

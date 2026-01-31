@@ -465,7 +465,7 @@ func (sm *ShadowMonitor) quarantineProcess(pid int) {
 		if proc.PID == pid {
 			proc.Status = ProcessStatusQuarantined
 			sm.logger.WithField("pid", pid).Warn("Process quarantined")
-			
+
 			// Implement process isolation using cgroups (Linux)
 			// On Windows, use job objects or process groups
 			if err := sm.isolateProcess(pid); err != nil {
@@ -482,14 +482,14 @@ func (sm *ShadowMonitor) killProcess(pid int) {
 	defer sm.mu.Unlock()
 
 	sm.logger.WithField("pid", pid).Error("Terminating compromised process")
-	
+
 	// Terminate process using syscall
 	proc, err := os.FindProcess(pid)
 	if err != nil {
 		sm.logger.WithError(err).Error("Failed to find process")
 		return
 	}
-	
+
 	if err := proc.Signal(syscall.SIGKILL); err != nil {
 		sm.logger.WithError(err).Error("Failed to kill process")
 		// Fallback: use kill command

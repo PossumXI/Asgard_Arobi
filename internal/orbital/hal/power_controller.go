@@ -28,36 +28,36 @@ type PowerConfig struct {
 	Protocol string `json:"protocol"`
 
 	// Connection settings
-	Address    string `json:"address"`     // IP address or device path
-	Port       int    `json:"port"`        // TCP port
-	BusID      int    `json:"busId"`       // I2C/CAN bus ID
-	DeviceAddr int    `json:"deviceAddr"`  // I2C device address
+	Address    string `json:"address"`    // IP address or device path
+	Port       int    `json:"port"`       // TCP port
+	BusID      int    `json:"busId"`      // I2C/CAN bus ID
+	DeviceAddr int    `json:"deviceAddr"` // I2C device address
 
 	// Hardware configuration
-	BatteryCapacity  float64 `json:"batteryCapacity"`  // Wh
-	SolarPanelPower  float64 `json:"solarPanelPower"`  // W nominal
-	NumBatteryCells  int     `json:"numBatteryCells"`
-	CellVoltageMin   float64 `json:"cellVoltageMin"`   // V
-	CellVoltageMax   float64 `json:"cellVoltageMax"`   // V
-	
+	BatteryCapacity float64 `json:"batteryCapacity"` // Wh
+	SolarPanelPower float64 `json:"solarPanelPower"` // W nominal
+	NumBatteryCells int     `json:"numBatteryCells"`
+	CellVoltageMin  float64 `json:"cellVoltageMin"` // V
+	CellVoltageMax  float64 `json:"cellVoltageMax"` // V
+
 	// Satellite-specific
-	SatelliteID  string `json:"satelliteId"`
+	SatelliteID   string        `json:"satelliteId"`
 	OrbitalPeriod time.Duration `json:"orbitalPeriod"` // Typical LEO: 90-100 min
 }
 
 // PowerTelemetry contains real-time power telemetry
 type PowerTelemetry struct {
-	BatteryVoltage      float64   `json:"batteryVoltage"`      // V
-	BatteryCurrent      float64   `json:"batteryCurrent"`      // A
-	BatteryTemperature  float64   `json:"batteryTemperature"`  // C
-	BatteryPercent      float64   `json:"batteryPercent"`      // %
-	SolarPanelVoltage   float64   `json:"solarPanelVoltage"`   // V
-	SolarPanelCurrent   float64   `json:"solarPanelCurrent"`   // A
-	SolarPanelPower     float64   `json:"solarPanelPower"`     // W
-	TotalPowerDraw      float64   `json:"totalPowerDraw"`      // W
-	InEclipse           bool      `json:"inEclipse"`
-	ChargeState         string    `json:"chargeState"`         // charging, discharging, full
-	Timestamp           time.Time `json:"timestamp"`
+	BatteryVoltage     float64   `json:"batteryVoltage"`     // V
+	BatteryCurrent     float64   `json:"batteryCurrent"`     // A
+	BatteryTemperature float64   `json:"batteryTemperature"` // C
+	BatteryPercent     float64   `json:"batteryPercent"`     // %
+	SolarPanelVoltage  float64   `json:"solarPanelVoltage"`  // V
+	SolarPanelCurrent  float64   `json:"solarPanelCurrent"`  // A
+	SolarPanelPower    float64   `json:"solarPanelPower"`    // W
+	TotalPowerDraw     float64   `json:"totalPowerDraw"`     // W
+	InEclipse          bool      `json:"inEclipse"`
+	ChargeState        string    `json:"chargeState"` // charging, discharging, full
+	Timestamp          time.Time `json:"timestamp"`
 }
 
 // NewSatellitePowerController creates a new power controller
@@ -111,7 +111,7 @@ func (p *SatellitePowerController) Initialize(ctx context.Context) error {
 
 func (p *SatellitePowerController) initTCP(ctx context.Context) error {
 	addr := fmt.Sprintf("%s:%d", p.config.Address, p.config.Port)
-	
+
 	dialer := net.Dialer{Timeout: 10 * time.Second}
 	conn, err := dialer.DialContext(ctx, "tcp", addr)
 	if err != nil {
@@ -142,7 +142,7 @@ func (p *SatellitePowerController) initCAN(ctx context.Context) error {
 	// CAN bus access via SocketCAN on Linux or USB-CAN adapters
 	// For satellite ground testing
 	addr := fmt.Sprintf("can%d", p.config.BusID)
-	
+
 	conn, err := net.Dial("unixgram", "/tmp/can_socket_"+addr)
 	if err != nil {
 		// Fallback to TCP gateway
@@ -212,11 +212,11 @@ func (p *SatellitePowerController) readTelemetry() error {
 func (p *SatellitePowerController) calculateBatteryPercent() float64 {
 	// Calculate SoC from voltage using Li-ion discharge curve
 	cellVoltage := p.lastTelemetry.BatteryVoltage / float64(p.config.NumBatteryCells)
-	
+
 	// Simplified Li-ion voltage to SoC mapping
 	minV := p.config.CellVoltageMin
 	maxV := p.config.CellVoltageMax
-	
+
 	if cellVoltage <= minV {
 		return 0.0
 	}
@@ -226,7 +226,7 @@ func (p *SatellitePowerController) calculateBatteryPercent() float64 {
 
 	// Non-linear mapping (approximation of Li-ion curve)
 	normalized := (cellVoltage - minV) / (maxV - minV)
-	
+
 	// Apply curve correction
 	if normalized < 0.2 {
 		return normalized * 50.0
@@ -381,7 +381,7 @@ func (p *SatellitePowerController) PredictEclipse(startTime time.Time, duration 
 		// Find next eclipse start
 		orbitsElapsed := float64(current.Sub(startTime)) / float64(orbitalPeriod)
 		nextOrbit := math.Ceil(orbitsElapsed)
-		
+
 		eclipseStart := startTime.Add(time.Duration(float64(orbitalPeriod) * (nextOrbit - eclipseFraction/2)))
 		eclipseEnd := eclipseStart.Add(eclipseDuration)
 

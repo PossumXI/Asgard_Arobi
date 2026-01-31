@@ -37,16 +37,16 @@ type HunoidConfig struct {
 	Protocol string `json:"protocol"`
 
 	// Connection settings
-	Address    string `json:"address"`    // IP address or ROS2 namespace
-	Port       int    `json:"port"`
-	ROS2Topic  string `json:"ros2Topic"`  // For ROS2 protocol
-	CANBusID   int    `json:"canBusId"`   // For CAN protocol
+	Address   string `json:"address"` // IP address or ROS2 namespace
+	Port      int    `json:"port"`
+	ROS2Topic string `json:"ros2Topic"` // For ROS2 protocol
+	CANBusID  int    `json:"canBusId"`  // For CAN protocol
 
 	// Robot configuration
-	RobotID      string   `json:"robotId"`
-	Model        string   `json:"model"`        // e.g., "hunoid-v1", "atlas", "spot"
-	JointNames   []string `json:"jointNames"`
-	JointLimits  map[string][2]float64 `json:"jointLimits"` // [min, max] radians
+	RobotID     string                `json:"robotId"`
+	Model       string                `json:"model"` // e.g., "hunoid-v1", "atlas", "spot"
+	JointNames  []string              `json:"jointNames"`
+	JointLimits map[string][2]float64 `json:"jointLimits"` // [min, max] radians
 
 	// Motion settings
 	MaxLinearVelocity  float64 `json:"maxLinearVelocity"`  // m/s
@@ -59,22 +59,22 @@ type HunoidConfig struct {
 	SafetyZone         float64 `json:"safetyZone"` // meters
 
 	// Update rates
-	ControlLoopRate  int `json:"controlLoopRate"`  // Hz
-	TelemetryRate    int `json:"telemetryRate"`    // Hz
+	ControlLoopRate int `json:"controlLoopRate"` // Hz
+	TelemetryRate   int `json:"telemetryRate"`   // Hz
 }
 
 // HunoidTelemetry contains real-time robot telemetry
 type HunoidTelemetry struct {
-	Position       Pose               `json:"position"`
-	JointStates    []Joint            `json:"jointStates"`
-	BatteryPercent float64            `json:"batteryPercent"`
-	BatteryVoltage float64            `json:"batteryVoltage"`
-	Temperature    float64            `json:"temperature"`
-	Status         string             `json:"status"`
-	Errors         []string           `json:"errors"`
-	IMUData        IMUReading         `json:"imuData"`
-	FootForces     [2]float64         `json:"footForces"` // Left, Right
-	Timestamp      time.Time          `json:"timestamp"`
+	Position       Pose       `json:"position"`
+	JointStates    []Joint    `json:"jointStates"`
+	BatteryPercent float64    `json:"batteryPercent"`
+	BatteryVoltage float64    `json:"batteryVoltage"`
+	Temperature    float64    `json:"temperature"`
+	Status         string     `json:"status"`
+	Errors         []string   `json:"errors"`
+	IMUData        IMUReading `json:"imuData"`
+	FootForces     [2]float64 `json:"footForces"` // Left, Right
+	Timestamp      time.Time  `json:"timestamp"`
 }
 
 // IMUReading represents IMU sensor data
@@ -192,7 +192,7 @@ func (h *RealHunoidController) Initialize(ctx context.Context) error {
 
 func (h *RealHunoidController) initHTTP(ctx context.Context) error {
 	url := fmt.Sprintf("http://%s:%d/api/status", h.config.Address, h.config.Port)
-	
+
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
 		return err
@@ -210,7 +210,7 @@ func (h *RealHunoidController) initHTTP(ctx context.Context) error {
 func (h *RealHunoidController) initROS2(ctx context.Context) error {
 	// ROS2 initialization via ros2-go or DDS directly
 	// Real implementation would use rclgo or similar
-	
+
 	// For now, attempt TCP connection to ROS2 bridge
 	addr := net.JoinHostPort(h.config.Address, strconv.Itoa(h.config.Port))
 	conn, err := net.DialTimeout("tcp", addr, 5*time.Second)
@@ -225,7 +225,7 @@ func (h *RealHunoidController) initROS2(ctx context.Context) error {
 func (h *RealHunoidController) initCAN(ctx context.Context) error {
 	// CAN bus initialization via SocketCAN
 	addr := fmt.Sprintf("can%d", h.config.CANBusID)
-	
+
 	conn, err := net.Dial("unixgram", "/tmp/can_socket_"+addr)
 	if err != nil {
 		// Fallback to TCP CAN gateway
@@ -243,7 +243,7 @@ func (h *RealHunoidController) initCAN(ctx context.Context) error {
 func (h *RealHunoidController) initEtherCAT(ctx context.Context) error {
 	// EtherCAT initialization
 	// Real implementation would use SOEM or IgH EtherCAT Master
-	
+
 	addr := net.JoinHostPort(h.config.Address, strconv.Itoa(h.config.Port))
 	conn, err := net.DialTimeout("tcp", addr, 5*time.Second)
 	if err != nil {
@@ -270,7 +270,7 @@ func (h *RealHunoidController) enableMotors() error {
 
 func (h *RealHunoidController) httpCommand(method, path string, body interface{}) error {
 	url := fmt.Sprintf("http://%s:%d%s", h.config.Address, h.config.Port, path)
-	
+
 	var bodyReader io.Reader
 	if body != nil {
 		data, err := json.Marshal(body)
@@ -332,7 +332,7 @@ func (h *RealHunoidController) updateTelemetry() {
 
 func (h *RealHunoidController) updateTelemetryHTTP() {
 	url := fmt.Sprintf("http://%s:%d/api/telemetry", h.config.Address, h.config.Port)
-	
+
 	resp, err := h.httpClient.Get(url)
 	if err != nil {
 		return
@@ -346,7 +346,7 @@ func (h *RealHunoidController) updateTelemetryHTTP() {
 
 	h.telemetry = telem
 	h.currentPose = telem.Position
-	
+
 	for _, js := range telem.JointStates {
 		if joint, exists := h.joints[js.ID]; exists {
 			*joint = js
@@ -376,12 +376,12 @@ func (h *RealHunoidController) updateTelemetryDirect() {
 	h.telemetry.BatteryPercent = float64(binary.BigEndian.Uint16(buf[0:2])) / 100.0
 	h.telemetry.BatteryVoltage = float64(binary.BigEndian.Uint16(buf[2:4])) / 100.0
 	h.telemetry.Temperature = float64(int16(binary.BigEndian.Uint16(buf[4:6]))) / 10.0
-	
+
 	// Parse position
 	h.currentPose.Position.X = math.Float64frombits(binary.BigEndian.Uint64(buf[8:16]))
 	h.currentPose.Position.Y = math.Float64frombits(binary.BigEndian.Uint64(buf[16:24]))
 	h.currentPose.Position.Z = math.Float64frombits(binary.BigEndian.Uint64(buf[24:32]))
-	
+
 	h.telemetry.Position = h.currentPose
 	h.telemetry.Timestamp = time.Now()
 }
@@ -446,7 +446,7 @@ func (h *RealHunoidController) moveToDirect(ctx context.Context, target Pose) er
 	buf := make([]byte, 64)
 	buf[0] = 0xAA // Magic
 	buf[1] = 0x03 // Move command
-	
+
 	binary.BigEndian.PutUint64(buf[8:16], math.Float64bits(target.Position.X))
 	binary.BigEndian.PutUint64(buf[16:24], math.Float64bits(target.Position.Y))
 	binary.BigEndian.PutUint64(buf[24:32], math.Float64bits(target.Position.Z))
@@ -538,7 +538,7 @@ func (h *RealHunoidController) setJointPositionsDirect(positions map[string]floa
 				break
 			}
 		}
-		
+
 		buf[offset] = byte(idx)
 		offset++
 		binary.BigEndian.PutUint64(buf[offset:offset+8], math.Float64bits(position))

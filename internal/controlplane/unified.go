@@ -23,8 +23,8 @@ type UnifiedControlPlane struct {
 	coordinator *Coordinator
 
 	// Connected systems
-	dtnNodes      map[string]*dtn.Node
-	ethicsKernel  *ethics.EthicalKernel
+	dtnNodes        map[string]*dtn.Node
+	ethicsKernel    *ethics.EthicalKernel
 	securityScanner SecurityScannerAdapter
 
 	// NATS connection for external events
@@ -58,55 +58,55 @@ type SecurityScannerAdapter interface {
 
 // SystemStatus tracks the status of a connected system.
 type SystemStatus struct {
-	SystemID      string            `json:"system_id"`
-	SystemType    AutonomySystemType `json:"system_type"`
-	Domain        EventDomain       `json:"domain"`
-	State         AutonomyState     `json:"state"`
-	LastHeartbeat time.Time         `json:"last_heartbeat"`
-	LastEvent     *CrossDomainEvent `json:"last_event,omitempty"`
+	SystemID      string                 `json:"system_id"`
+	SystemType    AutonomySystemType     `json:"system_type"`
+	Domain        EventDomain            `json:"domain"`
+	State         AutonomyState          `json:"state"`
+	LastHeartbeat time.Time              `json:"last_heartbeat"`
+	LastEvent     *CrossDomainEvent      `json:"last_event,omitempty"`
 	Metadata      map[string]interface{} `json:"metadata"`
 }
 
 // HealthStatus represents the overall health of the control plane.
 type HealthStatus struct {
-	Status           string                 `json:"status"` // healthy, degraded, critical
-	LastCheck        time.Time              `json:"last_check"`
-	ActiveSystems    int                    `json:"active_systems"`
-	TotalSystems     int                    `json:"total_systems"`
-	ActiveAlerts     int                    `json:"active_alerts"`
-	DomainHealth     map[EventDomain]string `json:"domain_health"`
-	Uptime           time.Duration          `json:"uptime_ns"`
-	startTime        time.Time
+	Status        string                 `json:"status"` // healthy, degraded, critical
+	LastCheck     time.Time              `json:"last_check"`
+	ActiveSystems int                    `json:"active_systems"`
+	TotalSystems  int                    `json:"total_systems"`
+	ActiveAlerts  int                    `json:"active_alerts"`
+	DomainHealth  map[EventDomain]string `json:"domain_health"`
+	Uptime        time.Duration          `json:"uptime_ns"`
+	startTime     time.Time
 }
 
 // ControlPlaneMetrics tracks control plane performance.
 type ControlPlaneMetrics struct {
 	mu                sync.RWMutex
-	EventsProcessed   int64             `json:"events_processed"`
+	EventsProcessed   int64                 `json:"events_processed"`
 	EventsByDomain    map[EventDomain]int64 `json:"events_by_domain"`
-	CommandsIssued    int64             `json:"commands_issued"`
-	CommandsSucceeded int64             `json:"commands_succeeded"`
-	CommandsFailed    int64             `json:"commands_failed"`
-	CoordinationRuns  int64             `json:"coordination_runs"`
-	AverageLatency    time.Duration     `json:"average_latency_ns"`
-	LastUpdated       time.Time         `json:"last_updated"`
+	CommandsIssued    int64                 `json:"commands_issued"`
+	CommandsSucceeded int64                 `json:"commands_succeeded"`
+	CommandsFailed    int64                 `json:"commands_failed"`
+	CoordinationRuns  int64                 `json:"coordination_runs"`
+	AverageLatency    time.Duration         `json:"average_latency_ns"`
+	LastUpdated       time.Time             `json:"last_updated"`
 }
 
 // Config holds configuration for the UnifiedControlPlane.
 type Config struct {
-	NATSUrl           string
-	EventHistorySize  int
+	NATSUrl             string
+	EventHistorySize    int
 	HealthCheckInterval time.Duration
-	HeartbeatTimeout  time.Duration
+	HeartbeatTimeout    time.Duration
 }
 
 // DefaultConfig returns sensible defaults.
 func DefaultConfig() Config {
 	return Config{
-		NATSUrl:           "nats://localhost:4222",
-		EventHistorySize:  10000,
+		NATSUrl:             "nats://localhost:4222",
+		EventHistorySize:    10000,
 		HealthCheckInterval: 30 * time.Second,
-		HeartbeatTimeout:  2 * time.Minute,
+		HeartbeatTimeout:    2 * time.Minute,
 	}
 }
 

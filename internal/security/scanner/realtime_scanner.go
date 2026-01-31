@@ -8,11 +8,11 @@ import (
 
 // RealtimeScanner implements the Scanner interface with real packet capture and analysis.
 type RealtimeScanner struct {
-	capture  *PacketCapture
-	analyzer *TrafficAnalyzer
-	stats    Statistics
-	mu       sync.RWMutex
-	running  bool
+	capture   *PacketCapture
+	analyzer  *TrafficAnalyzer
+	stats     Statistics
+	mu        sync.RWMutex
+	running   bool
 	onAnomaly func(*Anomaly)
 }
 

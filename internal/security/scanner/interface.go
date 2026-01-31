@@ -8,15 +8,15 @@ import (
 
 // PacketInfo represents network packet metadata
 type PacketInfo struct {
-	SourceIP      net.IP
-	DestIP        net.IP
-	SourcePort    int
-	DestPort      int
-	Protocol      string
-	Size          int
-	Timestamp     time.Time
-	Payload       []byte
-	Flags         string
+	SourceIP   net.IP
+	DestIP     net.IP
+	SourcePort int
+	DestPort   int
+	Protocol   string
+	Size       int
+	Timestamp  time.Time
+	Payload    []byte
+	Flags      string
 }
 
 // ThreatLevel represents threat severity
@@ -49,7 +49,7 @@ type Scanner interface {
 
 // Statistics contains scanner metrics
 type Statistics struct {
-	PacketsScanned   uint64
+	PacketsScanned    uint64
 	AnomaliesDetected uint64
 	ThreatsBlocked    uint64
 	StartTime         time.Time

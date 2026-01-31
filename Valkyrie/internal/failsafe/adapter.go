@@ -26,7 +26,7 @@ func (a *MAVLinkAdapter) SendAttitudeCommand(cmd AttitudeCommand) error {
 		Throttle:  cmd.Throttle,
 		Timestamp: time.Now(),
 	}
-	
+
 	return a.controller.SendAttitudeCommand(actuatorCmd)
 }
 
@@ -38,7 +38,7 @@ func (a *MAVLinkAdapter) SendPositionCommand(cmd PositionCommand) error {
 		Z:         cmd.Z,
 		Timestamp: time.Now(),
 	}
-	
+
 	return a.controller.SendPositionCommand(actuatorCmd)
 }
 
@@ -50,7 +50,7 @@ func (a *MAVLinkAdapter) SendVelocityCommand(cmd VelocityCommand) error {
 		Vz:        cmd.Vz,
 		Timestamp: time.Now(),
 	}
-	
+
 	return a.controller.SendVelocityCommand(actuatorCmd)
 }
 

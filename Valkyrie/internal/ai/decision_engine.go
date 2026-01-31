@@ -127,13 +127,13 @@ type Waypoint struct {
 
 // MissionConstraints defines mission limits
 type MissionConstraints struct {
-	MaxAltitude   float64
-	MinAltitude   float64
-	MaxSpeed      float64
-	NoFlyZones    []NoFlyZone
-	TimeWindow    [2]time.Time
-	FuelReserve   float64
-	StealthLevel  float64
+	MaxAltitude  float64
+	MinAltitude  float64
+	MaxSpeed     float64
+	NoFlyZones   []NoFlyZone
+	TimeWindow   [2]time.Time
+	FuelReserve  float64
+	StealthLevel float64
 }
 
 // NoFlyZone represents a restricted area
@@ -278,10 +278,10 @@ func (de *DecisionEngine) Decide(ctx context.Context) (*FlightCommand, error) {
 	// If no state available, create a default
 	if de.currentState == nil {
 		de.currentState = &fusion.FusionState{
-			Position:    [3]float64{0, 0, 500}, // Default safe altitude
-			Velocity:    [3]float64{0, 0, 0},
-			Attitude:    [3]float64{0, 0, 0},
-			Confidence:  0.5,
+			Position:   [3]float64{0, 0, 500}, // Default safe altitude
+			Velocity:   [3]float64{0, 0, 0},
+			Attitude:   [3]float64{0, 0, 0},
+			Confidence: 0.5,
 		}
 	}
 
@@ -461,7 +461,7 @@ func (de *DecisionEngine) getWeatherConditions() *WeatherConditions {
 		}
 		de.logger.WithError(err).Debug("Failed to get weather from Silenus, using defaults")
 	}
-	
+
 	// Fallback to default conditions
 	return &WeatherConditions{
 		WindSpeed:     5.0,
@@ -571,10 +571,10 @@ func (rl *ReinforcementLearningPolicy) SelectAction(
 	// Production-ready RL policy using Q-learning with linear function approximation
 	// Extract state features for function approximation
 	stateFeatures := rl.extractFeatures(state, threats, weather, posError)
-	
+
 	// Compute Q-values for action space using linear approximation: Q(s,a) = w^T * phi(s,a)
 	qValues := rl.computeQValues(stateFeatures)
-	
+
 	// Epsilon-greedy action selection
 	var action *RLAction
 	if rand.Float64() < rl.epsilon {
@@ -584,7 +584,7 @@ func (rl *ReinforcementLearningPolicy) SelectAction(
 		// Exploitation: select best action from Q-values
 		action = rl.exploitAction(qValues, state, threats, weather)
 	}
-	
+
 	// Apply safety constraints
 	action = rl.applySafetyConstraints(action, state, threats, weather)
 

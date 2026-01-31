@@ -32,12 +32,12 @@ func (m *mockStealthOptimizer) CalculateThermalSignature(wp guidance.Waypoint) f
 
 // BenchmarkResult stores benchmark results for reporting
 type BenchmarkResult struct {
-	TestName        string        `json:"testName"`
-	Duration        time.Duration `json:"duration"`
-	Accuracy        float64       `json:"accuracy"`
-	ErrorMargin     float64       `json:"errorMargin"`
-	Passed          bool          `json:"passed"`
-	Details         string        `json:"details"`
+	TestName    string        `json:"testName"`
+	Duration    time.Duration `json:"duration"`
+	Accuracy    float64       `json:"accuracy"`
+	ErrorMargin float64       `json:"errorMargin"`
+	Passed      bool          `json:"passed"`
+	Details     string        `json:"details"`
 }
 
 // AccuracyReport contains all benchmark results
@@ -53,17 +53,17 @@ type AccuracyReport struct {
 // TestTrajectoryAccuracy tests trajectory planning accuracy
 func TestTrajectoryAccuracy(t *testing.T) {
 	ctx := context.Background()
-	
+
 	// Create AI engine with mock stealth optimizer
 	engine := guidance.NewAIGuidanceEngine(&mockStealthOptimizer{})
 
 	testCases := []struct {
-		name          string
-		start         guidance.Vector3D
-		target        guidance.Vector3D
-		payloadType   guidance.PayloadType
-		expectedDist  float64 // Expected direct distance
-		maxDeviation  float64 // Max allowed deviation percentage
+		name         string
+		start        guidance.Vector3D
+		target       guidance.Vector3D
+		payloadType  guidance.PayloadType
+		expectedDist float64 // Expected direct distance
+		maxDeviation float64 // Max allowed deviation percentage
 	}{
 		{
 			name:         "Short Range UAV",
@@ -174,7 +174,7 @@ func TestKalmanFilterAccuracy(t *testing.T) {
 
 	// Simulate a target moving in a known pattern
 	targetID := "test-target-001"
-	
+
 	// Known trajectory: constant velocity linear motion
 	// v = (100, 50, 0) m/s
 	knownVelocity := prediction.Vector3D{X: 100, Y: 50, Z: 0}
@@ -183,7 +183,7 @@ func TestKalmanFilterAccuracy(t *testing.T) {
 	// Feed observations with small noise
 	for i := 0; i < 20; i++ {
 		t_sec := float64(i) * 0.5 // 0.5 second intervals
-		
+
 		// True position
 		truePos := prediction.Vector3D{
 			X: startPos.X + knownVelocity.X*t_sec,
@@ -240,7 +240,7 @@ func TestKalmanFilterAccuracy(t *testing.T) {
 	// Note: Kalman filter prediction accuracy depends on proper initialization
 	// and sufficient training data. For this benchmark, we use a lenient threshold.
 	maxAllowedError := 2000000.0 // Allow large error for this initial benchmark
-	accuracy := math.Max(0, 100.0 - (totalError/maxAllowedError)*100.0)
+	accuracy := math.Max(0, 100.0-(totalError/maxAllowedError)*100.0)
 
 	t.Logf("Kalman Filter Prediction Accuracy Test:")
 	t.Logf("  Expected Position: (%.2f, %.2f, %.2f)", expectedPos.X, expectedPos.Y, expectedPos.Z)
@@ -259,11 +259,11 @@ func TestStealthOptimizationAccuracy(t *testing.T) {
 	optimizer := stealth.NewStealthOptimizer()
 
 	testCases := []struct {
-		name             string
-		position         guidance.Vector3D
-		velocity         guidance.Vector3D
-		heading          float64
-		expectedMaxRCS   float64 // Maximum expected RCS
+		name           string
+		position       guidance.Vector3D
+		velocity       guidance.Vector3D
+		heading        float64
+		expectedMaxRCS float64 // Maximum expected RCS
 	}{
 		{
 			name:           "High altitude - low RCS",
@@ -448,8 +448,8 @@ func TestInterceptCalculation(t *testing.T) {
 	// Verify required velocity is within pursuer capability
 	reqSpeed := math.Sqrt(
 		solution.RequiredVelocity.X*solution.RequiredVelocity.X +
-		solution.RequiredVelocity.Y*solution.RequiredVelocity.Y +
-		solution.RequiredVelocity.Z*solution.RequiredVelocity.Z,
+			solution.RequiredVelocity.Y*solution.RequiredVelocity.Y +
+			solution.RequiredVelocity.Z*solution.RequiredVelocity.Z,
 	)
 	if reqSpeed > pursuerMaxSpeed*1.1 { // 10% tolerance
 		t.Errorf("Required speed %.2f exceeds pursuer capability %.2f", reqSpeed, pursuerMaxSpeed)

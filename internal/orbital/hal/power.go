@@ -13,18 +13,18 @@ import (
 
 // RemotePowerController implements PowerController via an HTTP telemetry endpoint.
 type RemotePowerController struct {
-	baseURL   string
-	client    *http.Client
-	cache     powerStatus
+	baseURL    string
+	client     *http.Client
+	cache      powerStatus
 	cacheUntil time.Time
 	mu         sync.RWMutex
 }
 
 type powerStatus struct {
-	BatteryPercent float64 `json:"batteryPercent"`
-	BatteryVoltage float64 `json:"batteryVoltage"`
+	BatteryPercent  float64 `json:"batteryPercent"`
+	BatteryVoltage  float64 `json:"batteryVoltage"`
 	SolarPanelPower float64 `json:"solarPanelPower"`
-	InEclipse      bool    `json:"inEclipse"`
+	InEclipse       bool    `json:"inEclipse"`
 }
 
 // NewRemotePowerController creates a new power controller using the provided endpoint.
@@ -36,7 +36,7 @@ func NewRemotePowerController(baseURL string) (*RemotePowerController, error) {
 
 	return &RemotePowerController{
 		baseURL: trimmed,
-		client: &http.Client{Timeout: 10 * time.Second},
+		client:  &http.Client{Timeout: 10 * time.Second},
 	}, nil
 }
 

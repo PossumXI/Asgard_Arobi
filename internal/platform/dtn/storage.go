@@ -93,7 +93,7 @@ func (s *InMemoryStorage) Store(ctx context.Context, b *bundle.Bundle) error {
 	if len(s.bundles) >= s.maxSize {
 		// Evict expired bundles first
 		s.evictExpiredLocked()
-		
+
 		// If still at capacity, evict lowest priority
 		if len(s.bundles) >= s.maxSize {
 			s.evictLowestPriorityLocked()

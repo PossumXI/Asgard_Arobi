@@ -26,7 +26,7 @@ type ContactWindow struct {
 	ToNode      string
 	StartTime   time.Time
 	EndTime     time.Time
-	Bandwidth   int64   // bytes/second
+	Bandwidth   int64 // bytes/second
 	Latency     time.Duration
 	Reliability float64 // 0.0 to 1.0
 }

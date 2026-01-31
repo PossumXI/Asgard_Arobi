@@ -102,7 +102,7 @@ func (r *RealOrbitalPosition) GetTime() (time.Time, error) {
 func (r *RealOrbitalPosition) GetVelocity() (vx, vy, vz float64, err error) {
 	// Compute velocity from position changes
 	now := time.Now().UTC()
-	
+
 	r.mu.RLock()
 	propagator := r.propagator
 	r.mu.RUnlock()
@@ -191,4 +191,3 @@ func cos(radians float64) float64 {
 	x2 := x * x
 	return 1 - x2/2 + x2*x2/24 - x2*x2*x2/720 + x2*x2*x2*x2/40320
 }
-

@@ -22,18 +22,18 @@ import (
 )
 
 var (
-	ErrAccessCodeRequired     = errors.New("access code required")
-	ErrAccessCodeInvalid      = errors.New("access code invalid")
-	ErrAccessCodeExpired      = errors.New("access code expired")
-	ErrAccessCodeRevoked      = errors.New("access code revoked")
+	ErrAccessCodeRequired      = errors.New("access code required")
+	ErrAccessCodeInvalid       = errors.New("access code invalid")
+	ErrAccessCodeExpired       = errors.New("access code expired")
+	ErrAccessCodeRevoked       = errors.New("access code revoked")
 	ErrAccessCodeScopeMismatch = errors.New("access code scope mismatch")
 	ErrAccessCodeUsageExceeded = errors.New("access code usage exceeded")
 )
 
 // AccessCodeService handles issuance and validation of access codes.
 type AccessCodeService struct {
-	repo        *repositories.AccessCodeRepository
-	userRepo    *repositories.UserRepository
+	repo         *repositories.AccessCodeRepository
+	userRepo     *repositories.UserRepository
 	emailService *EmailService
 }
 
@@ -41,7 +41,7 @@ type AccessCodeService struct {
 type AccessCodeIssueRequest struct {
 	UserID                string
 	CreatedBy             string
-	ClearanceLevel         string
+	ClearanceLevel        string
 	Scope                 string
 	ExpiresAt             time.Time
 	MaxUses               *int
@@ -70,8 +70,8 @@ func NewAccessCodeService(
 	emailService *EmailService,
 ) *AccessCodeService {
 	return &AccessCodeService{
-		repo:        repo,
-		userRepo:    userRepo,
+		repo:         repo,
+		userRepo:     userRepo,
 		emailService: emailService,
 	}
 }
@@ -241,7 +241,7 @@ func (s *AccessCodeService) RotateForUser(ctx context.Context, userID, createdBy
 	return s.IssueForUser(ctx, AccessCodeIssueRequest{
 		UserID:                userID,
 		CreatedBy:             createdBy,
-		ClearanceLevel:         clearance,
+		ClearanceLevel:        clearance,
 		Scope:                 scope,
 		RotationIntervalHours: rotationHours,
 	})
@@ -262,7 +262,7 @@ func (s *AccessCodeService) RotateDue(ctx context.Context) ([]AccessCodeRotation
 		result, err := s.IssueForUser(ctx, AccessCodeIssueRequest{
 			UserID:                record.UserID.String,
 			CreatedBy:             record.CreatedBy.String,
-			ClearanceLevel:         record.ClearanceLevel,
+			ClearanceLevel:        record.ClearanceLevel,
 			Scope:                 record.Scope,
 			RotationIntervalHours: record.RotationIntervalHours,
 		})

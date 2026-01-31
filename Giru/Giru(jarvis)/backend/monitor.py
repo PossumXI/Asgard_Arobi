@@ -396,7 +396,7 @@ class MonitoringServer:
         # Bind to 0.0.0.0 to accept connections from outside Docker container
         bind_host = "0.0.0.0" if os.getenv("GIRU_DOCKER") else "127.0.0.1"
         async with websockets.serve(self._handle_client, bind_host, self.port):
-            print(f"📊 Monitoring server started on ws://127.0.0.1:{self.port}")
+            print(f"📊 Monitoring server started on ws://{bind_host}:{self.port}")
             
             # Periodically send dashboard updates
             while self._running:

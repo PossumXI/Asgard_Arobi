@@ -80,69 +80,69 @@ type SensorHealth struct {
 
 // CalibrationData stores sensor calibration parameters
 type CalibrationData struct {
-	SensorID     string    `json:"sensorId"`
+	SensorID     string     `json:"sensorId"`
 	SensorType   SensorType `json:"sensorType"`
-	BiasX        float64   `json:"biasX"`
-	BiasY        float64   `json:"biasY"`
-	BiasZ        float64   `json:"biasZ"`
-	ScaleX       float64   `json:"scaleX"`
-	ScaleY       float64   `json:"scaleY"`
-	ScaleZ       float64   `json:"scaleZ"`
-	Misalignment Matrix3x3 `json:"misalignment"`
-	Timestamp    time.Time `json:"timestamp"`
-	ValidUntil   time.Time `json:"validUntil"`
+	BiasX        float64    `json:"biasX"`
+	BiasY        float64    `json:"biasY"`
+	BiasZ        float64    `json:"biasZ"`
+	ScaleX       float64    `json:"scaleX"`
+	ScaleY       float64    `json:"scaleY"`
+	ScaleZ       float64    `json:"scaleZ"`
+	Misalignment Matrix3x3  `json:"misalignment"`
+	Timestamp    time.Time  `json:"timestamp"`
+	ValidUntil   time.Time  `json:"validUntil"`
 }
 
 // FusedState represents the combined state estimate from all sensors
 type FusedState struct {
-	Position       Vector3D  `json:"position"`
-	Velocity       Vector3D  `json:"velocity"`
-	Acceleration   Vector3D  `json:"acceleration"`
-	Covariance     Matrix6x6 `json:"covariance"`
-	Timestamp      time.Time `json:"timestamp"`
-	Confidence     float64   `json:"confidence"`
-	ActiveSensors  int       `json:"activeSensors"`
-	PrimarySensor  SensorType `json:"primarySensor"`
-	FusionQuality  float64   `json:"fusionQuality"` // 0.0-1.0
-	IsConverged    bool      `json:"isConverged"`
+	Position      Vector3D   `json:"position"`
+	Velocity      Vector3D   `json:"velocity"`
+	Acceleration  Vector3D   `json:"acceleration"`
+	Covariance    Matrix6x6  `json:"covariance"`
+	Timestamp     time.Time  `json:"timestamp"`
+	Confidence    float64    `json:"confidence"`
+	ActiveSensors int        `json:"activeSensors"`
+	PrimarySensor SensorType `json:"primarySensor"`
+	FusionQuality float64    `json:"fusionQuality"` // 0.0-1.0
+	IsConverged   bool       `json:"isConverged"`
 }
 
 // AnomalyReport describes a detected sensor anomaly
 type AnomalyReport struct {
-	ID          string     `json:"id"`
-	SensorID    string     `json:"sensorId"`
-	SensorType  SensorType `json:"sensorType"`
-	AnomalyType string     `json:"anomalyType"` // spike, drift, dropout, noise, inconsistent
-	Severity    float64    `json:"severity"`    // 0.0-1.0
-	Description string     `json:"description"`
+	ID          string        `json:"id"`
+	SensorID    string        `json:"sensorId"`
+	SensorType  SensorType    `json:"sensorType"`
+	AnomalyType string        `json:"anomalyType"` // spike, drift, dropout, noise, inconsistent
+	Severity    float64       `json:"severity"`    // 0.0-1.0
+	Description string        `json:"description"`
 	Reading     SensorReading `json:"reading"`
-	Expected    Vector3D   `json:"expected"`
-	Actual      Vector3D   `json:"actual"`
-	Timestamp   time.Time  `json:"timestamp"`
+	Expected    Vector3D      `json:"expected"`
+	Actual      Vector3D      `json:"actual"`
+	Timestamp   time.Time     `json:"timestamp"`
 }
 
 // EKFConfig holds Extended Kalman Filter configuration
 type EKFConfig struct {
-	ProcessNoisePos     float64 `json:"processNoisePos"`
-	ProcessNoiseVel     float64 `json:"processNoiseVel"`
-	InitialCovariance   float64 `json:"initialCovariance"`
+	ProcessNoisePos      float64 `json:"processNoisePos"`
+	ProcessNoiseVel      float64 `json:"processNoiseVel"`
+	InitialCovariance    float64 `json:"initialCovariance"`
 	MahalanobisThreshold float64 `json:"mahalanobisThreshold"` // For outlier rejection
 	ConvergenceThreshold float64 `json:"convergenceThreshold"`
-	MaxIterations       int     `json:"maxIterations"`
+	MaxIterations        int     `json:"maxIterations"`
 }
 
 // FusionConfig holds sensor fusion configuration
 type FusionConfig struct {
-	EKF                  EKFConfig          `json:"ekf"`
-	SensorPriorities     map[SensorType]int `json:"sensorPriorities"`
-	SensorWeights        map[SensorType]float64 `json:"sensorWeights"`
-	MinSensorsRequired   int               `json:"minSensorsRequired"`
-	SensorTimeout        time.Duration     `json:"sensorTimeout"`
-	AnomalyThreshold     float64           `json:"anomalyThreshold"`
-	CalibrationInterval  time.Duration     `json:"calibrationInterval"`
-	EnableFailover       bool              `json:"enableFailover"`
-	FailoverPriority     []SensorType      `json:"failoverPriority"`
-	UpdateRate           time.Duration     `json:"updateRate"`
+	EKF                 EKFConfig              `json:"ekf"`
+	SensorPriorities    map[SensorType]int     `json:"sensorPriorities"`
+	SensorWeights       map[SensorType]float64 `json:"sensorWeights"`
+	MinSensorsRequired  int                    `json:"minSensorsRequired"`
+	SensorTimeout       time.Duration          `json:"sensorTimeout"`
+	AnomalyThreshold    float64                `json:"anomalyThreshold"`
+	CalibrationInterval time.Duration          `json:"calibrationInterval"`
+	EnableFailover      bool                   `json:"enableFailover"`
+	FailoverPriority    []SensorType           `json:"failoverPriority"`
+	UpdateRate          time.Duration          `json:"updateRate"`
 }
 
 // DefaultFusionConfig returns default fusion configuration
@@ -190,11 +190,11 @@ func DefaultFusionConfig() FusionConfig {
 type SensorFusion struct {
 	mu sync.RWMutex
 
-	id       string
-	config   FusionConfig
+	id        string
+	config    FusionConfig
 	isRunning bool
-	ctx      context.Context
-	cancel   context.CancelFunc
+	ctx       context.Context
+	cancel    context.CancelFunc
 
 	// EKF state
 	state          FusedState
@@ -212,10 +212,10 @@ type SensorFusion struct {
 	anomalyMaxSize int
 
 	// Callbacks
-	onStateUpdate    func(state FusedState)
-	onSensorFailure  func(sensorID string, health SensorHealth)
-	onAnomalyDetect  func(anomaly AnomalyReport)
-	onFailoverEvent  func(from, to SensorType)
+	onStateUpdate   func(state FusedState)
+	onSensorFailure func(sensorID string, health SensorHealth)
+	onAnomalyDetect func(anomaly AnomalyReport)
+	onFailoverEvent func(from, to SensorType)
 }
 
 // NewSensorFusion creates a new sensor fusion instance

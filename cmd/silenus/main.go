@@ -301,9 +301,9 @@ func runTelemetryLoop(ctx context.Context, satelliteID string, powerCtrl hal.Pow
 				Voltage:     voltage,
 				SolarPower:  solarPower,
 				Eclipse:     inEclipse,
-			Latitude:    lat,
-			Longitude:   lon,
-			Altitude:    alt * 1000, // Convert km to meters
+				Latitude:    lat,
+				Longitude:   lon,
+				Altitude:    alt * 1000, // Convert km to meters
 			}
 
 			data, err := json.Marshal(telemetry)
@@ -371,7 +371,7 @@ func (m *mockCamera) StopStream() error {
 	return nil
 }
 func (m *mockCamera) SetExposure(microseconds int) error { return nil }
-func (m *mockCamera) SetGain(gain float64) error        { return nil }
+func (m *mockCamera) SetGain(gain float64) error         { return nil }
 func (m *mockCamera) GetDiagnostics() (hal.CameraDiagnostics, error) {
 	return hal.CameraDiagnostics{
 		Temperature: 24.5,

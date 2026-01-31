@@ -25,19 +25,19 @@ func NewControlPlaneHandler(cp *controlplane.UnifiedControlPlane) *ControlPlaneH
 
 // ControlPlaneStatusResponse represents the overall system status.
 type ControlPlaneStatusResponse struct {
-	Health       *controlplane.HealthStatus           `json:"health"`
-	Systems      map[string]*controlplane.SystemStatus `json:"systems"`
-	Metrics      *controlplane.ControlPlaneMetrics    `json:"metrics"`
-	Coordinator  *CoordinatorStatusResponse           `json:"coordinator"`
-	Timestamp    time.Time                            `json:"timestamp"`
+	Health      *controlplane.HealthStatus            `json:"health"`
+	Systems     map[string]*controlplane.SystemStatus `json:"systems"`
+	Metrics     *controlplane.ControlPlaneMetrics     `json:"metrics"`
+	Coordinator *CoordinatorStatusResponse            `json:"coordinator"`
+	Timestamp   time.Time                             `json:"timestamp"`
 }
 
 // CoordinatorStatusResponse contains coordinator status information.
 type CoordinatorStatusResponse struct {
-	PoliciesCount    int                              `json:"policies_count"`
-	EnabledPolicies  int                              `json:"enabled_policies"`
-	ActiveResponses  int                              `json:"active_responses"`
-	Metrics          *controlplane.CoordinatorMetrics `json:"metrics"`
+	PoliciesCount   int                              `json:"policies_count"`
+	EnabledPolicies int                              `json:"enabled_policies"`
+	ActiveResponses int                              `json:"active_responses"`
+	Metrics         *controlplane.CoordinatorMetrics `json:"metrics"`
 }
 
 // EventsResponse represents paginated events.
@@ -59,25 +59,25 @@ type CommandRequest struct {
 
 // CommandResponse represents the result of a command execution.
 type CommandResponse struct {
-	CommandID   string                 `json:"command_id"`
-	Success     bool                   `json:"success"`
-	Error       string                 `json:"error,omitempty"`
-	Result      map[string]interface{} `json:"result,omitempty"`
-	ExecutedAt  time.Time              `json:"executed_at"`
-	DurationMs  int64                  `json:"duration_ms"`
+	CommandID  string                 `json:"command_id"`
+	Success    bool                   `json:"success"`
+	Error      string                 `json:"error,omitempty"`
+	Result     map[string]interface{} `json:"result,omitempty"`
+	ExecutedAt time.Time              `json:"executed_at"`
+	DurationMs int64                  `json:"duration_ms"`
 }
 
 // PolicyResponse represents a coordination policy.
 type PolicyResponse struct {
-	ID            string   `json:"id"`
-	Name          string   `json:"name"`
-	Description   string   `json:"description"`
-	Priority      int      `json:"priority"`
-	Enabled       bool     `json:"enabled"`
-	TriggerType   string   `json:"trigger_type,omitempty"`
+	ID            string                 `json:"id"`
+	Name          string                 `json:"name"`
+	Description   string                 `json:"description"`
+	Priority      int                    `json:"priority"`
+	Enabled       bool                   `json:"enabled"`
+	TriggerType   string                 `json:"trigger_type,omitempty"`
 	Actions       []PolicyActionResponse `json:"actions"`
-	CooldownMs    int64    `json:"cooldown_ms"`
-	LastTriggered *time.Time `json:"last_triggered,omitempty"`
+	CooldownMs    int64                  `json:"cooldown_ms"`
+	LastTriggered *time.Time             `json:"last_triggered,omitempty"`
 }
 
 // PolicyActionResponse represents a policy action.
@@ -138,7 +138,7 @@ func (h *ControlPlaneHandler) GetHealth(w http.ResponseWriter, r *http.Request) 
 	}
 
 	health := h.controlPlane.GetHealth()
-	
+
 	status := http.StatusOK
 	if health.Status == "critical" {
 		status = http.StatusServiceUnavailable
@@ -459,7 +459,7 @@ func (h *ControlPlaneHandler) GetMetrics(w http.ResponseWriter, r *http.Request)
 	}
 
 	metrics := h.controlPlane.GetMetrics()
-	
+
 	coordinator := h.controlPlane.GetCoordinator()
 	var coordMetrics *controlplane.CoordinatorMetrics
 	if coordinator != nil {

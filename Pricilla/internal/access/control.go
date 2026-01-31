@@ -17,22 +17,22 @@ import (
 type ClearanceLevel int
 
 const (
-	ClearancePublic    ClearanceLevel = 0  // Public access - basic info only
-	ClearanceCivilian  ClearanceLevel = 1  // Civilian - humanitarian missions
-	ClearanceMilitary  ClearanceLevel = 2  // Military - tactical missions
-	ClearanceGov       ClearanceLevel = 3  // Government - classified missions
-	ClearanceSecret    ClearanceLevel = 4  // Secret - top secret missions
-	ClearanceUltra     ClearanceLevel = 5  // Ultra - highest classification
+	ClearancePublic   ClearanceLevel = 0 // Public access - basic info only
+	ClearanceCivilian ClearanceLevel = 1 // Civilian - humanitarian missions
+	ClearanceMilitary ClearanceLevel = 2 // Military - tactical missions
+	ClearanceGov      ClearanceLevel = 3 // Government - classified missions
+	ClearanceSecret   ClearanceLevel = 4 // Secret - top secret missions
+	ClearanceUltra    ClearanceLevel = 5 // Ultra - highest classification
 )
 
 // AccessType defines what type of access is requested
 type AccessType string
 
 const (
-	AccessView      AccessType = "view"      // View only access
-	AccessCommand   AccessType = "command"   // Can issue commands
-	AccessControl   AccessType = "control"   // Full control
-	AccessAdmin     AccessType = "admin"     // Administrative access
+	AccessView    AccessType = "view"    // View only access
+	AccessCommand AccessType = "command" // Can issue commands
+	AccessControl AccessType = "control" // Full control
+	AccessAdmin   AccessType = "admin"   // Administrative access
 )
 
 // MissionClassification defines mission security level
@@ -50,21 +50,21 @@ const (
 
 // User represents a system user
 type User struct {
-	ID             string         `json:"id"`
-	Username       string         `json:"username"`
-	Email          string         `json:"email"`
-	PasswordHash   string         `json:"-"`
-	Clearance      ClearanceLevel `json:"clearance"`
-	AccessTypes    []AccessType   `json:"accessTypes"`
-	Organization   string         `json:"organization"`
-	Role           string         `json:"role"`
-	Active         bool           `json:"active"`
-	MFAEnabled     bool           `json:"mfaEnabled"`
-	MFASecret      string         `json:"-"`
-	LastLogin      time.Time      `json:"lastLogin"`
-	CreatedAt      time.Time      `json:"createdAt"`
-	ExpiresAt      *time.Time     `json:"expiresAt,omitempty"`
-	AllowedIPs     []string       `json:"allowedIPs,omitempty"`
+	ID           string         `json:"id"`
+	Username     string         `json:"username"`
+	Email        string         `json:"email"`
+	PasswordHash string         `json:"-"`
+	Clearance    ClearanceLevel `json:"clearance"`
+	AccessTypes  []AccessType   `json:"accessTypes"`
+	Organization string         `json:"organization"`
+	Role         string         `json:"role"`
+	Active       bool           `json:"active"`
+	MFAEnabled   bool           `json:"mfaEnabled"`
+	MFASecret    string         `json:"-"`
+	LastLogin    time.Time      `json:"lastLogin"`
+	CreatedAt    time.Time      `json:"createdAt"`
+	ExpiresAt    *time.Time     `json:"expiresAt,omitempty"`
+	AllowedIPs   []string       `json:"allowedIPs,omitempty"`
 }
 
 // Session represents an authenticated session
@@ -107,31 +107,31 @@ type AccessDecision struct {
 
 // AuditLog represents an access audit entry
 type AuditLog struct {
-	ID           string         `json:"id"`
-	UserID       string         `json:"userId"`
-	SessionID    string         `json:"sessionId"`
-	Action       string         `json:"action"`
-	Resource     string         `json:"resource"`
-	ResourceType string         `json:"resourceType"`
-	Allowed      bool           `json:"allowed"`
-	Reason       string         `json:"reason"`
-	IPAddress    string         `json:"ipAddress"`
-	Timestamp    time.Time      `json:"timestamp"`
+	ID           string                 `json:"id"`
+	UserID       string                 `json:"userId"`
+	SessionID    string                 `json:"sessionId"`
+	Action       string                 `json:"action"`
+	Resource     string                 `json:"resource"`
+	ResourceType string                 `json:"resourceType"`
+	Allowed      bool                   `json:"allowed"`
+	Reason       string                 `json:"reason"`
+	IPAddress    string                 `json:"ipAddress"`
+	Timestamp    time.Time              `json:"timestamp"`
 	Metadata     map[string]interface{} `json:"metadata,omitempty"`
 }
 
 // Terminal represents an access terminal
 type Terminal struct {
-	ID             string         `json:"id"`
-	Name           string         `json:"name"`
-	Type           TerminalType   `json:"type"`
-	Location       string         `json:"location"`
-	Clearance      ClearanceLevel `json:"clearance"`
-	Status         string         `json:"status"` // online, offline, maintenance
-	ActiveUsers    int            `json:"activeUsers"`
-	LastHeartbeat  time.Time      `json:"lastHeartbeat"`
-	IPAddress      string         `json:"ipAddress"`
-	Capabilities   []string       `json:"capabilities"`
+	ID            string         `json:"id"`
+	Name          string         `json:"name"`
+	Type          TerminalType   `json:"type"`
+	Location      string         `json:"location"`
+	Clearance     ClearanceLevel `json:"clearance"`
+	Status        string         `json:"status"` // online, offline, maintenance
+	ActiveUsers   int            `json:"activeUsers"`
+	LastHeartbeat time.Time      `json:"lastHeartbeat"`
+	IPAddress     string         `json:"ipAddress"`
+	Capabilities  []string       `json:"capabilities"`
 }
 
 // TerminalType defines the type of access terminal
@@ -644,12 +644,11 @@ func ClassificationToClearance(class MissionClassification) ClearanceLevel {
 
 // MissionAccessRules defines access rules for a mission
 type MissionAccessRules struct {
-	MissionID        string                `json:"missionId"`
-	Classification   MissionClassification `json:"classification"`
-	RequiredClearance ClearanceLevel       `json:"requiredClearance"`
-	AllowedViewers   []string              `json:"allowedViewers,omitempty"`  // User IDs
-	AllowedCommanders []string             `json:"allowedCommanders,omitempty"` // User IDs
-	Compartments     []string              `json:"compartments,omitempty"` // Special access programs
-	CreatedAt        time.Time             `json:"createdAt"`
+	MissionID         string                `json:"missionId"`
+	Classification    MissionClassification `json:"classification"`
+	RequiredClearance ClearanceLevel        `json:"requiredClearance"`
+	AllowedViewers    []string              `json:"allowedViewers,omitempty"`    // User IDs
+	AllowedCommanders []string              `json:"allowedCommanders,omitempty"` // User IDs
+	Compartments      []string              `json:"compartments,omitempty"`      // Special access programs
+	CreatedAt         time.Time             `json:"createdAt"`
 }
-

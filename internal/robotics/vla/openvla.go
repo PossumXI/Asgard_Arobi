@@ -28,8 +28,8 @@ type VLAConfig struct {
 	Backend string `json:"backend"`
 
 	// Model settings
-	ModelPath    string `json:"modelPath"`    // Path to model weights
-	ModelName    string `json:"modelName"`    // e.g., "openvla-7b", "rt-2-x"
+	ModelPath    string `json:"modelPath"` // Path to model weights
+	ModelName    string `json:"modelName"` // e.g., "openvla-7b", "rt-2-x"
 	ModelVersion string `json:"modelVersion"`
 
 	// Remote inference
@@ -37,32 +37,32 @@ type VLAConfig struct {
 	APIKey       string `json:"apiKey"`
 
 	// Model parameters
-	MaxTokens     int     `json:"maxTokens"`
-	Temperature   float64 `json:"temperature"`
-	TopP          float64 `json:"topP"`
+	MaxTokens   int     `json:"maxTokens"`
+	Temperature float64 `json:"temperature"`
+	TopP        float64 `json:"topP"`
 
 	// Input settings
-	ImageWidth    int `json:"imageWidth"`
-	ImageHeight   int `json:"imageHeight"`
-	MaxPromptLen  int `json:"maxPromptLen"`
+	ImageWidth   int `json:"imageWidth"`
+	ImageHeight  int `json:"imageHeight"`
+	MaxPromptLen int `json:"maxPromptLen"`
 
 	// Execution settings
-	ActionSpace    []string `json:"actionSpace"`    // Available actions
-	ConfidenceMin  float64  `json:"confidenceMin"`  // Minimum confidence threshold
-	SafetyChecks   bool     `json:"safetyChecks"`   // Enable safety validation
+	ActionSpace   []string `json:"actionSpace"`   // Available actions
+	ConfidenceMin float64  `json:"confidenceMin"` // Minimum confidence threshold
+	SafetyChecks  bool     `json:"safetyChecks"`  // Enable safety validation
 }
 
 // InferenceRequest represents a VLA inference request
 type InferenceRequest struct {
-	Image     string `json:"image"`      // Base64 encoded image
-	Prompt    string `json:"prompt"`     // Natural language command
-	History   []Turn `json:"history"`    // Conversation history
+	Image     string `json:"image"`   // Base64 encoded image
+	Prompt    string `json:"prompt"`  // Natural language command
+	History   []Turn `json:"history"` // Conversation history
 	MaxTokens int    `json:"max_tokens"`
 }
 
 // Turn represents a conversation turn
 type Turn struct {
-	Role    string `json:"role"`    // "user" or "assistant"
+	Role    string `json:"role"` // "user" or "assistant"
 	Content string `json:"content"`
 }
 
@@ -584,7 +584,7 @@ func (v *OpenVLAModel) StreamInferAction(ctx context.Context, visualObs []byte, 
 	// Process SSE stream
 	reader := resp.Body
 	buf := make([]byte, 4096)
-	
+
 	for {
 		n, err := reader.Read(buf)
 		if err != nil {

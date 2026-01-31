@@ -174,9 +174,9 @@ type ProcedureStep struct {
 
 // FailsafeConfig holds failsafe parameters
 type FailsafeConfig struct {
-	EnableAutoRTB    bool
-	EnableAutoLand   bool
-	EnableParachute  bool
+	EnableAutoRTB   bool
+	EnableAutoLand  bool
+	EnableParachute bool
 
 	MinSafeAltitudeAGL  float64
 	MinSafeFuel         float64
@@ -583,7 +583,7 @@ func (es *EmergencySystem) IsHealthy() bool {
 // Emergency procedure actions
 func switchToBackupEngine(ctx context.Context, es *EmergencySystem) error {
 	es.logger.Info("Switching to backup engine...")
-	
+
 	// Send MAVLink command to switch to backup engine
 	if es.actuator != nil {
 		// Set engine mode via actuator interface
@@ -591,13 +591,13 @@ func switchToBackupEngine(ctx context.Context, es *EmergencySystem) error {
 		es.logger.Info("Backup engine activated")
 		return nil
 	}
-	
+
 	return fmt.Errorf("actuator interface not available")
 }
 
 func establishBestGlide(ctx context.Context, es *EmergencySystem) error {
 	es.logger.Info("Establishing best glide speed...")
-	
+
 	if es.actuator == nil {
 		return fmt.Errorf("actuator not available")
 	}
@@ -605,34 +605,34 @@ func establishBestGlide(ctx context.Context, es *EmergencySystem) error {
 	// Set optimal glide angle (typically 3-5 degrees pitch down) and maintain best glide speed
 	// Best glide speed varies by aircraft, typically 60-80 knots for small aircraft
 	pitchAngle := -0.087 // -5 degrees in radians
-	
+
 	cmd := AttitudeCommand{
 		Roll:     0.0,
 		Pitch:    pitchAngle,
 		Yaw:      0.0,
 		Throttle: 0.0, // Engine off, glide only
 	}
-	
+
 	if err := es.actuator.SendAttitudeCommand(cmd); err != nil {
 		return fmt.Errorf("failed to set glide attitude: %w", err)
 	}
-	
+
 	es.logger.Info("Best glide established")
 	return nil
 }
 
 func identifyLandingZone(ctx context.Context, es *EmergencySystem) error {
 	es.logger.Info("Identifying landing zone...")
-	
+
 	// Use terrain data from Silenus or local sensors to find suitable landing area
 	// Criteria: flat terrain, no obstacles, sufficient length, away from populated areas
-	
+
 	if len(es.config.LandingZones) > 0 {
 		// Use pre-configured landing zones
 		es.logger.WithField("zones", len(es.config.LandingZones)).Info("Using configured landing zones")
 		return nil
 	}
-	
+
 	// In production, would query Silenus for terrain data or use onboard sensors
 	// For now, log that identification is in progress
 	es.logger.Info("Landing zone identification in progress - using terrain analysis")
@@ -641,7 +641,7 @@ func identifyLandingZone(ctx context.Context, es *EmergencySystem) error {
 
 func executeEmergencyLanding(ctx context.Context, es *EmergencySystem) error {
 	es.logger.Warn("Executing emergency landing...")
-	
+
 	if es.actuator == nil {
 		return fmt.Errorf("actuator not available")
 	}
@@ -658,7 +658,7 @@ func executeEmergencyLanding(ctx context.Context, es *EmergencySystem) error {
 		Yaw:      0.0,
 		Throttle: 0.2, // Minimal throttle for control
 	}
-	
+
 	if err := es.actuator.SendAttitudeCommand(cmd); err != nil {
 		return fmt.Errorf("failed to set landing attitude: %w", err)
 	}
@@ -674,24 +674,24 @@ func executeEmergencyLanding(ctx context.Context, es *EmergencySystem) error {
 
 func attemptBackupRadio(ctx context.Context, es *EmergencySystem) error {
 	es.logger.Info("Attempting backup radio...")
-	
+
 	// In production, this would:
 	// 1. Switch to backup radio hardware
 	// 2. Try different frequencies
 	// 3. Attempt satellite communication via Sat_Net
 	// 4. Try mesh networking if available
-	
+
 	es.mu.Lock()
 	es.commHealth = HealthDegraded // Assume degraded until connection restored
 	es.mu.Unlock()
-	
+
 	es.logger.Info("Backup radio systems activated - attempting reconnection")
 	return nil
 }
 
 func continueAutonomous(ctx context.Context, es *EmergencySystem) error {
 	es.logger.Info("Continuing mission autonomously...")
-	
+
 	if es.actuator == nil {
 		return fmt.Errorf("actuator not available")
 	}
@@ -700,18 +700,18 @@ func continueAutonomous(ctx context.Context, es *EmergencySystem) error {
 	if err := es.actuator.SetFlightMode("AUTO"); err != nil {
 		return fmt.Errorf("failed to set AUTO mode: %w", err)
 	}
-	
+
 	es.mu.Lock()
 	es.mode = ModeEmergency
 	es.mu.Unlock()
-	
+
 	es.logger.Info("Autonomous mode activated")
 	return nil
 }
 
 func returnToBase(ctx context.Context, es *EmergencySystem) error {
 	es.logger.Warn("Initiating return to base...")
-	
+
 	if es.actuator == nil {
 		return fmt.Errorf("actuator not available")
 	}
@@ -734,14 +734,14 @@ func returnToBase(ctx context.Context, es *EmergencySystem) error {
 			es.logger.WithField("rtb_location", es.config.RTBLocation).Info("RTB waypoint set")
 		}
 	}
-	
+
 	es.logger.Warn("Return to base initiated")
 	return nil
 }
 
 func switchToBackupSensors(ctx context.Context, es *EmergencySystem) error {
 	es.logger.Info("Switching to backup sensors...")
-	
+
 	// Activate backup sensor arrays
 	es.mu.Lock()
 	if es.gpsHealth == HealthFailed {
@@ -757,91 +757,91 @@ func switchToBackupSensors(ctx context.Context, es *EmergencySystem) error {
 		es.radarHealth = HealthDegraded
 	}
 	es.mu.Unlock()
-	
+
 	es.logger.Info("Backup sensors activated")
 	return nil
 }
 
 func recalibrateNavigation(ctx context.Context, es *EmergencySystem) error {
 	es.logger.Info("Recalibrating navigation...")
-	
+
 	// In production, this would:
 	// 1. Reset Extended Kalman Filter
 	// 2. Re-initialize sensor fusion
 	// 3. Recalibrate IMU bias
 	// 4. Re-sync GPS if available
 	// 5. Reset position/velocity estimates
-	
+
 	es.logger.Info("Navigation recalibration initiated - filter reset and sensor re-sync in progress")
 	return nil
 }
 
 func assessFlightCapability(ctx context.Context, es *EmergencySystem) error {
 	es.logger.Info("Assessing flight capability...")
-	
+
 	es.mu.RLock()
 	battery := es.batteryLevel
 	fuel := es.fuelLevel
 	primaryHealth := es.primaryFlight
 	backupHealth := es.backupFlight
 	es.mu.RUnlock()
-	
+
 	// Assess if safe to continue
 	canContinue := true
 	reasons := []string{}
-	
+
 	if battery < es.config.MinSafeBattery {
 		canContinue = false
 		reasons = append(reasons, fmt.Sprintf("battery critical: %.1f%%", battery*100))
 	}
-	
+
 	if fuel < es.config.MinSafeFuel {
 		canContinue = false
 		reasons = append(reasons, fmt.Sprintf("fuel critical: %.1f%%", fuel*100))
 	}
-	
+
 	if primaryHealth == HealthFailed && backupHealth == HealthFailed {
 		canContinue = false
 		reasons = append(reasons, "all flight controllers failed")
 	}
-	
+
 	if canContinue {
 		es.logger.Info("Flight capability assessment: SAFE TO CONTINUE")
 	} else {
 		es.logger.WithField("reasons", reasons).Warn("Flight capability assessment: NOT SAFE - landing required")
 	}
-	
+
 	return nil
 }
 
 func reduceThrottle(ctx context.Context, es *EmergencySystem) error {
 	es.logger.Info("Reducing throttle to economy mode...")
-	
+
 	if es.actuator == nil {
 		return fmt.Errorf("actuator not available")
 	}
 
 	// Set throttle to economy setting (typically 40-50% for fuel efficiency)
 	economyThrottle := 0.45
-	
+
 	cmd := AttitudeCommand{
 		Roll:     0.0,
 		Pitch:    0.0,
 		Yaw:      0.0,
 		Throttle: economyThrottle,
 	}
-	
+
 	if err := es.actuator.SendAttitudeCommand(cmd); err != nil {
 		return fmt.Errorf("failed to set economy throttle: %w", err)
 	}
-	
+
 	es.logger.WithField("throttle", economyThrottle).Info("Throttle reduced to economy mode")
 	return nil
 }
 
 func findNearestLanding(ctx context.Context, es *EmergencySystem) error {
 	es.logger.Info("Finding nearest landing zone...")
-	
+
 	// Use configured landing zones or query terrain data
 	if len(es.config.LandingZones) > 0 {
 		// Find nearest landing zone from current position
@@ -849,7 +849,7 @@ func findNearestLanding(ctx context.Context, es *EmergencySystem) error {
 		es.logger.WithField("zones_available", len(es.config.LandingZones)).Info("Nearest landing zone identified")
 		return nil
 	}
-	
+
 	// Query Silenus for terrain data to find suitable landing area
 	es.logger.Info("Querying terrain data for landing zone identification")
 	return nil
