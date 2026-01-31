@@ -1746,7 +1746,9 @@ async def main() -> None:
     monitor_task = asyncio.create_task(monitoring_server.start())
     
     # Start main WebSocket server
-    async with websockets.serve(handler, "127.0.0.1", port):
+    # Bind to 0.0.0.0 to accept connections from outside Docker container
+    bind_host = "0.0.0.0" if os.getenv("GIRU_DOCKER") else "127.0.0.1"
+    async with websockets.serve(handler, bind_host, port):
         log_sync(f"Giru JARVIS backend listening on ws://127.0.0.1:{port}")
         await asyncio.Future()
 

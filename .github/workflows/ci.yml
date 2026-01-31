@@ -21,6 +21,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y libpcap-dev
+      
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
@@ -118,7 +121,7 @@ jobs:
         run: npm run build
       
       - name: Run tests
-        run: npm test --if-present -- --passWithNoTests
+        run: npm test --if-present
 
   frontend-hubs:
     name: Frontend - Hubs
@@ -150,7 +153,7 @@ jobs:
         run: npm run build
       
       - name: Run tests
-        run: npm test --if-present -- --passWithNoTests
+        run: npm test --if-present
 
   # ===========================================
   # Docker Build Jobs

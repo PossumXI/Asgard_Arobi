@@ -11,6 +11,9 @@ services:
       GIRU_PORT: "7777"
       GIRU_MONITOR_PORT: "7778"
       
+      # Docker mode - binds to 0.0.0.0 for external access
+      GIRU_DOCKER: "1"
+      
       # ASGARD system endpoints
       PRICILLA_BASE_URL: "http://host.docker.internal:8092"
       PRICILLA_URL: "http://host.docker.internal:8092"
