@@ -19,14 +19,14 @@ type DashboardStats struct {
 
 // AlertResponse represents an alert.
 type AlertResponse struct {
-	ID             string   `json:"id"`
-	SatelliteID    *string  `json:"satelliteId"`
-	AlertType      string   `json:"alertType"`
+	ID              string  `json:"id"`
+	SatelliteID     *string `json:"satelliteId"`
+	AlertType       string  `json:"alertType"`
 	ConfidenceScore float64 `json:"confidenceScore"`
-	Location       *GeoLoc  `json:"detectionLocation"`
+	Location        *GeoLoc `json:"detectionLocation"`
 	VideoSegmentURL *string `json:"videoSegmentUrl"`
-	Status         string   `json:"status"`
-	CreatedAt      string   `json:"createdAt"`
+	Status          string  `json:"status"`
+	CreatedAt       string  `json:"createdAt"`
 }
 
 // GeoLoc represents a geographic location.
@@ -93,55 +93,55 @@ func (s *Server) handleDashboardStats(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ctx := r.Context()
-	
+
 	var satCount, hunoidCount, alertCount, missionCount, threatCount int
 	var systemHealth float64 = 100.0
-	
+
 	if s.pgDB != nil {
 		// Query satellite count
-		if err := s.pgDB.QueryRowContext(ctx, 
+		if err := s.pgDB.QueryRowContext(ctx,
 			"SELECT COUNT(*) FROM satellites WHERE status = 'operational'").Scan(&satCount); err != nil {
 			s.writeError(w, http.StatusInternalServerError, "Database error", "DB_ERROR")
 			return
 		}
-		
+
 		// Query hunoid count
-		if err := s.pgDB.QueryRowContext(ctx, 
+		if err := s.pgDB.QueryRowContext(ctx,
 			"SELECT COUNT(*) FROM hunoids WHERE status IN ('idle', 'active')").Scan(&hunoidCount); err != nil {
 			s.writeError(w, http.StatusInternalServerError, "Database error", "DB_ERROR")
 			return
 		}
-		
+
 		// Query pending alerts
-		if err := s.pgDB.QueryRowContext(ctx, 
+		if err := s.pgDB.QueryRowContext(ctx,
 			"SELECT COUNT(*) FROM alerts WHERE status IN ('new', 'acknowledged')").Scan(&alertCount); err != nil {
 			s.writeError(w, http.StatusInternalServerError, "Database error", "DB_ERROR")
 			return
 		}
-		
+
 		// Query active missions
-		if err := s.pgDB.QueryRowContext(ctx, 
+		if err := s.pgDB.QueryRowContext(ctx,
 			"SELECT COUNT(*) FROM missions WHERE status IN ('pending', 'active')").Scan(&missionCount); err != nil {
 			s.writeError(w, http.StatusInternalServerError, "Database error", "DB_ERROR")
 			return
 		}
-		
+
 		// Query threats today
-		if err := s.pgDB.QueryRowContext(ctx, 
+		if err := s.pgDB.QueryRowContext(ctx,
 			"SELECT COUNT(*) FROM threats WHERE detected_at > NOW() - INTERVAL '24 hours'").Scan(&threatCount); err != nil {
 			s.writeError(w, http.StatusInternalServerError, "Database error", "DB_ERROR")
 			return
 		}
-		
+
 		// Calculate system health based on component status
 		var degradedCount int
-		s.pgDB.QueryRowContext(ctx, 
+		s.pgDB.QueryRowContext(ctx,
 			`SELECT COUNT(*) FROM (
 				SELECT 1 FROM satellites WHERE status != 'operational'
 				UNION ALL
 				SELECT 1 FROM hunoids WHERE status = 'error'
 			) AS degraded`).Scan(&degradedCount)
-		
+
 		totalComponents := satCount + hunoidCount
 		if totalComponents > 0 {
 			systemHealth = 100.0 * float64(totalComponents-degradedCount) / float64(totalComponents)
@@ -169,7 +169,7 @@ func (s *Server) handleAlerts(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ctx := r.Context()
-	
+
 	if s.pgDB == nil {
 		s.writeError(w, http.StatusServiceUnavailable, "Database not available", "DB_UNAVAILABLE")
 		return
@@ -193,12 +193,12 @@ func (s *Server) handleAlerts(w http.ResponseWriter, r *http.Request) {
 		FROM alerts a
 	`
 	args := []interface{}{}
-	
+
 	if status != "" {
 		query += " WHERE a.status = $1"
 		args = append(args, status)
 	}
-	
+
 	query += " ORDER BY a.created_at DESC LIMIT $" + strconv.Itoa(len(args)+1)
 	args = append(args, limit)
 
@@ -267,7 +267,7 @@ func (s *Server) handleMissions(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ctx := r.Context()
-	
+
 	if s.pgDB == nil {
 		s.writeError(w, http.StatusServiceUnavailable, "Database not available", "DB_UNAVAILABLE")
 		return
@@ -291,12 +291,12 @@ func (s *Server) handleMissions(w http.ResponseWriter, r *http.Request) {
 		FROM missions m
 	`
 	args := []interface{}{}
-	
+
 	if status != "" {
 		query += " WHERE m.status = $1"
 		args = append(args, status)
 	}
-	
+
 	query += " ORDER BY m.created_at DESC LIMIT $" + strconv.Itoa(len(args)+1)
 	args = append(args, limit)
 
@@ -360,7 +360,7 @@ func (s *Server) handleSatellites(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ctx := r.Context()
-	
+
 	if s.pgDB == nil {
 		s.writeError(w, http.StatusServiceUnavailable, "Database not available", "DB_UNAVAILABLE")
 		return
@@ -383,12 +383,12 @@ func (s *Server) handleSatellites(w http.ResponseWriter, r *http.Request) {
 		FROM satellites s
 	`
 	args := []interface{}{}
-	
+
 	if status != "" {
 		query += " WHERE s.status = $1"
 		args = append(args, status)
 	}
-	
+
 	query += " ORDER BY s.name ASC LIMIT $" + strconv.Itoa(len(args)+1)
 	args = append(args, limit)
 
@@ -459,7 +459,7 @@ func (s *Server) handleHunoids(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ctx := r.Context()
-	
+
 	if s.pgDB == nil {
 		s.writeError(w, http.StatusServiceUnavailable, "Database not available", "DB_UNAVAILABLE")
 		return
@@ -482,12 +482,12 @@ func (s *Server) handleHunoids(w http.ResponseWriter, r *http.Request) {
 		FROM hunoids h
 	`
 	args := []interface{}{}
-	
+
 	if status != "" {
 		query += " WHERE h.status = $1"
 		args = append(args, status)
 	}
-	
+
 	query += " ORDER BY h.serial_number ASC LIMIT $" + strconv.Itoa(len(args)+1)
 	args = append(args, limit)
 
@@ -556,7 +556,7 @@ func (s *Server) handleThreats(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ctx := r.Context()
-	
+
 	if s.pgDB == nil {
 		s.writeError(w, http.StatusServiceUnavailable, "Database not available", "DB_UNAVAILABLE")
 		return
@@ -582,7 +582,7 @@ func (s *Server) handleThreats(w http.ResponseWriter, r *http.Request) {
 	`
 	args := []interface{}{}
 	argNum := 1
-	
+
 	if status != "" {
 		query += " AND t.status = $" + strconv.Itoa(argNum)
 		args = append(args, status)
@@ -593,7 +593,7 @@ func (s *Server) handleThreats(w http.ResponseWriter, r *http.Request) {
 		args = append(args, severity)
 		argNum++
 	}
-	
+
 	query += " ORDER BY t.detected_at DESC LIMIT $" + strconv.Itoa(argNum)
 	args = append(args, limit)
 

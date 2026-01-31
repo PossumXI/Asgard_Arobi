@@ -211,6 +211,11 @@ ai:
   decision_rate: 50.0  # Hz
   safety_priority: 0.9
   max_roll_angle: 0.785  # 45 degrees
+  geo_reference_enabled: true
+  geo_reference_latitude: 37.7749
+  geo_reference_longitude: -122.4194
+  geo_reference_source: n2yo
+  geo_reference_norad_id: 25544
 
 security:
   anomaly_threshold: 0.7

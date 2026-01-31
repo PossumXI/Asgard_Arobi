@@ -7,6 +7,14 @@ if (-not $env:ASGARD_ENV) {
     $env:ASGARD_ENV = "development"
 }
 
+# Enable hardware bypass for Hunoid/Silenus by default in dev tests.
+if (-not $env:HUNOID_BYPASS_HARDWARE) {
+    $env:HUNOID_BYPASS_HARDWARE = "1"
+}
+if (-not $env:SILENUS_BYPASS_HARDWARE) {
+    $env:SILENUS_BYPASS_HARDWARE = "1"
+}
+
 $testResults = @()
 $allPassed = $true
 

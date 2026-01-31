@@ -50,6 +50,23 @@
   - `npm test` in `Websites/` (PASS, no test files)
   - `npm test` in `test/e2e` (FAIL: Pricilla/Giru services offline)
 
+## 2026-01-30 (DB Connectivity Fix)
+- Updated Mongo default port to 27018 and added `authSource=admin` to Mongo URI.
+- Synced `.env` credentials with running containers to match live DB users.
+- Reinitialized Mongo volume to reset admin credentials.
+- Nysus health now reports `mongodb: ok`, `postgres: ok`, `nats: ok`.
+
+## 2026-01-30 (Live Metrics Demo Run)
+- Started Giru JARVIS with `npm run dev:win` (Python 3.13 backend + Electron UI).
+- Added live metrics overlay in `test/e2e/asgard-complete-demo.spec.ts` (no hardcoded values).
+- Playwright E2E suite re-run (PASS, 6 tests).
+
+## 2026-01-30 (Valkyrie Weather Geo Reference)
+- Enabled geo-referenced weather lookups using N2YO satellite positions (with fusion fallback).
+- Added geo reference defaults to Valkyrie configs and Kubernetes ConfigMap.
+- Wired Nysus satellite tracking routes for N2YO position queries.
+- Documented configuration and activation details.
+
 ## 2026-01-28 (Audit Hardening & MCP Data Wiring)
 - Replaced MCP placeholder responses with Postgres-backed tools and resources.
 - Queued MCP commands via control plane command table for satellites, missions, scans, trajectories.

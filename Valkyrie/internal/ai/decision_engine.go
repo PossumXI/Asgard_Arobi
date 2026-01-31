@@ -5,6 +5,7 @@ import (
 	"context"
 	"math"
 	"math/rand"
+	"strings"
 	"sync"
 	"time"
 
@@ -58,6 +59,12 @@ type DecisionConfig struct {
 	EnableWeatherAvoid bool
 
 	DecisionRate float64 // Hz
+
+	GeoReferenceEnabled   bool    // enable local meters -> lat/lon conversion
+	GeoReferenceLatitude  float64 // degrees
+	GeoReferenceLongitude float64 // degrees
+	GeoReferenceSource    string  // "fusion" (default) or "n2yo"
+	GeoReferenceNoradID   int     // NORAD ID for N2YO position lookups
 }
 
 // Mission represents a flight mission
@@ -436,14 +443,9 @@ func (de *DecisionEngine) getWeatherConditions() *WeatherConditions {
 	if de.asgardClients != nil && de.asgardClients.Silenus != nil {
 		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 		defer cancel()
-		
-		// Get current position from fusion state
-		lat, lon := 0.0, 0.0
-		if de.currentState != nil && de.currentState.Confidence > 0 {
-			lat = de.currentState.Position[0]
-			lon = de.currentState.Position[1]
-		}
-		
+
+		lat, lon := de.getWeatherCoordinates(ctx)
+
 		weather, err := de.asgardClients.Silenus.GetWeather(ctx, lat, lon)
 		if err == nil && weather != nil {
 			return &WeatherConditions{
@@ -471,6 +473,51 @@ func (de *DecisionEngine) getWeatherConditions() *WeatherConditions {
 		Temperature:   15.0,
 		Pressure:      101325.0,
 	}
+}
+
+func (de *DecisionEngine) getWeatherCoordinates(ctx context.Context) (float64, float64) {
+	if strings.EqualFold(de.config.GeoReferenceSource, "n2yo") {
+		if de.asgardClients != nil && de.asgardClients.Nysus != nil {
+			noradID := de.config.GeoReferenceNoradID
+			if noradID == 0 {
+				noradID = 25544 // ISS default
+			}
+			lat, lon, err := de.asgardClients.Nysus.GetRealtimeSatellitePosition(ctx, noradID)
+			if err == nil {
+				return lat, lon
+			}
+			de.logger.WithError(err).Warn("N2YO position lookup failed; falling back to fusion coordinates")
+		}
+	}
+
+	if de.currentState == nil || de.currentState.Confidence <= 0 {
+		return 0.0, 0.0
+	}
+
+	x := de.currentState.Position[0]
+	y := de.currentState.Position[1]
+
+	if !de.config.GeoReferenceEnabled {
+		return x, y
+	}
+
+	if de.config.GeoReferenceLatitude == 0 && de.config.GeoReferenceLongitude == 0 {
+		de.logger.Warn("Geo reference enabled but origin not set; using raw position")
+		return x, y
+	}
+
+	// Convert local meters (X east, Y north) to lat/lon.
+	// Use reference latitude for the cosine factor (proper local tangent plane conversion).
+	const metersPerDegLat = 111320.0
+	refLatRad := de.config.GeoReferenceLatitude * math.Pi / 180.0
+	metersPerDegLon := metersPerDegLat * math.Cos(refLatRad)
+	if metersPerDegLon == 0 {
+		return de.config.GeoReferenceLatitude + (y / metersPerDegLat), de.config.GeoReferenceLongitude
+	}
+
+	lat := de.config.GeoReferenceLatitude + (y / metersPerDegLat)
+	lon := de.config.GeoReferenceLongitude + (x / metersPerDegLon)
+	return lat, lon
 }
 
 // Run starts the decision loop

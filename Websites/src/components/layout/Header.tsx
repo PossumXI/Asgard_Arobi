@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, ChevronDown, Sun, Moon, User, LogOut, Plane, Crosshair, Shield } from 'lucide-react';
+import { Menu, X, ChevronDown, Sun, Moon, User, LogOut, Plane, Crosshair, Shield, Monitor, Landmark, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/Button';
 import { useTheme } from '@/providers/ThemeProvider';
@@ -15,6 +15,7 @@ interface ProductLink {
 }
 
 const productLinks: ProductLink[] = [
+  // ASGARD Defense Systems
   {
     href: '/valkyrie',
     label: 'Valkyrie',
@@ -32,6 +33,25 @@ const productLinks: ProductLink[] = [
     label: 'Giru',
     description: 'AI Security',
     icon: <Shield className="w-5 h-5" />,
+  },
+  // Aura Genesis Ecosystem
+  {
+    href: '/apex-os',
+    label: 'APEX-OS-LQ',
+    description: 'Autonomous Computing',
+    icon: <Monitor className="w-5 h-5" />,
+  },
+  {
+    href: '/foundation',
+    label: 'Foundation',
+    description: 'Community Governance',
+    icon: <Landmark className="w-5 h-5" />,
+  },
+  {
+    href: '/icf',
+    label: 'ICF Program',
+    description: 'Proof of Intelligence',
+    icon: <Users className="w-5 h-5" />,
   },
 ];
 

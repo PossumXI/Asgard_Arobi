@@ -83,7 +83,7 @@ export default function MilitaryHub() {
                     } else {
                       setAccessError('Access code not authorized for military hub.');
                     }
-                  } catch (err) {
+                  } catch {
                     setAccessError('Failed to verify access code.');
                   } finally {
                     setIsVerifying(false);

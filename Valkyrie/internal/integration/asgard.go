@@ -201,6 +201,33 @@ func (nc *NysusClient) GetMission(ctx context.Context, missionID string) (map[st
 	return result, nil
 }
 
+// GetRealtimeSatellitePosition retrieves real-time satellite position from Nysus.
+func (nc *NysusClient) GetRealtimeSatellitePosition(ctx context.Context, noradID int) (float64, float64, error) {
+	if noradID == 0 {
+		return 0, 0, fmt.Errorf("norad_id is required")
+	}
+	path := fmt.Sprintf("/api/satellites/realtime?norad_id=%d", noradID)
+	resp, err := nc.get(ctx, path)
+	if err != nil {
+		return 0, 0, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		return 0, 0, fmt.Errorf("nysus satellite lookup failed: %s", string(body))
+	}
+
+	var result struct {
+		Latitude  float64 `json:"latitude"`
+		Longitude float64 `json:"longitude"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return 0, 0, err
+	}
+	return result.Latitude, result.Longitude, nil
+}
+
 func (nc *NysusClient) get(ctx context.Context, path string) (*http.Response, error) {
 	req, err := http.NewRequestWithContext(ctx, "GET", nc.config.BaseURL+path, nil)
 	if err != nil {

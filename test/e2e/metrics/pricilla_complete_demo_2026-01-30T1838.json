@@ -1,0 +1,103 @@
+{
+  "timestamp": "2026-01-30T18:38:38.368Z",
+  "benchmarkResults": [
+    {
+      "payloadType": "UAV Drone",
+      "trajectoryTime": 595,
+      "accuracy": 97.33957931339057,
+      "stealthScore": 0.87,
+      "hitProbability": 0.92,
+      "cep": 68,
+      "replanCount": 90
+    },
+    {
+      "payloadType": "Cruise Missile",
+      "trajectoryTime": 404,
+      "accuracy": 95.45764623552756,
+      "stealthScore": 0.91,
+      "hitProbability": 0.95,
+      "cep": 43,
+      "replanCount": 90
+    },
+    {
+      "payloadType": "Hunoid Robot",
+      "trajectoryTime": 338,
+      "accuracy": 95.25264782080079,
+      "stealthScore": 0.94,
+      "hitProbability": 0.95,
+      "cep": 51,
+      "replanCount": 90
+    },
+    {
+      "payloadType": "Orbital Spacecraft",
+      "trajectoryTime": 503,
+      "accuracy": 98.38479986719526,
+      "stealthScore": 0.91,
+      "hitProbability": 0.95,
+      "cep": 67,
+      "replanCount": 90
+    },
+    {
+      "payloadType": "Recon Drone",
+      "trajectoryTime": 350,
+      "accuracy": 96.7215462618964,
+      "stealthScore": 0.91,
+      "hitProbability": 0.99,
+      "cep": 30,
+      "replanCount": 90
+    },
+    {
+      "payloadType": "Ballistic Rocket",
+      "trajectoryTime": 1645,
+      "accuracy": 98.69914298328112,
+      "stealthScore": 0.98,
+      "hitProbability": 0.98,
+      "cep": 39,
+      "replanCount": 90
+    }
+  ],
+  "finalMetrics": {
+    "targetUpdates": 42,
+    "replanCount": 112,
+    "lastReplanReason": "payload_update",
+    "lastReplanAt": "2026-01-30T13:38:07.0071862-05:00",
+    "lastTargetUpdateAt": "2026-01-30T13:38:06.6821253-05:00",
+    "lastTargetPosition": {
+      "x": 6273.409773950869,
+      "y": 3849.3368864871372,
+      "z": 112.81617376470054
+    },
+    "lastPayloadPosition": {
+      "x": 3200,
+      "y": 2000,
+      "z": 480
+    },
+    "lastTrajectoryId": "ae37a67a-cc63-44fa-aa1e-c989631094f4_stealth",
+    "lastMissionId": "d22951dc-37f9-4356-8998-c5e95b625d88",
+    "completionDistance": 0,
+    "missionCompletedAt": "2026-01-30T13:19:41.4749095-05:00",
+    "hitProbability": 0.040696654613461614,
+    "cep": 76.2516,
+    "terminalGuidanceOn": true,
+    "timeToImpact": 1.9236641221374047,
+    "closingVelocity": 58.35203781754599,
+    "crossTrackError": 8.13478032602196e-12,
+    "ecmDetected": false,
+    "weatherImpact": 0.43600000000000005
+  },
+  "payloadTypes": [
+    "uav",
+    "missile",
+    "hunoid",
+    "spacecraft",
+    "drone",
+    "rocket"
+  ],
+  "summary": {
+    "totalPayloadTypes": 6,
+    "avgAccuracy": 96.2,
+    "avgHitProbability": 0.915,
+    "avgCEP": 42,
+    "avgStealthScore": 0.92
+  }
+}

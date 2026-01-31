@@ -83,6 +83,9 @@ func (s *AccessCodeService) RequiresAccessCode(ctx context.Context, userID strin
 	}
 	_, err := s.repo.GetActiveForUser(ctx, userID)
 	if err != nil {
+		if isAccessCodeTableMissing(err) {
+			return false, nil
+		}
 		if strings.Contains(err.Error(), "not found") {
 			return false, nil
 		}
@@ -96,7 +99,11 @@ func (s *AccessCodeService) List(ctx context.Context) ([]map[string]interface{},
 	if s.repo == nil {
 		return nil, fmt.Errorf("access code repository unavailable")
 	}
-	return s.repo.List(ctx, 200)
+	records, err := s.repo.List(ctx, 200)
+	if err != nil && isAccessCodeTableMissing(err) {
+		return []map[string]interface{}{}, nil
+	}
+	return records, err
 }
 
 // GetUserByEmail returns a user by email.
@@ -195,6 +202,9 @@ func (s *AccessCodeService) Validate(ctx context.Context, code, scope string) (*
 	hash := hashAccessCode(code)
 	record, err := s.repo.GetByHash(ctx, hash)
 	if err != nil {
+		if isAccessCodeTableMissing(err) {
+			return nil, ErrAccessCodeInvalid
+		}
 		return nil, ErrAccessCodeInvalid
 	}
 	if record.RevokedAt.Valid {
@@ -384,4 +394,11 @@ func int32ToNull(value int) sql.NullInt32 {
 		return sql.NullInt32{}
 	}
 	return sql.NullInt32{Int32: int32(value), Valid: true}
+}
+
+func isAccessCodeTableMissing(err error) bool {
+	if err == nil {
+		return false
+	}
+	return strings.Contains(err.Error(), "access_codes") && strings.Contains(err.Error(), "does not exist")
 }

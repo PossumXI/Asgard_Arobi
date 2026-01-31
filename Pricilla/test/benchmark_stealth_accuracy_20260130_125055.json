@@ -1,0 +1,41 @@
+{
+  "timestamp": "2026-01-30T12:50:55.598205-05:00",
+  "systemVersion": "1.0.0",
+  "totalTests": 4,
+  "passedTests": 4,
+  "overallAccuracy": 67.46908989525454,
+  "results": [
+    {
+      "testName": "High altitude - low RCS",
+      "duration": 0,
+      "accuracy": 81.46145432081123,
+      "errorMargin": -0.6292290864162245,
+      "passed": true,
+      "details": "RCS: 0.3708 m², Thermal: 3.08, Expected Max RCS: 2.00"
+    },
+    {
+      "testName": "Low altitude - moderate RCS",
+      "duration": 0,
+      "accuracy": 40.31964071537918,
+      "errorMargin": 0.48401796423104093,
+      "passed": true,
+      "details": "RCS: 2.9840 m², Thermal: 62.31, Expected Max RCS: 5.00"
+    },
+    {
+      "testName": "Ground level - high RCS",
+      "duration": 0,
+      "accuracy": 74.54347630694258,
+      "errorMargin": -1.963478104555406,
+      "passed": true,
+      "details": "RCS: 2.0365 m², Thermal: 43.91, Expected Max RCS: 8.00"
+    },
+    {
+      "testName": "High speed - Doppler effect",
+      "duration": 0,
+      "accuracy": 73.55178823788519,
+      "errorMargin": -1.1775894118942594,
+      "passed": true,
+      "details": "RCS: 1.3224 m², Thermal: 128.47, Expected Max RCS: 5.00"
+    }
+  ]
+}

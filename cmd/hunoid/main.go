@@ -7,6 +7,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
 	"os"
 	"os/signal"
@@ -1465,6 +1466,151 @@ func executeAction(ctx context.Context, robot control.HunoidController, manip co
 	}
 }
 
+type mockHunoidController struct {
+	mu      sync.Mutex
+	pose    control.Pose
+	moving  bool
+	battery float64
+}
+
+func newMockHunoidController() *mockHunoidController {
+	return &mockHunoidController{
+		pose: control.Pose{
+			Position:    control.Vector3{X: 0, Y: 0, Z: 0},
+			Orientation: control.Quaternion{W: 1, X: 0, Y: 0, Z: 0},
+			Timestamp:   time.Now().UTC(),
+		},
+		battery: 92.0,
+	}
+}
+
+func (m *mockHunoidController) Initialize(ctx context.Context) error { return nil }
+func (m *mockHunoidController) GetCurrentPose() (control.Pose, error) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.pose.Timestamp = time.Now().UTC()
+	return m.pose, nil
+}
+func (m *mockHunoidController) MoveTo(ctx context.Context, target control.Pose) error {
+	m.mu.Lock()
+	m.pose = target
+	m.pose.Timestamp = time.Now().UTC()
+	m.moving = true
+	m.mu.Unlock()
+	go func() {
+		time.Sleep(600 * time.Millisecond)
+		m.mu.Lock()
+		m.moving = false
+		m.mu.Unlock()
+	}()
+	return nil
+}
+func (m *mockHunoidController) Stop() error {
+	m.mu.Lock()
+	m.moving = false
+	m.mu.Unlock()
+	return nil
+}
+func (m *mockHunoidController) GetJointStates() ([]control.Joint, error) { return []control.Joint{}, nil }
+func (m *mockHunoidController) SetJointPositions(positions map[string]float64) error {
+	return nil
+}
+func (m *mockHunoidController) IsMoving() bool {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	return m.moving
+}
+func (m *mockHunoidController) GetBatteryPercent() float64 {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.battery -= 0.01
+	if m.battery < 35.0 {
+		m.battery = 90.0
+	}
+	return m.battery
+}
+
+type mockManipulatorController struct {
+	mu        sync.Mutex
+	gripper   float64
+	lastReach control.Vector3
+}
+
+func newMockManipulatorController() *mockManipulatorController {
+	return &mockManipulatorController{gripper: 1.0}
+}
+
+func (m *mockManipulatorController) OpenGripper() error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.gripper = 1.0
+	return nil
+}
+func (m *mockManipulatorController) CloseGripper() error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.gripper = 0.0
+	return nil
+}
+func (m *mockManipulatorController) GetGripperState() (float64, error) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	return m.gripper, nil
+}
+func (m *mockManipulatorController) ReachTo(ctx context.Context, position control.Vector3) error {
+	m.mu.Lock()
+	m.lastReach = position
+	m.mu.Unlock()
+	return nil
+}
+
+type mockVLAModel struct{}
+
+func (m *mockVLAModel) Initialize(ctx context.Context, modelPath string) error { return nil }
+func (m *mockVLAModel) InferAction(ctx context.Context, visualObs []byte, textCommand string) (*vla.Action, error) {
+	lower := strings.ToLower(textCommand)
+	if strings.Contains(lower, "move") || strings.Contains(lower, "navigate") {
+		return &vla.Action{
+			Type: vla.ActionNavigate,
+			Parameters: map[string]interface{}{
+				"x": rand.Float64() * 5,
+				"y": rand.Float64() * 5,
+				"z": 0.0,
+			},
+			Confidence: 0.85,
+		}, nil
+	}
+	return &vla.Action{
+		Type:       vla.ActionWait,
+		Parameters: map[string]interface{}{},
+		Confidence: 0.9,
+	}, nil
+}
+func (m *mockVLAModel) GetModelInfo() vla.ModelInfo {
+	return vla.ModelInfo{
+		Name:    "Hunoid-Mock-VLA",
+		Version: "1.0.0",
+		SupportedActions: []vla.ActionType{
+			vla.ActionNavigate,
+			vla.ActionPickUp,
+			vla.ActionPutDown,
+			vla.ActionOpen,
+			vla.ActionClose,
+			vla.ActionInspect,
+			vla.ActionWait,
+		},
+	}
+}
+func (m *mockVLAModel) Shutdown() error { return nil }
+
+func getEnvBool(key string, fallback bool) bool {
+	value := strings.TrimSpace(strings.ToLower(os.Getenv(key)))
+	if value == "" {
+		return fallback
+	}
+	return value == "1" || value == "true" || value == "yes"
+}
+
 func main() {
 	hunoidID := flag.String("id", "hunoid001", "Hunoid ID")
 	serialNum := flag.String("serial", "HND-2026-001", "Serial number")
@@ -1477,6 +1623,7 @@ func main() {
 	reportPath := flag.String("report", "Documentation/Hunoid_Mission_Report.md", "Report output path")
 	telemetryInterval := flag.Duration("telemetry-interval", 5*time.Second, "Telemetry interval")
 	metricsAddr := flag.String("metrics-addr", ":9092", "Metrics server address")
+	stayAlive := flag.Bool("stay-alive", false, "Keep running after mission completes")
 	flag.Parse()
 
 	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
@@ -1496,29 +1643,46 @@ func main() {
 		}()
 	}
 
-	hunoidEndpoint := os.Getenv("HUNOID_ENDPOINT")
-	robot, err := control.NewRemoteHunoid(*hunoidID, hunoidEndpoint)
-	if err != nil {
-		log.Fatalf("Failed to initialize robot controller: %v", err)
-	}
-	if err := robot.Initialize(ctx); err != nil {
-		log.Fatalf("Failed to initialize robot: %v", err)
-	}
-	log.Println("Robot controller initialized")
+	bypassHardware := getEnvBool("HUNOID_BYPASS_HARDWARE", false)
 
-	manipulator, err := control.NewRemoteManipulator(*hunoidID, hunoidEndpoint)
-	if err != nil {
-		log.Fatalf("Failed to initialize manipulator: %v", err)
-	}
-	log.Println("Manipulator initialized")
+	var robot control.HunoidController
+	var manipulator control.ManipulatorController
+	var vlaModel vla.VLAModel
 
-	vlaEndpoint := os.Getenv("VLA_ENDPOINT")
-	vlaModel, err := vla.NewHTTPVLA(vlaEndpoint)
-	if err != nil {
-		log.Fatalf("Failed to initialize VLA client: %v", err)
-	}
-	if err := vlaModel.Initialize(ctx, "models/openvla.onnx"); err != nil {
-		log.Fatalf("Failed to initialize VLA: %v", err)
+	if bypassHardware {
+		log.Println("Hardware bypass enabled; using simulated Hunoid controller, manipulator, and VLA.")
+		robot = newMockHunoidController()
+		manipulator = newMockManipulatorController()
+		vlaModel = &mockVLAModel{}
+		if err := vlaModel.Initialize(ctx, ""); err != nil {
+			log.Fatalf("Failed to initialize mock VLA: %v", err)
+		}
+	} else {
+		hunoidEndpoint := os.Getenv("HUNOID_ENDPOINT")
+		var err error
+		robot, err = control.NewRemoteHunoid(*hunoidID, hunoidEndpoint)
+		if err != nil {
+			log.Fatalf("Failed to initialize robot controller: %v", err)
+		}
+		if err := robot.Initialize(ctx); err != nil {
+			log.Fatalf("Failed to initialize robot: %v", err)
+		}
+		log.Println("Robot controller initialized")
+
+		manipulator, err = control.NewRemoteManipulator(*hunoidID, hunoidEndpoint)
+		if err != nil {
+			log.Fatalf("Failed to initialize manipulator: %v", err)
+		}
+		log.Println("Manipulator initialized")
+
+		vlaEndpoint := os.Getenv("VLA_ENDPOINT")
+		vlaModel, err = vla.NewHTTPVLA(vlaEndpoint)
+		if err != nil {
+			log.Fatalf("Failed to initialize VLA client: %v", err)
+		}
+		if err := vlaModel.Initialize(ctx, "models/openvla.onnx"); err != nil {
+			log.Fatalf("Failed to initialize VLA: %v", err)
+		}
 	}
 	defer vlaModel.Shutdown()
 	modelInfo := vlaModel.GetModelInfo()
@@ -1629,6 +1793,11 @@ func main() {
 			} else {
 				log.Printf("Mission report written to %s", *reportPath)
 			}
+		}
+		if *stayAlive {
+			log.Println("Mission complete. Awaiting shutdown signal...")
+			<-sigChan
+			log.Println("Shutting down Hunoid...")
 		}
 		cancel()
 	}

@@ -90,6 +90,19 @@ redis:
 
 ## Activity Log
 
+[2026-01-30 17:40:00] [INFO] MongoDB volume reset to restore auth
+
+---
+
+## Status Report: 2026-01-30 17:40:00 (Mongo Reset)
+
+### Action
+
+- Removed `data_mongo_data` volume and recreated MongoDB container to reinitialize admin credentials.
+- Result: MongoDB authentication restored; Nysus health reports `mongodb: ok`.
+
+---
+
 [2026-01-30 15:20:00] [INFO] Manual container status check
 
 ---

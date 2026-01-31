@@ -51,6 +51,13 @@ ai:
   enable_threat_avoid: true
   enable_weather_avoid: true
 
+  # Geo reference (local meters -> lat/lon for weather queries)
+  geo_reference_enabled: true
+  geo_reference_latitude: 37.7749
+  geo_reference_longitude: -122.4194
+  geo_reference_source: n2yo
+  geo_reference_norad_id: 25544
+
 # Security Monitoring
 security:
   enabled: true

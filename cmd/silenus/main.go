@@ -1,11 +1,15 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/base64"
 	"encoding/json"
 	"flag"
 	"fmt"
+	"image"
+	"image/color"
+	"image/jpeg"
 	"log"
 	"net/http"
 	"os"
@@ -52,33 +56,50 @@ func main() {
 		}()
 	}
 
-	// Initialize hardware
-	cameraConfig, err := loadCameraConfig()
-	if err != nil {
-		log.Fatalf("Camera configuration error: %v", err)
-	}
-	camera := hal.NewCamera(cameraConfig)
-	if err := camera.Initialize(ctx); err != nil {
-		log.Fatalf("Failed to initialize camera: %v", err)
-	}
-	defer camera.Shutdown()
+	bypassHardware := getEnvBool("SILENUS_BYPASS_HARDWARE", false)
 
-	powerEndpoint := os.Getenv("POWER_CONTROLLER_URL")
-	powerCtrl, err := hal.NewRemotePowerController(powerEndpoint)
-	if err != nil {
-		log.Fatalf("Failed to initialize power controller: %v", err)
-	}
+	// Initialize hardware (or fall back to simulated controllers)
+	var camera hal.CameraController
+	var powerCtrl hal.PowerController
+	var gpsCtrl hal.GPSController
 
-	// Use real orbital position tracking
-	orbitalCfg := hal.DefaultOrbitalConfig()
-	if n2yoKey := os.Getenv("N2YO_API_KEY"); n2yoKey != "" {
-		orbitalCfg.N2YOAPIKey = n2yoKey
+	if bypassHardware {
+		log.Println("Hardware bypass enabled; using simulated camera/power/GPS controllers.")
+		camera = newMockCamera(*satelliteID)
+		powerCtrl = newMockPowerController()
+		gpsCtrl = newMockGPSController()
+		if err := camera.Initialize(ctx); err != nil {
+			log.Fatalf("Failed to initialize mock camera: %v", err)
+		}
+		defer camera.Shutdown()
+	} else {
+		cameraConfig, err := loadCameraConfig()
+		if err != nil {
+			log.Fatalf("Camera configuration error: %v", err)
+		}
+		camera = hal.NewCamera(cameraConfig)
+		if err := camera.Initialize(ctx); err != nil {
+			log.Fatalf("Failed to initialize camera: %v", err)
+		}
+		defer camera.Shutdown()
+
+		powerEndpoint := os.Getenv("POWER_CONTROLLER_URL")
+		powerCtrl, err = hal.NewRemotePowerController(powerEndpoint)
+		if err != nil {
+			log.Fatalf("Failed to initialize power controller: %v", err)
+		}
+
+		// Use real orbital position tracking
+		orbitalCfg := hal.DefaultOrbitalConfig()
+		if n2yoKey := os.Getenv("N2YO_API_KEY"); n2yoKey != "" {
+			orbitalCfg.N2YOAPIKey = n2yoKey
+		}
+		realPos, err := hal.NewRealOrbitalPosition(orbitalCfg)
+		if err != nil {
+			log.Fatalf("Failed to initialize orbital position provider: %v", err)
+		}
+		gpsCtrl = realPos
 	}
-	realPos, err := hal.NewRealOrbitalPosition(orbitalCfg)
-	if err != nil {
-		log.Fatalf("Failed to initialize orbital position provider: %v", err)
-	}
-	var gpsCtrl hal.GPSController = realPos
 
 	// Initialize vision processor - use real implementations only
 	var visionProc vision.VisionProcessor
@@ -116,9 +137,14 @@ func main() {
 
 	gatewayAddr := os.Getenv("SATNET_GATEWAY_ADDR")
 	if gatewayAddr == "" {
-		log.Fatalf("SATNET_GATEWAY_ADDR is required for Sat_Net connectivity")
+		if bypassHardware {
+			log.Println("SATNET_GATEWAY_ADDR not set; running in offline Sat_Net mode.")
+		} else {
+			log.Fatalf("SATNET_GATEWAY_ADDR is required for Sat_Net connectivity")
+		}
+	} else {
+		registerSatNetNeighbor(satnetNode, transport, gatewayAddr)
 	}
-	registerSatNetNeighbor(satnetNode, transport, gatewayAddr)
 
 	// Create alert channel
 	alertChan := make(chan tracking.Alert, 100)
@@ -294,6 +320,134 @@ func runTelemetryLoop(ctx context.Context, satelliteID string, powerCtrl hal.Pow
 			return
 		}
 	}
+}
+
+type mockCamera struct {
+	satelliteID string
+	stopChan    chan struct{}
+}
+
+func newMockCamera(satelliteID string) *mockCamera {
+	return &mockCamera{
+		satelliteID: satelliteID,
+		stopChan:    make(chan struct{}),
+	}
+}
+
+func (m *mockCamera) Initialize(ctx context.Context) error { return nil }
+func (m *mockCamera) Shutdown() error {
+	return m.StopStream()
+}
+func (m *mockCamera) CaptureFrame(ctx context.Context) ([]byte, error) {
+	return generateMockFrame(), nil
+}
+func (m *mockCamera) StartStream(ctx context.Context, frameChan chan<- []byte) error {
+	ticker := time.NewTicker(1 * time.Second)
+	go func() {
+		defer ticker.Stop()
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-m.stopChan:
+				return
+			case <-ticker.C:
+				frame := generateMockFrame()
+				select {
+				case frameChan <- frame:
+				default:
+				}
+			}
+		}
+	}()
+	return nil
+}
+func (m *mockCamera) StopStream() error {
+	select {
+	case <-m.stopChan:
+	default:
+		close(m.stopChan)
+	}
+	return nil
+}
+func (m *mockCamera) SetExposure(microseconds int) error { return nil }
+func (m *mockCamera) SetGain(gain float64) error        { return nil }
+func (m *mockCamera) GetDiagnostics() (hal.CameraDiagnostics, error) {
+	return hal.CameraDiagnostics{
+		Temperature: 24.5,
+		Voltage:     12.1,
+		FrameCount:  0,
+		ErrorCount:  0,
+	}, nil
+}
+
+type mockPowerController struct {
+	start time.Time
+}
+
+func newMockPowerController() *mockPowerController {
+	return &mockPowerController{start: time.Now()}
+}
+
+func (m *mockPowerController) GetBatteryPercent() (float64, error) {
+	elapsed := time.Since(m.start).Minutes()
+	percent := 95.0 - elapsed*0.05
+	if percent < 20.0 {
+		percent = 20.0
+	}
+	return percent, nil
+}
+func (m *mockPowerController) GetBatteryVoltage() (float64, error) {
+	return 12.2, nil
+}
+func (m *mockPowerController) GetSolarPanelPower() (float64, error) {
+	return 320.0, nil
+}
+func (m *mockPowerController) IsInEclipse() (bool, error) {
+	return false, nil
+}
+func (m *mockPowerController) SetPowerMode(mode hal.PowerMode) error {
+	return nil
+}
+
+type mockGPSController struct{}
+
+func newMockGPSController() *mockGPSController { return &mockGPSController{} }
+func (m *mockGPSController) GetPosition() (lat, lon, alt float64, err error) {
+	return 37.7749, -122.4194, 408000.0, nil
+}
+func (m *mockGPSController) GetTime() (time.Time, error) {
+	return time.Now().UTC(), nil
+}
+func (m *mockGPSController) GetVelocity() (vx, vy, vz float64, err error) {
+	return 0, 0, 0, nil
+}
+
+func generateMockFrame() []byte {
+	img := image.NewRGBA(image.Rect(0, 0, 640, 480))
+	bg := color.RGBA{R: 12, G: 16, B: 22, A: 255}
+	fire := color.RGBA{R: 220, G: 80, B: 30, A: 255}
+	for y := 0; y < 480; y++ {
+		for x := 0; x < 640; x++ {
+			img.SetRGBA(x, y, bg)
+		}
+	}
+	for y := 180; y < 300; y++ {
+		for x := 260; x < 380; x++ {
+			img.SetRGBA(x, y, fire)
+		}
+	}
+	var buf bytes.Buffer
+	_ = jpeg.Encode(&buf, img, &jpeg.Options{Quality: 80})
+	return buf.Bytes()
+}
+
+func getEnvBool(key string, fallback bool) bool {
+	value := strings.TrimSpace(strings.ToLower(os.Getenv(key)))
+	if value == "" {
+		return fallback
+	}
+	return value == "1" || value == "true" || value == "yes"
 }
 
 func startMetricsServer(addr string) *http.Server {

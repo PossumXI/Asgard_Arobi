@@ -2,18 +2,20 @@ import { Link } from 'react-router-dom';
 import { Github, Twitter, Linkedin, Mail, Globe } from 'lucide-react';
 
 const footerLinks = {
-  products: [
+  asgard: [
     { label: 'Valkyrie', href: '/valkyrie' },
     { label: 'Pricilla', href: '/pricilla' },
     { label: 'Giru', href: '/giru' },
-    { label: 'Silenus', href: '/silenus' },
-    { label: 'Hunoid', href: '/hunoid' },
+  ],
+  auraGenesis: [
+    { label: 'APEX-OS-LQ', href: '/apex-os' },
+    { label: 'Foundation', href: '/foundation' },
+    { label: 'ICF Program', href: '/icf' },
   ],
   company: [
     { label: 'About', href: '/about' },
     { label: 'Contact', href: '/contact' },
-    { label: 'Careers', href: '/careers' },
-    { label: 'Press', href: '/press' },
+    { label: 'Pricing', href: '/pricing' },
   ],
   legal: [
     { label: 'Privacy Policy', href: '/privacy' },
@@ -69,13 +71,28 @@ export default function Footer() {
             </a>
           </div>
 
-          {/* Products */}
+          {/* ASGARD Products */}
           <div>
             <h4 className="font-semibold text-sm text-asgard-900 dark:text-white mb-4">
-              Products
+              ASGARD Defense
             </h4>
             <ul className="space-y-3">
-              {footerLinks.products.map((link) => (
+              {footerLinks.asgard.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    to={link.href}
+                    className="text-sm text-asgard-500 hover:text-asgard-900 dark:text-asgard-400 dark:hover:text-white transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <h4 className="font-semibold text-sm text-asgard-900 dark:text-white mb-4 mt-6">
+              Aura Genesis
+            </h4>
+            <ul className="space-y-3">
+              {footerLinks.auraGenesis.map((link) => (
                 <li key={link.href}>
                   <Link
                     to={link.href}

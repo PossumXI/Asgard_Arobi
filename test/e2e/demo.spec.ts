@@ -124,18 +124,22 @@ test.describe('ASGARD Professional Demo', () => {
     
     console.log('🔮 ACT 3: THE FUTURE');
     
-    // Check if port 3002 has content
-    try {
-      const response = await page.goto('http://localhost:3002', { timeout: 5000 });
-      if (response?.ok()) {
-        await page.waitForLoadState('networkidle');
-        await showTitle(page, '🔮 ADVANCED SYSTEMS', 'Next-Generation Defense');
-        await pause(2500);
-        await smoothScrollToBottom(page);
-        await pause(1500);
+    const futureUrl = (process.env.ASGARD_FUTURE_URL ?? '').trim();
+    if (futureUrl) {
+      try {
+        const response = await page.goto(futureUrl, { timeout: 5000 });
+        if (response?.ok()) {
+          await page.waitForLoadState('networkidle');
+          await showTitle(page, '🔮 ADVANCED SYSTEMS', 'Next-Generation Defense');
+          await pause(2500);
+          await smoothScrollToBottom(page);
+          await pause(1500);
+        }
+      } catch {
+        console.log(`Future systems page unavailable at ${futureUrl}, continuing...`);
       }
-    } catch {
-      console.log('Port 3002 not available, continuing...');
+    } else {
+      console.log('Future systems page not configured (ASGARD_FUTURE_URL not set).');
     }
     
     // ═══════════════════════════════════════════════════════════════════

@@ -198,7 +198,7 @@ export class WebRTCStreamClient {
   private mode: WebRTCClientMode;
   private localStream: MediaStream | null;
   private onTrackCallback: ((stream: MediaStream) => void) | null = null;
-  // Stats callback for future use
+  // Stats callback for optional WebRTC monitoring
   private onStatsCallback: ((stats: RTCStatsReport) => void) | null = null;
 
   constructor(session: StreamSession, options: WebRTCClientOptions = {}) {
@@ -336,7 +336,11 @@ export class WebRTCStreamClient {
 
   async getStats(): Promise<RTCStatsReport | null> {
     if (!this.peerConnection) return null;
-    return this.peerConnection.getStats();
+    const stats = await this.peerConnection.getStats();
+    if (this.onStatsCallback) {
+      this.onStatsCallback(stats);
+    }
+    return stats;
   }
 
   disconnect(): void {

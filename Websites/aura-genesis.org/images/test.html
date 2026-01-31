@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Test Page</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        img { max-width: 400px; border: 1px solid #ccc; margin: 10px 0; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+    <h1>Image Accessibility Test</h1>
+    <p>This page tests if your social media images are accessible via HTTP.</p>
+
+    <div class="test-section">
+        <h2>Test 1: Direct Image URLs</h2>
+        <p>These should display if the images are accessible:</p>
+
+        <h3>aura-genesis-social.jpg</h3>
+        <img src="aura-genesis-social.jpg" alt="Aura Genesis Social Image" onerror="console.error('Failed to load aura-genesis-social.jpg')">
+
+        <h3>apex-os-lq-social.jpg</h3>
+        <img src="apex-os-lq-social.jpg" alt="APEX-OS-LQ Social Image" onerror="console.error('Failed to load apex-os-lq-social.jpg')">
+
+        <h3>foundation-social.jpg</h3>
+        <img src="foundation-social.jpg" alt="Foundation Social Image" onerror="console.error('Failed to load foundation-social.jpg')">
+
+        <h3>icf-social.jpg</h3>
+        <img src="icf-social.jpg" alt="ICF Social Image" onerror="console.error('Failed to load icf-social.jpg')">
+    </div>
+
+    <div class="test-section">
+        <h2>Test 2: Full URLs (as used in meta tags)</h2>
+        <p>These test the full URLs used in your meta tags:</p>
+
+        <h3>aura-genesis-social.jpg (full URL)</h3>
+        <img src="https://aura-genesis.org/images/aura-genesis-social.jpg" alt="Aura Genesis Social Image Full URL" onerror="console.error('Failed to load full URL for aura-genesis-social.jpg')">
+
+        <h3>apex-os-lq-social.jpg (full URL)</h3>
+        <img src="https://aura-genesis.org/images/apex-os-lq-social.jpg" alt="APEX-OS-LQ Social Image Full URL" onerror="console.error('Failed to load full URL for apex-os-lq-social.jpg')">
+    </div>
+
+    <div class="test-section">
+        <h2>Test 3: Meta Tag Validation</h2>
+        <p>Check the meta tags for your pages:</p>
+        <ul>
+            <li><a href="https://developers.facebook.com/tools/debug/" target="_blank">Facebook Sharing Debugger</a> - Test your homepage</li>
+            <li><a href="https://cards-dev.twitter.com/validator" target="_blank">Twitter Card Validator</a> - Test your homepage</li>
+            <li><a href="https://opengraphcheck.com/" target="_blank">Open Graph Check</a> - Test any URL</li>
+        </ul>
+    </div>
+
+    <script>
+        // Log any image loading errors to console
+        window.addEventListener('error', function(e) {
+            if (e.target.tagName === 'IMG') {
+                console.error('Image failed to load:', e.target.src);
+            }
+        }, true);
+    </script>
+</body>
+</html>

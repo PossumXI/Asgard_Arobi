@@ -1,0 +1,105 @@
+{
+  "name": "APEX-OS-LQ",
+  "version": "1.0.0",
+  "release_date": "2025-01-15",
+  "description": "The next generation autonomous computer operating system",
+  "homepage": "https://aura-genesis.org",
+  "license": "Proprietary",
+  "packages": {
+    "windows": {
+      "filename": "apex-os-lq-windows-1.0.0.exe",
+      "url": "/downloads/apex-os-lq-windows-1.0.0.exe",
+      "size": "2.8 GB",
+      "size_bytes": 3006477107,
+      "sha256": "a1b2c3d4e5f6789012345678901234567890123456789012345678901234567890",
+      "requirements": {
+        "os": "Windows 11",
+        "architecture": "64-bit",
+        "ram": "8GB",
+        "storage": "20GB"
+      },
+      "installer_type": "exe"
+    },
+    "macos": {
+      "filename": "apex-os-lq-macos-1.0.0.dmg",
+      "url": "/downloads/apex-os-lq-macos-1.0.0.dmg",
+      "size": "3.2 GB",
+      "size_bytes": 3435973836,
+      "sha256": "b2c3d4e5f678901234567890123456789012345678901234567890123456789012",
+      "requirements": {
+        "os": "macOS 12.0+",
+        "architecture": "Intel/Apple Silicon",
+        "ram": "8GB",
+        "storage": "20GB"
+      },
+      "installer_type": "dmg"
+    },
+    "linux": {
+      "filename": "apex-os-lq-linux-1.0.0.AppImage",
+      "url": "/downloads/apex-os-lq-linux-1.0.0.AppImage",
+      "size": "2.5 GB",
+      "size_bytes": 2684354560,
+      "sha256": "c3d4e5f6789012345678901234567890123456789012345678901234567890123",
+      "requirements": {
+        "os": "Ubuntu 20.04+, Fedora 35+, Debian 11+",
+        "architecture": "64-bit",
+        "ram": "8GB",
+        "storage": "20GB"
+      },
+      "installer_type": "AppImage"
+    }
+  },
+  "usb_creator": {
+    "filename": "apex-os-lq-usb-creator-1.0.0.exe",
+    "url": "/downloads/apex-os-lq-usb-creator-1.0.0.exe",
+    "size": "150 MB",
+    "size_bytes": 157286400,
+    "sha256": "d4e5f67890123456789012345678901234567890123456789012345678901234",
+    "supported_platforms": ["windows", "macos", "linux"]
+  },
+  "pricing": {
+    "one_time_fee": 49.00,
+    "currency": "USD",
+    "subscription_model": true,
+    "subscription_details": "Ongoing features and services managed through APEX-OS-LQ"
+  },
+  "support": {
+    "discord": "https://discord.gg/h64Cg8c6",
+    "email": "contact@aura-genesis.org",
+    "documentation": "https://aura-genesis.org/docs"
+  },
+  "system_requirements": {
+    "minimum": {
+      "ram": "8GB",
+      "storage": "20GB",
+      "network": "Stable internet connection",
+      "security": "TPM 2.0 support recommended"
+    },
+    "recommended": {
+      "ram": "16GB",
+      "storage": "50GB SSD",
+      "network": "High-speed internet",
+      "security": "TPM 2.0 + Secure Boot"
+    }
+  },
+  "changelog": [
+    {
+      "version": "1.0.0",
+      "date": "2025-01-15",
+      "changes": [
+        "Initial release of APEX-OS-LQ",
+        "AI-powered security system (AISA)",
+        "Blockchain integration with Arobi Network",
+        "Post-quantum cryptography support",
+        "seL4 microkernel foundation",
+        "Token rewards system"
+      ]
+    }
+  ],
+  "checksums": {
+    "windows": "a1b2c3d4e5f6789012345678901234567890123456789012345678901234567890",
+    "macos": "b2c3d4e5f678901234567890123456789012345678901234567890123456789012",
+    "linux": "c3d4e5f6789012345678901234567890123456789012345678901234567890123",
+    "usb_creator": "d4e5f67890123456789012345678901234567890123456789012345678901234"
+  }
+}

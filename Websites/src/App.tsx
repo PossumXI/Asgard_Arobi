@@ -16,6 +16,11 @@ const Pricilla = lazy(() => import('@/pages/Pricilla'));
 const Valkyrie = lazy(() => import('@/pages/Valkyrie'));
 const Contact = lazy(() => import('@/pages/Contact'));
 const Giru = lazy(() => import('@/pages/Giru'));
+// Aura Genesis ecosystem pages
+const ApexOS = lazy(() => import('@/pages/ApexOS'));
+const Foundation = lazy(() => import('@/pages/Foundation'));
+const ICF = lazy(() => import('@/pages/ICF'));
+// Auth and dashboard
 const SignIn = lazy(() => import('@/pages/auth/SignIn'));
 const SignUp = lazy(() => import('@/pages/auth/SignUp'));
 const Dashboard = lazy(() => import('@/pages/dashboard/Dashboard'));
@@ -44,6 +49,10 @@ export default function App() {
                 <Route path="valkyrie" element={withErrorBoundary(Valkyrie)} />
                 <Route path="contact" element={withErrorBoundary(Contact)} />
                 <Route path="giru" element={withErrorBoundary(Giru)} />
+                {/* Aura Genesis ecosystem routes */}
+                <Route path="apex-os" element={withErrorBoundary(ApexOS)} />
+                <Route path="foundation" element={withErrorBoundary(Foundation)} />
+                <Route path="icf" element={withErrorBoundary(ICF)} />
                 <Route path="pricing" element={withErrorBoundary(Pricing)} />
                 <Route path="signin" element={withErrorBoundary(SignIn)} />
                 <Route path="signup" element={withErrorBoundary(SignUp)} />

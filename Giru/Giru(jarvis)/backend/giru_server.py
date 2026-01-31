@@ -48,11 +48,21 @@ except ImportError:
 import psutil
 import pyaudio
 import pyttsx3
-import pywhatkit
 import requests
 import speech_recognition as sr
 import websockets
 import wikipedia
+
+PYWHATKIT_AVAILABLE = False
+PYWHATKIT_ERROR = None
+try:
+    if os.getenv("DISPLAY") or os.getenv("GIRU_ALLOW_PYWHATKIT") == "1":
+        import pywhatkit
+        PYWHATKIT_AVAILABLE = True
+    else:
+        PYWHATKIT_ERROR = "DISPLAY not set"
+except Exception as exc:
+    PYWHATKIT_ERROR = str(exc)
 
 # Import our modules
 from ai_providers import get_ai_manager, MODELS, ModelTier
@@ -363,7 +373,7 @@ def play_elevenlabs(text: str) -> bool:
             # Fallback: save to temp file and use playsound
             import tempfile
             try:
-                from playsound import playsound
+                from playsound import playsound  # type: ignore[reportMissingImports]
                 with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as f:
                     f.write(response.content)
                     temp_path = f.name
@@ -1448,11 +1458,15 @@ async def handle_command(text: str) -> str:
         if target.startswith("http://") or target.startswith("https://"):
             webbrowser.open(target)
             return f"Opening {target} in your browser."
+        if not PYWHATKIT_AVAILABLE:
+            return "Browser search is unavailable in headless mode."
         pywhatkit.search(target)
         return f"Searching for {target}."
     
     if lower.startswith("search "):
         query = text[7:].strip()
+        if not PYWHATKIT_AVAILABLE:
+            return "Browser search is unavailable in headless mode."
         pywhatkit.search(query)
         return f"Searching for {query}."
     
@@ -1672,6 +1686,10 @@ async def main() -> None:
     tts_queue: "queue.Queue[str]" = queue.Queue()
     handler.tts_queue = tts_queue
 
+    if not PYWHATKIT_AVAILABLE:
+        detail = f" ({PYWHATKIT_ERROR})" if PYWHATKIT_ERROR else ""
+        log_sync(f"pywhatkit disabled in this environment{detail}.", "warn")
+
     # Initialize singletons
     ai_manager, monitor, db = get_instances()
     
@@ -1682,6 +1700,9 @@ async def main() -> None:
     # Start speech recognition loop
     listener_thread = threading.Thread(target=speech_loop, args=(tts_queue,), daemon=True)
     listener_thread.start()
+
+    if os.getenv("GIRU_TTS_SELFTEST") == "1":
+        tts_queue.put("Giru online. Speech synthesis self-test complete.")
 
     # Get available models
     available_models = ai_manager.get_available_models()

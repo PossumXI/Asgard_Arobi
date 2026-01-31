@@ -34,6 +34,9 @@ generated specifications belong here.
 | `Runbooks.md` | Operational incident response playbooks |
 | `Release_Procedure.md` | Staged release and rollback procedure |
 | `Port_Allocations.md` | Service port assignments |
+| `Access_Code_System.md` | Access code lifecycle and rotation policy |
+| `Change_Log_Access_Codes_2026-01-30.md` | Access code system update log |
+| `Change_Log_Weather_Geo_Reference_2026-01-30.md` | Valkyrie weather geo reference activation |
 
 ### Features & Demos
 | File | Description |

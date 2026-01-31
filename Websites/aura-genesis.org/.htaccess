@@ -1,0 +1,50 @@
+# Apache configuration for downloads directory
+<Directory "/downloads/">
+    Options -Indexes
+    AllowOverride None
+    Require all granted
+
+    # Enable CORS for downloads
+    Header always set Access-Control-Allow-Origin "*"
+    Header always set Access-Control-Allow-Methods "GET, POST, OPTIONS"
+    Header always set Access-Control-Allow-Headers "Content-Type"
+
+    # Cache static downloads for 1 hour
+    ExpiresActive on
+    ExpiresDefault "access plus 1 hour"
+</Directory>
+
+# Redirect old download URLs
+RedirectMatch 301 ^/download/(.*)$ /downloads/$1
+
+# Security headers
+<FilesMatch "\.(exe|dmg|AppImage)$">
+    Header set X-Content-Type-Options nosniff
+    Header set X-Frame-Options DENY
+    Header set Content-Security-Policy "default-src 'none'; style-src 'unsafe-inline'; sandbox"
+</FilesMatch>
+
+# Prevent access to sensitive files
+<FilesMatch "\.(htaccess|htpasswd|ini|log|sh|inc|bak)$">
+Order Allow,Deny
+Deny from all
+</FilesMatch>
+
+# Ensure images are served with correct MIME types and headers
+<FilesMatch "\.(jpg|jpeg|png|gif|svg|webp)$">
+    Header set X-Content-Type-Options nosniff
+    Header set Cache-Control "public, max-age=86400"
+
+    # Enable CORS for images (important for social media)
+    Header always set Access-Control-Allow-Origin "*"
+    Header always set Access-Control-Allow-Methods "GET, HEAD, OPTIONS"
+    Header always set Access-Control-Allow-Headers "Range"
+</FilesMatch>
+
+# Specific rules for social media images
+<FilesMatch "social\.jpg$">
+    # Longer cache for social images (7 days)
+    Header set Cache-Control "public, max-age=604800"
+    # Ensure proper content type
+    Header set Content-Type "image/jpeg"
+</FilesMatch>

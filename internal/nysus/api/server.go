@@ -98,7 +98,8 @@ func NewServer(cfg Config, pgDB *db.PostgresDB, mongoDB *db.MongoDB, eventBus *e
 		accessCodeRepo := repositories.NewAccessCodeRepository(pgDB)
 		accessCodeService = services.NewAccessCodeService(accessCodeRepo, userRepo, services.NewEmailService())
 
-		bootstrapAdminUser(pgDB)
+		adminBootstrap := bootstrapAdminUser(pgDB)
+		bootstrapAccessCode(accessCodeService, adminBootstrap)
 	}
 
 	// Initialize signaling server with the SFU and optional stream service.
@@ -256,6 +257,10 @@ func (s *Server) registerRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/api/satellites", s.handleSatellites)
 	mux.HandleFunc("/api/hunoids", s.handleHunoids)
 	mux.HandleFunc("/api/threats", s.handleThreats)
+
+	// Satellite tracking (N2YO)
+	satelliteHandlers := NewSatelliteHandlers(os.Getenv("N2YO_API_KEY"))
+	satelliteHandlers.RegisterRoutes(mux)
 
 	// Streams endpoints (for Hubs)
 	mux.HandleFunc("/api/streams", s.handleStreams)

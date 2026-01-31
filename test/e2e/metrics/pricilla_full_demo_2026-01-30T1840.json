@@ -1,0 +1,29 @@
+{
+  "targetUpdates": 51,
+  "replanCount": 132,
+  "lastReplanReason": "payload_update",
+  "lastReplanAt": "2026-01-30T13:40:10.1409431-05:00",
+  "lastTargetUpdateAt": "2026-01-30T13:39:51.233624-05:00",
+  "lastTargetPosition": {
+    "x": 6000,
+    "y": 3750,
+    "z": 75
+  },
+  "lastPayloadPosition": {
+    "x": 5900,
+    "y": 3700,
+    "z": 55
+  },
+  "lastTrajectoryId": "9bd944d7-8fbe-486c-9970-19bfcd376e05_stealth",
+  "lastMissionId": "84524a58-b54b-4b9e-8c84-c0c0c286b6fb",
+  "completionDistance": 0,
+  "missionCompletedAt": "2026-01-30T13:39:07.4788584-05:00",
+  "hitProbability": 0.5948991912359606,
+  "cep": 53.46,
+  "terminalGuidanceOn": true,
+  "timeToImpact": 10.661157024793388,
+  "closingVelocity": 10.653455966540049,
+  "crossTrackError": 113.57816691600748,
+  "ecmDetected": false,
+  "weatherImpact": 0.18799999999999997
+}
