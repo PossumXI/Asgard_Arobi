@@ -181,6 +181,28 @@ func getEnv(key string) string {
 	return os.Getenv(key)
 }
 
+// getAllowedOrigins returns the list of allowed CORS origins from environment.
+func getAllowedOrigins() []string {
+	origins := os.Getenv("ALLOWED_ORIGINS")
+	if origins == "" {
+		return []string{"http://localhost:3000", "http://localhost:3001", "http://localhost:5173"}
+	}
+	return strings.Split(origins, ",")
+}
+
+// isOriginAllowed checks if the given origin is in the allowed list.
+func isOriginAllowed(origin string, allowed []string) bool {
+	if origin == "" {
+		return false
+	}
+	for _, a := range allowed {
+		if strings.TrimSpace(a) == origin {
+			return true
+		}
+	}
+	return false
+}
+
 // Start begins serving HTTP requests.
 func (s *Server) Start() error {
 	// Start WebSocket hub
@@ -310,10 +332,21 @@ func (s *Server) middleware(next http.Handler) http.Handler {
 			return
 		}
 
-		// CORS headers
-		w.Header().Set("Access-Control-Allow-Origin", "*")
+		// CORS headers - restrict to configured origins
+		origin := r.Header.Get("Origin")
+		allowedOrigins := getAllowedOrigins()
+		if isOriginAllowed(origin, allowedOrigins) {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+			w.Header().Set("Access-Control-Allow-Credentials", "true")
+		}
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+		// Security headers
+		w.Header().Set("X-Content-Type-Options", "nosniff")
+		w.Header().Set("X-Frame-Options", "DENY")
+		w.Header().Set("X-XSS-Protection", "1; mode=block")
+		w.Header().Set("Referrer-Policy", "strict-origin-when-cross-origin")
 
 		// Handle preflight
 		if r.Method == "OPTIONS" {

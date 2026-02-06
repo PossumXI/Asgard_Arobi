@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [main, develop]
 
+# Restrict default permissions to read-only
+permissions:
+  contents: read
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -17,22 +21,24 @@ jobs:
   go-lint:
     name: Go Lint
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      
+
       - name: Install system dependencies
         run: sudo apt-get update && sudo apt-get install -y libpcap-dev
-      
+
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
           go-version: "1.24"
           cache: true
-      
+
       - name: Run go vet
         run: go vet ./...
-      
+
       - name: Run go fmt check
         run: |
           if [ -n "$(gofmt -l .)" ]; then
@@ -44,6 +50,8 @@ jobs:
   go-security:
     name: Go Security Scan
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -60,31 +68,41 @@ jobs:
       - name: Run govulncheck
         run: |
           go install golang.org/x/vuln/cmd/govulncheck@latest
-          govulncheck ./... || true
+          govulncheck ./...
+
+      - name: Check for secrets in codebase
+        run: |
+          if git ls-files --cached | xargs grep -rlE '(sk_live_|sk_test_|AKIA[0-9A-Z]{16}|ghp_[a-zA-Z0-9]{36}|gsk_[a-zA-Z0-9]+)' -- '*.go' '*.ts' '*.tsx' '*.json' '*.yaml' '*.yml' 2>/dev/null; then
+            echo "::error::Potential secrets detected in tracked files!"
+            exit 1
+          fi
+          echo "No secrets detected in tracked files."
 
   go-tests:
     name: Go Tests
     needs: [go-lint]
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      
+
       - name: Install system dependencies
         run: sudo apt-get update && sudo apt-get install -y libpcap-dev
-      
+
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
           go-version: "1.24"
           cache: true
-      
+
       - name: Run tests with coverage
         run: |
           go test -v -race -coverprofile=coverage.out -covermode=atomic \
             $(go list ./... | grep -v "Pricilla/test") \
             -skip "TestTrajectoryAccuracy|TestKalmanFilterAccuracy"
-      
+
       - name: Upload coverage
         uses: codecov/codecov-action@v4
         with:
@@ -97,64 +115,68 @@ jobs:
   frontend-websites:
     name: Frontend - Websites
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     defaults:
       run:
         working-directory: Websites
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      
+
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: "20.x"
           cache: 'npm'
           cache-dependency-path: Websites/package-lock.json
-      
+
       - name: Install dependencies
         run: npm ci
-      
+
       - name: Run lint
         run: npm run lint --if-present
-      
+
       - name: Run type check
         run: npm run typecheck --if-present
-      
+
       - name: Build
         run: npm run build
-      
+
       - name: Run tests
         run: npm test --if-present
 
   frontend-hubs:
     name: Frontend - Hubs
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     defaults:
       run:
         working-directory: Hubs
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      
+
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: "20.x"
           cache: 'npm'
           cache-dependency-path: Hubs/package-lock.json
-      
+
       - name: Install dependencies
         run: npm ci
-      
+
       - name: Run lint
         run: npm run lint --if-present
-      
+
       - name: Run type check
         run: npm run typecheck --if-present
-      
+
       - name: Build
         run: npm run build
-      
+
       - name: Run tests
         run: npm test --if-present
 
@@ -165,6 +187,9 @@ jobs:
     name: Docker Build
     needs: [go-tests]
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     if: github.event_name == 'push'
     strategy:
       matrix:
@@ -199,14 +224,21 @@ jobs:
     name: CI Success
     needs: [go-tests, go-security, frontend-websites, frontend-hubs]
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     if: always()
     steps:
       - name: Check all jobs
+        env:
+          GO_TESTS_RESULT: ${{ needs.go-tests.result }}
+          GO_SECURITY_RESULT: ${{ needs.go-security.result }}
+          FRONTEND_WEBSITES_RESULT: ${{ needs.frontend-websites.result }}
+          FRONTEND_HUBS_RESULT: ${{ needs.frontend-hubs.result }}
         run: |
-          if [[ "${{ needs.go-tests.result }}" == "failure" ]] || \
-             [[ "${{ needs.go-security.result }}" == "failure" ]] || \
-             [[ "${{ needs.frontend-websites.result }}" == "failure" ]] || \
-             [[ "${{ needs.frontend-hubs.result }}" == "failure" ]]; then
+          if [[ "$GO_TESTS_RESULT" == "failure" ]] || \
+             [[ "$GO_SECURITY_RESULT" == "failure" ]] || \
+             [[ "$FRONTEND_WEBSITES_RESULT" == "failure" ]] || \
+             [[ "$FRONTEND_HUBS_RESULT" == "failure" ]]; then
             echo "One or more jobs failed"
             exit 1
           fi

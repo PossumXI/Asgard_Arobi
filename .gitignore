@@ -81,9 +81,17 @@ temp/
 *.crt
 *.p12
 credentials.json
+*_credentials.json
 service-account.json
 secrets.yaml
 !Control_net/kubernetes/secrets.yaml.example
+*_access_keys*.txt
+founder/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
 
 # Terraform state (if used)
 *.tfstate

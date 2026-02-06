@@ -1,0 +1,162 @@
+{
+  "name": "ASGARD DO-178C Compliance Workflow",
+  "description": "Compliance workflow for government/aviation certification requirements",
+  "requiredTier": 6,
+  "standard": "DO-178C DAL-B",
+  "statuses": [
+    {
+      "id": "1",
+      "name": "Draft",
+      "category": "new",
+      "description": "Initial requirement or task drafted"
+    },
+    {
+      "id": "2",
+      "name": "Internal Review",
+      "category": "indeterminate",
+      "description": "Being reviewed by internal team"
+    },
+    {
+      "id": "3",
+      "name": "Compliance Review",
+      "category": "indeterminate",
+      "description": "Being reviewed by compliance officer"
+    },
+    {
+      "id": "4",
+      "name": "Implementation",
+      "category": "indeterminate",
+      "description": "Work is being implemented"
+    },
+    {
+      "id": "5",
+      "name": "Verification",
+      "category": "indeterminate",
+      "description": "Implementation is being verified"
+    },
+    {
+      "id": "6",
+      "name": "Government Review",
+      "category": "indeterminate",
+      "description": "Submitted for government/FAA review"
+    },
+    {
+      "id": "7",
+      "name": "Approved",
+      "category": "done",
+      "description": "Approved by all parties"
+    },
+    {
+      "id": "8",
+      "name": "Certified",
+      "category": "done",
+      "description": "Officially certified (DO-178C/FAA)"
+    },
+    {
+      "id": "9",
+      "name": "Rejected",
+      "category": "done",
+      "description": "Rejected - requires rework"
+    }
+  ],
+  "transitions": [
+    {
+      "from": "Draft",
+      "to": "Internal Review",
+      "name": "Submit for Review",
+      "requiredFields": ["description", "acceptanceCriteria", "traceabilityLinks"]
+    },
+    {
+      "from": "Internal Review",
+      "to": "Draft",
+      "name": "Return for Rework"
+    },
+    {
+      "from": "Internal Review",
+      "to": "Compliance Review",
+      "name": "Approve for Compliance",
+      "requiresRole": "tech-lead"
+    },
+    {
+      "from": "Compliance Review",
+      "to": "Draft",
+      "name": "Compliance Rejection",
+      "requiredFields": ["rejectionReason"]
+    },
+    {
+      "from": "Compliance Review",
+      "to": "Implementation",
+      "name": "Approve for Implementation",
+      "requiresRole": "compliance-officer"
+    },
+    {
+      "from": "Implementation",
+      "to": "Verification",
+      "name": "Submit for Verification",
+      "requiredFields": ["implementationNotes", "testCoverage"]
+    },
+    {
+      "from": "Verification",
+      "to": "Implementation",
+      "name": "Verification Failed",
+      "requiredFields": ["failureReport"]
+    },
+    {
+      "from": "Verification",
+      "to": "Government Review",
+      "name": "Submit to Government",
+      "requiredFields": ["verificationReport", "traceabilityMatrix"],
+      "requiresRole": "program-manager"
+    },
+    {
+      "from": "Government Review",
+      "to": "Rejected",
+      "name": "Government Rejection",
+      "requiredFields": ["rejectionReport"]
+    },
+    {
+      "from": "Government Review",
+      "to": "Approved",
+      "name": "Government Approval",
+      "requiredFields": ["approvalDocument"]
+    },
+    {
+      "from": "Rejected",
+      "to": "Draft",
+      "name": "Resubmit",
+      "requiredFields": ["correctionPlan"]
+    },
+    {
+      "from": "Approved",
+      "to": "Certified",
+      "name": "Certify",
+      "requiredFields": ["certificationNumber", "certificationDate"],
+      "requiresRole": "cto"
+    }
+  ],
+  "requiredDocuments": {
+    "Draft": ["requirementSpec"],
+    "Compliance Review": ["complianceMatrix", "hazardAnalysis"],
+    "Verification": ["testPlan", "testResults"],
+    "Government Review": [
+      "softwareDevelopmentPlan",
+      "softwareVerificationPlan",
+      "traceabilityMatrix",
+      "testCoverageAnalysis",
+      "configurationIndex"
+    ]
+  },
+  "auditRequirements": {
+    "allTransitions": true,
+    "documentAccess": true,
+    "retentionYears": 10,
+    "governmentAuditAccess": true
+  },
+  "notifications": {
+    "Compliance Review": ["compliance-team", "program-manager"],
+    "Government Review": ["government-liaison", "cto"],
+    "Approved": ["all-stakeholders"],
+    "Certified": ["executive-team", "government-liaison"],
+    "Rejected": ["compliance-team", "tech-lead", "program-manager"]
+  }
+}

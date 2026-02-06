@@ -5,7 +5,7 @@
  * Copyright 2026 Arobi. All Rights Reserved.
  */
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Shield, Download, Key, Monitor, Apple, Terminal, CheckCircle, AlertTriangle, Lock } from 'lucide-react';
 

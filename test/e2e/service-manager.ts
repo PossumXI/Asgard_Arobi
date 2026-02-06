@@ -97,7 +97,7 @@ export const ASGARD_SERVICES: ServiceConfig[] = [
     args: ['-http', ':8094', '-auto-unseal'],
     healthEndpoint: 'http://localhost:8094/vault/health',
     port: 8094,
-    env: { VAULT_MASTER_PASSWORD: 'asgard-dev-vault-2026' },
+    env: { VAULT_MASTER_PASSWORD: process.env.VAULT_MASTER_PASSWORD || 'asgard-dev-vault-2026' },
     startupTimeout: 10000,
     healthCheckInterval: 2000,
     required: true,

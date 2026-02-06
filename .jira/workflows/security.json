@@ -1,0 +1,144 @@
+{
+  "name": "ASGARD Security Workflow",
+  "description": "Security issue workflow with enhanced review stages",
+  "requiredTier": 4,
+  "statuses": [
+    {
+      "id": "1",
+      "name": "Reported",
+      "category": "new",
+      "description": "Security issue has been reported"
+    },
+    {
+      "id": "2",
+      "name": "Triaged",
+      "category": "indeterminate",
+      "description": "Issue has been assessed for severity"
+    },
+    {
+      "id": "3",
+      "name": "In Progress",
+      "category": "indeterminate",
+      "description": "Fix is being developed"
+    },
+    {
+      "id": "4",
+      "name": "Security Review",
+      "category": "indeterminate",
+      "description": "Fix is being reviewed by security team"
+    },
+    {
+      "id": "5",
+      "name": "Penetration Testing",
+      "category": "indeterminate",
+      "description": "Fix is being validated through pen testing"
+    },
+    {
+      "id": "6",
+      "name": "Verified",
+      "category": "indeterminate",
+      "description": "Fix has been verified as effective"
+    },
+    {
+      "id": "7",
+      "name": "Resolved",
+      "category": "done",
+      "description": "Issue is resolved and deployed"
+    },
+    {
+      "id": "8",
+      "name": "Won't Fix",
+      "category": "done",
+      "description": "Issue will not be addressed (with justification)"
+    }
+  ],
+  "transitions": [
+    {
+      "from": "Reported",
+      "to": "Triaged",
+      "name": "Triage",
+      "requiredFields": ["severity", "priority", "affectedComponent"]
+    },
+    {
+      "from": "Triaged",
+      "to": "In Progress",
+      "name": "Start Fix",
+      "requiredFields": ["assignee"]
+    },
+    {
+      "from": "Triaged",
+      "to": "Won't Fix",
+      "name": "Close as Won't Fix",
+      "requiredFields": ["resolution", "justification"],
+      "requiresApproval": true
+    },
+    {
+      "from": "In Progress",
+      "to": "Security Review",
+      "name": "Submit for Review",
+      "requiredFields": ["pullRequest"]
+    },
+    {
+      "from": "Security Review",
+      "to": "In Progress",
+      "name": "Request Changes",
+      "requiredFields": ["reviewComments"]
+    },
+    {
+      "from": "Security Review",
+      "to": "Penetration Testing",
+      "name": "Approve for Testing",
+      "requiresRole": "security-lead"
+    },
+    {
+      "from": "Penetration Testing",
+      "to": "Security Review",
+      "name": "Test Failed",
+      "requiredFields": ["testReport"]
+    },
+    {
+      "from": "Penetration Testing",
+      "to": "Verified",
+      "name": "Test Passed",
+      "requiredFields": ["testReport", "verification"]
+    },
+    {
+      "from": "Verified",
+      "to": "Resolved",
+      "name": "Deploy & Close",
+      "requiredFields": ["deploymentDate"],
+      "requiresApproval": true
+    },
+    {
+      "from": "Resolved",
+      "to": "Reported",
+      "name": "Reopen",
+      "requiredFields": ["reopenReason"]
+    }
+  ],
+  "notifications": {
+    "Reported": ["security-team"],
+    "Triaged": ["security-lead", "assignee"],
+    "Security Review": ["security-team", "cto"],
+    "Verified": ["security-team", "cto", "stakeholders"],
+    "Resolved": ["all-subscribers"]
+  },
+  "slaTargets": {
+    "critical": {
+      "triage": "4h",
+      "resolution": "24h"
+    },
+    "high": {
+      "triage": "8h",
+      "resolution": "72h"
+    },
+    "medium": {
+      "triage": "24h",
+      "resolution": "7d"
+    },
+    "low": {
+      "triage": "72h",
+      "resolution": "30d"
+    }
+  }
+}

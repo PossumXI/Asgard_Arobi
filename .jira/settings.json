@@ -1,0 +1,33 @@
+{
+  "$schema": "https://raw.githubusercontent.com/gao-sun/vscode-jira/main/src/schemas/settings.schema.json",
+  "baseUrl": "https://arobi.atlassian.net",
+  "projectKey": "ASGARD",
+  "defaultIssueType": "Task",
+  "defaultPriority": "Medium",
+  "workingProject": "ASGARD",
+  "enableCredentialHelper": true,
+  "strictSSL": true,
+  "trackingTimeMode": "never",
+  "trackingTimeModeHybridTimeout": 60,
+  "numberOfIssues": 50,
+  "cacheDirectory": ".jira/cache",
+  "stateDirectory": ".jira/state",
+  "globalState": false,
+  "customJQL": {
+    "My Issues": "project = ASGARD AND assignee = currentUser() ORDER BY updated DESC",
+    "Open Tasks": "project = ASGARD AND status != Done ORDER BY priority DESC",
+    "Sprint Backlog": "project = ASGARD AND sprint in openSprints()",
+    "High Priority": "project = ASGARD AND priority in (Highest, High) ORDER BY created DESC",
+    "Public Tasks": "project = ASGARD AND labels = public ORDER BY priority DESC",
+    "Developer Tasks": "project = ASGARD AND labels in (developer, frontend, backend, api) ORDER BY priority DESC"
+  },
+  "issueTypeColors": {
+    "Bug": "#FF5630",
+    "Story": "#2684FF",
+    "Task": "#4FADE6",
+    "Epic": "#6554C0",
+    "Subtask": "#42526E",
+    "Security": "#FF991F",
+    "Compliance": "#00875A"
+  }
+}

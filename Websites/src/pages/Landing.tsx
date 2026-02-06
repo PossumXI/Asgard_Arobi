@@ -157,10 +157,12 @@ export default function Landing() {
                   <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
-              <Button variant="outline" size="lg" className="group">
-                <Play className="w-4 h-4 mr-2" />
-                Watch Demo
-              </Button>
+              <Link to="/demo">
+                <Button variant="outline" size="lg" className="group">
+                  <Play className="w-4 h-4 mr-2" />
+                  Watch Demo
+                </Button>
+              </Link>
             </motion.div>
 
             {/* Trust Badges */}

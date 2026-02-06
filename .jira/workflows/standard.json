@@ -1,0 +1,83 @@
+{
+  "name": "ASGARD Standard Workflow",
+  "description": "Standard development workflow for ASGARD project",
+  "statuses": [
+    {
+      "id": "1",
+      "name": "To Do",
+      "category": "new"
+    },
+    {
+      "id": "2",
+      "name": "In Progress",
+      "category": "indeterminate"
+    },
+    {
+      "id": "3",
+      "name": "Code Review",
+      "category": "indeterminate"
+    },
+    {
+      "id": "4",
+      "name": "Testing",
+      "category": "indeterminate"
+    },
+    {
+      "id": "5",
+      "name": "Done",
+      "category": "done"
+    },
+    {
+      "id": "6",
+      "name": "Blocked",
+      "category": "indeterminate"
+    }
+  ],
+  "transitions": [
+    {
+      "from": "To Do",
+      "to": "In Progress",
+      "name": "Start Work"
+    },
+    {
+      "from": "In Progress",
+      "to": "Code Review",
+      "name": "Submit for Review"
+    },
+    {
+      "from": "Code Review",
+      "to": "In Progress",
+      "name": "Request Changes"
+    },
+    {
+      "from": "Code Review",
+      "to": "Testing",
+      "name": "Approve"
+    },
+    {
+      "from": "Testing",
+      "to": "Code Review",
+      "name": "Test Failed"
+    },
+    {
+      "from": "Testing",
+      "to": "Done",
+      "name": "Test Passed"
+    },
+    {
+      "from": "In Progress",
+      "to": "Blocked",
+      "name": "Block"
+    },
+    {
+      "from": "Blocked",
+      "to": "In Progress",
+      "name": "Unblock"
+    },
+    {
+      "from": "Done",
+      "to": "To Do",
+      "name": "Reopen"
+    }
+  ]
+}

@@ -20,6 +20,7 @@ const Giru = lazy(() => import('@/pages/Giru'));
 const ApexOS = lazy(() => import('@/pages/ApexOS'));
 const Foundation = lazy(() => import('@/pages/Foundation'));
 const ICF = lazy(() => import('@/pages/ICF'));
+const Demo = lazy(() => import('@/pages/Demo'));
 // Auth and dashboard
 const SignIn = lazy(() => import('@/pages/auth/SignIn'));
 const SignUp = lazy(() => import('@/pages/auth/SignUp'));
@@ -53,6 +54,7 @@ export default function App() {
                 <Route path="apex-os" element={withErrorBoundary(ApexOS)} />
                 <Route path="foundation" element={withErrorBoundary(Foundation)} />
                 <Route path="icf" element={withErrorBoundary(ICF)} />
+                <Route path="demo" element={withErrorBoundary(Demo)} />
                 <Route path="pricing" element={withErrorBoundary(Pricing)} />
                 <Route path="signin" element={withErrorBoundary(SignIn)} />
                 <Route path="signup" element={withErrorBoundary(SignUp)} />
