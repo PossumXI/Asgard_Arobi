@@ -23,9 +23,6 @@ CREATE INDEX IF NOT EXISTS idx_streams_active
 ON streams(started_at DESC) 
 WHERE status = 'active';
 
-CREATE INDEX IF NOT EXISTS idx_streams_user_id 
-ON streams(user_id);
-
 -- Missions table indexes
 CREATE INDEX IF NOT EXISTS idx_missions_status_priority 
 ON missions(status, priority DESC, created_at DESC);

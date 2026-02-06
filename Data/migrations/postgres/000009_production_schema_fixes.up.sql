@@ -397,66 +397,74 @@ DECLARE
 BEGIN
     SELECT jsonb_build_object(
         'satellites', (
-            SELECT jsonb_agg(jsonb_build_object(
-                'id', s.id,
-                'name', s.name,
-                'status', s.status,
-                'battery', s.current_battery_percent,
-                'last_telemetry', s.last_telemetry
-            ))
-            FROM satellites s
-            WHERE s.status = 'operational'
-            ORDER BY s.name
-            LIMIT 50
+            SELECT COALESCE(jsonb_agg(sat_row), '[]'::jsonb) FROM (
+                SELECT jsonb_build_object(
+                    'id', s.id,
+                    'name', s.name,
+                    'status', s.status,
+                    'battery', s.current_battery_percent,
+                    'last_telemetry', s.last_telemetry
+                ) AS sat_row
+                FROM satellites s
+                WHERE s.status = 'operational'
+                ORDER BY s.name
+                LIMIT 50
+            ) sub
         ),
         'hunoids', (
-            SELECT jsonb_agg(jsonb_build_object(
-                'id', h.id,
-                'serial_number', h.serial_number,
-                'status', h.status,
-                'battery', h.battery_percent,
-                'location', CASE 
-                    WHEN h.latitude IS NOT NULL THEN 
-                        jsonb_build_object('lat', h.latitude, 'lon', h.longitude)
-                    ELSE NULL
-                END,
-                'last_telemetry', h.last_telemetry
-            ))
-            FROM hunoids h
-            WHERE h.status IN ('active', 'idle')
-            ORDER BY h.serial_number
-            LIMIT 50
+            SELECT COALESCE(jsonb_agg(hun_row), '[]'::jsonb) FROM (
+                SELECT jsonb_build_object(
+                    'id', h.id,
+                    'serial_number', h.serial_number,
+                    'status', h.status,
+                    'battery', h.battery_percent,
+                    'location', CASE
+                        WHEN h.latitude IS NOT NULL THEN
+                            jsonb_build_object('lat', h.latitude, 'lon', h.longitude)
+                        ELSE NULL
+                    END,
+                    'last_telemetry', h.last_telemetry
+                ) AS hun_row
+                FROM hunoids h
+                WHERE h.status IN ('active', 'idle')
+                ORDER BY h.serial_number
+                LIMIT 50
+            ) sub
         ),
         'recent_alerts', (
-            SELECT jsonb_agg(jsonb_build_object(
-                'id', a.id,
-                'type', a.alert_type,
-                'confidence', a.confidence_score,
-                'location', jsonb_build_object('lat', a.latitude, 'lon', a.longitude),
-                'status', a.status,
-                'created_at', a.created_at
-            ))
-            FROM alerts a
-            WHERE a.created_at > NOW() - INTERVAL '24 hours'
-            ORDER BY a.created_at DESC
-            LIMIT 20
+            SELECT COALESCE(jsonb_agg(alert_row), '[]'::jsonb) FROM (
+                SELECT jsonb_build_object(
+                    'id', a.id,
+                    'type', a.alert_type,
+                    'confidence', a.confidence_score,
+                    'location', jsonb_build_object('lat', a.latitude, 'lon', a.longitude),
+                    'status', a.status,
+                    'created_at', a.created_at
+                ) AS alert_row
+                FROM alerts a
+                WHERE a.created_at > NOW() - INTERVAL '24 hours'
+                ORDER BY a.created_at DESC
+                LIMIT 20
+            ) sub
         ),
         'active_missions', (
-            SELECT jsonb_agg(jsonb_build_object(
-                'id', m.id,
-                'type', m.mission_type,
-                'priority', m.priority,
-                'status', m.status,
-                'started_at', m.started_at
-            ))
-            FROM missions m
-            WHERE m.status IN ('pending', 'active')
-            ORDER BY m.priority DESC
-            LIMIT 10
+            SELECT COALESCE(jsonb_agg(mission_row), '[]'::jsonb) FROM (
+                SELECT jsonb_build_object(
+                    'id', m.id,
+                    'type', m.mission_type,
+                    'priority', m.priority,
+                    'status', m.status,
+                    'started_at', m.started_at
+                ) AS mission_row
+                FROM missions m
+                WHERE m.status IN ('pending', 'active')
+                ORDER BY m.priority DESC
+                LIMIT 10
+            ) sub
         ),
         'stats', (SELECT row_to_json(s.*) FROM get_system_health_stats() s)
     ) INTO v_result;
-    
+
     RETURN v_result;
 END;
 $$ LANGUAGE plpgsql;
