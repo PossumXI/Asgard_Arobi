@@ -16,8 +16,8 @@ import (
 
 // NotificationAPI provides HTTP handlers for notifications
 type NotificationAPI struct {
-	emailClient        *email.ResendClient
-	accessKeyManager   *AccessKeyManager
+	emailClient         *email.ResendClient
+	accessKeyManager    *AccessKeyManager
 	verificationManager *VerificationCodeManager
 }
 
@@ -42,8 +42,8 @@ func NewNotificationAPI() *NotificationAPI {
 	verificationManager := NewVerificationCodeManager(emailClient)
 
 	return &NotificationAPI{
-		emailClient:        emailClient,
-		accessKeyManager:   accessKeyManager,
+		emailClient:         emailClient,
+		accessKeyManager:    accessKeyManager,
 		verificationManager: verificationManager,
 	}
 }
@@ -150,11 +150,11 @@ func (api *NotificationAPI) handleAccessKeys(w http.ResponseWriter, r *http.Requ
 		api.jsonResponse(w, http.StatusCreated, APIResponse{
 			Success: true,
 			Data: map[string]interface{}{
-				"key_id":    key.ID,
-				"key":       rawKey, // Only returned once!
-				"key_type":  key.KeyType,
+				"key_id":     key.ID,
+				"key":        rawKey, // Only returned once!
+				"key_type":   key.KeyType,
 				"expires_at": key.ExpiresAt,
-				"issued_to": key.IssuedTo,
+				"issued_to":  key.IssuedTo,
 			},
 		})
 
@@ -354,10 +354,10 @@ func (api *NotificationAPI) handleStatus(w http.ResponseWriter, r *http.Request)
 	api.jsonResponse(w, http.StatusOK, APIResponse{
 		Success: true,
 		Data: map[string]interface{}{
-			"email_enabled":   emailEnabled,
-			"email_provider":  "Resend",
-			"founder_email":   "Gaetano@aura-genesis.org",
-			"active_keys":     len(api.accessKeyManager.ListKeys()),
+			"email_enabled":  emailEnabled,
+			"email_provider": "Resend",
+			"founder_email":  "Gaetano@aura-genesis.org",
+			"active_keys":    len(api.accessKeyManager.ListKeys()),
 		},
 	})
 }

@@ -34,9 +34,9 @@ type IntegratedSimulation struct {
 	lastUpdate time.Time
 
 	// Channels for real-time data
-	stateChan     chan *SimulatorState
-	telemetryChan chan *TelemetryUpdate
-	alertsChan    chan *SecurityAlert
+	stateChan      chan *SimulatorState
+	telemetryChan  chan *TelemetryUpdate
+	alertsChan     chan *SecurityAlert
 	trajectoryChan chan *TrajectoryData
 
 	// Results
@@ -46,9 +46,9 @@ type IntegratedSimulation struct {
 // IntegrationConfig holds endpoints for all ASGARD services
 type IntegrationConfig struct {
 	// Giru Security
-	GiruSecurityURL  string // e.g., "http://localhost:9090"
-	GiruJarvisURL    string // e.g., "http://localhost:7777"
-	GiruJarvisWSURL  string // e.g., "ws://localhost:7778"
+	GiruSecurityURL string // e.g., "http://localhost:9090"
+	GiruJarvisURL   string // e.g., "http://localhost:7777"
+	GiruJarvisWSURL string // e.g., "ws://localhost:7778"
 
 	// Pricilla
 	PricillaURL string // e.g., "http://localhost:8089"
@@ -70,15 +70,15 @@ type IntegrationConfig struct {
 // DefaultIntegrationConfig returns default configuration
 func DefaultIntegrationConfig() IntegrationConfig {
 	return IntegrationConfig{
-		GiruSecurityURL:  "http://localhost:9090",
-		GiruJarvisURL:    "http://localhost:7777",
-		GiruJarvisWSURL:  "ws://localhost:7778",
-		PricillaURL:      "http://localhost:8089",
-		HunoidURL:        "http://localhost:8090",
-		NysusURL:         "http://localhost:8080",
-		ValkyrieURL:      "http://localhost:8093",
-		TelemetryRateHz:  10.0,
-		SecurityRateHz:   1.0,
+		GiruSecurityURL: "http://localhost:9090",
+		GiruJarvisURL:   "http://localhost:7777",
+		GiruJarvisWSURL: "ws://localhost:7778",
+		PricillaURL:     "http://localhost:8089",
+		HunoidURL:       "http://localhost:8090",
+		NysusURL:        "http://localhost:8080",
+		ValkyrieURL:     "http://localhost:8093",
+		TelemetryRateHz: 10.0,
+		SecurityRateHz:  1.0,
 	}
 }
 
@@ -127,10 +127,10 @@ type TrajectoryData struct {
 
 // TrajectoryPoint represents a single trajectory waypoint
 type TrajectoryPoint struct {
-	Position  [3]float64    `json:"position"`  // lat, lon, alt
-	Velocity  [3]float64    `json:"velocity"`  // N, E, D
-	TimeAt    time.Duration `json:"timeAt"`
-	Heading   float64       `json:"heading"`
+	Position [3]float64    `json:"position"` // lat, lon, alt
+	Velocity [3]float64    `json:"velocity"` // N, E, D
+	TimeAt   time.Duration `json:"timeAt"`
+	Heading  float64       `json:"heading"`
 }
 
 // RescueTarget represents a target for Hunoid rescue
@@ -154,8 +154,8 @@ type IntegratedSimulationResult struct {
 	TrajectoryData   []TrajectoryData
 
 	// Rescue operations (if applicable)
-	RescueTargets   []RescueTarget
-	RescuesAttempted int
+	RescueTargets     []RescueTarget
+	RescuesAttempted  int
 	RescuesSuccessful int
 
 	// Performance
@@ -415,7 +415,7 @@ func (is *IntegratedSimulation) requestTrajectory(state *SimulatorState) (*Traje
 		"current_velocity": []float64{state.VelocityNorth, state.VelocityEast, -state.VelocityDown},
 		"target_position":  []float64{state.Latitude + 0.01, state.Longitude, state.Altitude}, // Example target
 		"constraints": map[string]interface{}{
-			"max_speed":       50.0,
+			"max_speed":        50.0,
 			"max_acceleration": 5.0,
 		},
 	}

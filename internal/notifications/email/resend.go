@@ -54,15 +54,15 @@ func NewResendClient(cfg ResendConfig) *ResendClient {
 
 // EmailRequest represents an email send request
 type EmailRequest struct {
-	From        string   `json:"from"`
-	To          []string `json:"to"`
-	Subject     string   `json:"subject"`
-	HTML        string   `json:"html,omitempty"`
-	Text        string   `json:"text,omitempty"`
-	ReplyTo     string   `json:"reply_to,omitempty"`
-	BCC         []string `json:"bcc,omitempty"`
-	CC          []string `json:"cc,omitempty"`
-	Tags        []Tag    `json:"tags,omitempty"`
+	From        string       `json:"from"`
+	To          []string     `json:"to"`
+	Subject     string       `json:"subject"`
+	HTML        string       `json:"html,omitempty"`
+	Text        string       `json:"text,omitempty"`
+	ReplyTo     string       `json:"reply_to,omitempty"`
+	BCC         []string     `json:"bcc,omitempty"`
+	CC          []string     `json:"cc,omitempty"`
+	Tags        []Tag        `json:"tags,omitempty"`
 	Attachments []Attachment `json:"attachments,omitempty"`
 }
 

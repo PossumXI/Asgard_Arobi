@@ -26,7 +26,7 @@ type ReserveConfig struct {
 	AbsoluteFuelLevel    float64 `yaml:"absolute_fuel_level"`
 
 	// Time-based reserves
-	MissionReserveMinutes     float64 `yaml:"mission_reserve_minutes"`     // Minutes of flight at cruise
+	MissionReserveMinutes     float64 `yaml:"mission_reserve_minutes"` // Minutes of flight at cruise
 	ContingencyReserveMinutes float64 `yaml:"contingency_reserve_minutes"`
 	EmergencyReserveMinutes   float64 `yaml:"emergency_reserve_minutes"`
 }

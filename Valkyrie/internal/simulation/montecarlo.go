@@ -22,18 +22,18 @@ import (
 type MonteCarloRunner struct {
 	mu sync.RWMutex
 
-	config     MonteCarloConfig
-	simulator  Simulator
-	scenarios  []*Scenario
-	results    *MonteCarloResult
+	config    MonteCarloConfig
+	simulator Simulator
+	scenarios []*Scenario
+	results   *MonteCarloResult
 
 	// Random number generator
 	rng *rand.Rand
 
 	// Progress tracking
-	totalRuns    int
+	totalRuns     int
 	completedRuns int
-	progressChan chan float64
+	progressChan  chan float64
 
 	// Worker management
 	workers int

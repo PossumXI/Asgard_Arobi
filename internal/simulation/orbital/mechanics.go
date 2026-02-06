@@ -28,30 +28,30 @@ const (
 type OrbitType string
 
 const (
-	OrbitLEO           OrbitType = "LEO"           // Low Earth Orbit (160-2000 km)
-	OrbitMEO           OrbitType = "MEO"           // Medium Earth Orbit (2000-35786 km)
-	OrbitGEO           OrbitType = "GEO"           // Geostationary (35786 km)
-	OrbitHEO           OrbitType = "HEO"           // Highly Elliptical
-	OrbitSSO           OrbitType = "SSO"           // Sun-Synchronous
-	OrbitSubOrbital    OrbitType = "SUB_ORBITAL"   // Below orbital velocity
-	OrbitAtmospheric   OrbitType = "ATMOSPHERIC"   // Within atmosphere
+	OrbitLEO         OrbitType = "LEO"         // Low Earth Orbit (160-2000 km)
+	OrbitMEO         OrbitType = "MEO"         // Medium Earth Orbit (2000-35786 km)
+	OrbitGEO         OrbitType = "GEO"         // Geostationary (35786 km)
+	OrbitHEO         OrbitType = "HEO"         // Highly Elliptical
+	OrbitSSO         OrbitType = "SSO"         // Sun-Synchronous
+	OrbitSubOrbital  OrbitType = "SUB_ORBITAL" // Below orbital velocity
+	OrbitAtmospheric OrbitType = "ATMOSPHERIC" // Within atmosphere
 )
 
 // OrbitalElements defines a Keplerian orbit
 type OrbitalElements struct {
-	SemiMajorAxis       float64   `json:"semi_major_axis"`        // a, meters
-	Eccentricity        float64   `json:"eccentricity"`           // e, 0-1
-	Inclination         float64   `json:"inclination"`            // i, radians
-	RAAN                float64   `json:"raan"`                   // Ω, Right Ascension of Ascending Node, radians
-	ArgumentOfPeriapsis float64   `json:"argument_of_periapsis"`  // ω, radians
-	TrueAnomaly         float64   `json:"true_anomaly"`           // ν, radians
+	SemiMajorAxis       float64   `json:"semi_major_axis"`       // a, meters
+	Eccentricity        float64   `json:"eccentricity"`          // e, 0-1
+	Inclination         float64   `json:"inclination"`           // i, radians
+	RAAN                float64   `json:"raan"`                  // Ω, Right Ascension of Ascending Node, radians
+	ArgumentOfPeriapsis float64   `json:"argument_of_periapsis"` // ω, radians
+	TrueAnomaly         float64   `json:"true_anomaly"`          // ν, radians
 	Epoch               time.Time `json:"epoch"`
 }
 
 // StateVector represents position and velocity in inertial frame
 type StateVector struct {
-	Position  Vector3   `json:"position"`   // meters, ECI frame
-	Velocity  Vector3   `json:"velocity"`   // m/s, ECI frame
+	Position  Vector3   `json:"position"` // meters, ECI frame
+	Velocity  Vector3   `json:"velocity"` // m/s, ECI frame
 	Timestamp time.Time `json:"timestamp"`
 }
 
@@ -445,9 +445,9 @@ func (op *OrbitalPredictor) CalculateTransfer(targetAltitude float64) TransferPa
 type TransferParameters struct {
 	InitialAltitude float64       `json:"initial_altitude"`
 	FinalAltitude   float64       `json:"final_altitude"`
-	DeltaV1         float64       `json:"delta_v_1"`       // First burn, m/s
-	DeltaV2         float64       `json:"delta_v_2"`       // Second burn, m/s
-	TotalDeltaV     float64       `json:"total_delta_v"`   // Total, m/s
+	DeltaV1         float64       `json:"delta_v_1"`     // First burn, m/s
+	DeltaV2         float64       `json:"delta_v_2"`     // Second burn, m/s
+	TotalDeltaV     float64       `json:"total_delta_v"` // Total, m/s
 	TransferTime    time.Duration `json:"transfer_time"`
 	TransferType    string        `json:"transfer_type"`
 }
@@ -474,14 +474,14 @@ func (op *OrbitalPredictor) GetStatistics() map[string]interface{} {
 	period := op.GetOrbitalPeriod()
 
 	return map[string]interface{}{
-		"orbit_type":           op.GetOrbitType(),
-		"altitude_km":          op.GetAltitude() / 1000,
-		"velocity_km_s":        op.GetOrbitalVelocity() / 1000,
-		"period_minutes":       period / 60,
-		"semi_major_axis_km":   op.elements.SemiMajorAxis / 1000,
-		"eccentricity":         op.elements.Eccentricity,
-		"inclination_degrees":  op.elements.Inclination * 180 / math.Pi,
-		"ground_track_points":  len(op.groundTrack),
+		"orbit_type":          op.GetOrbitType(),
+		"altitude_km":         op.GetAltitude() / 1000,
+		"velocity_km_s":       op.GetOrbitalVelocity() / 1000,
+		"period_minutes":      period / 60,
+		"semi_major_axis_km":  op.elements.SemiMajorAxis / 1000,
+		"eccentricity":        op.elements.Eccentricity,
+		"inclination_degrees": op.elements.Inclination * 180 / math.Pi,
+		"ground_track_points": len(op.groundTrack),
 	}
 }
 

@@ -32,19 +32,19 @@ const (
 
 // AccessKey represents a generated access key
 type AccessKey struct {
-	ID           string    `json:"id"`
-	KeyType      KeyType   `json:"key_type"`
-	KeyHash      string    `json:"key_hash"` // SHA-256 hash of the actual key
-	CreatedAt    time.Time `json:"created_at"`
-	ExpiresAt    time.Time `json:"expires_at"`
-	IssuedTo     string    `json:"issued_to"` // Protected person ID or email
-	IssuedBy     string    `json:"issued_by"`
-	UsedAt       *time.Time `json:"used_at,omitempty"`
-	Revoked      bool      `json:"revoked"`
-	RevokedAt    *time.Time `json:"revoked_at,omitempty"`
-	RevokedBy    string    `json:"revoked_by,omitempty"`
-	Description  string    `json:"description,omitempty"`
-	Permissions  []string  `json:"permissions"`
+	ID          string     `json:"id"`
+	KeyType     KeyType    `json:"key_type"`
+	KeyHash     string     `json:"key_hash"` // SHA-256 hash of the actual key
+	CreatedAt   time.Time  `json:"created_at"`
+	ExpiresAt   time.Time  `json:"expires_at"`
+	IssuedTo    string     `json:"issued_to"` // Protected person ID or email
+	IssuedBy    string     `json:"issued_by"`
+	UsedAt      *time.Time `json:"used_at,omitempty"`
+	Revoked     bool       `json:"revoked"`
+	RevokedAt   *time.Time `json:"revoked_at,omitempty"`
+	RevokedBy   string     `json:"revoked_by,omitempty"`
+	Description string     `json:"description,omitempty"`
+	Permissions []string   `json:"permissions"`
 }
 
 // AccessKeyManager manages access key generation and validation
@@ -57,11 +57,11 @@ type AccessKeyManager struct {
 
 // AccessKeyConfig holds configuration
 type AccessKeyConfig struct {
-	DefaultExpiration time.Duration
-	FounderEmail      string
+	DefaultExpiration  time.Duration
+	FounderEmail       string
 	NotifyOnGeneration bool
-	NotifyOnUse       bool
-	NotifyOnRevoke    bool
+	NotifyOnUse        bool
+	NotifyOnRevoke     bool
 }
 
 // DefaultAccessKeyConfig returns default configuration

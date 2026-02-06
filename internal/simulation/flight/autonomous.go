@@ -21,14 +21,14 @@ type AutonomousFlightController struct {
 	weatherAPI *WeatherAPI
 
 	// Decision state
-	currentDecision   DecisionState
-	decisionHistory   []DecisionRecord
-	threatResponses   []ThreatResponse
-	replanCount       int
+	currentDecision DecisionState
+	decisionHistory []DecisionRecord
+	threatResponses []ThreatResponse
+	replanCount     int
 
 	// Callbacks
-	onDecision      func(DecisionRecord)
-	onReplan        func(FlightPlan, string)
+	onDecision       func(DecisionRecord)
+	onReplan         func(FlightPlan, string)
 	onThreatResponse func(ThreatResponse)
 
 	// Control
@@ -39,28 +39,28 @@ type AutonomousFlightController struct {
 
 // DecisionState represents the current autonomous decision state
 type DecisionState struct {
-	Mode             string  `json:"mode"`             // normal, evasive, abort, loiter
-	Confidence       float64 `json:"confidence"`       // 0-1
-	ThreatLevel      float64 `json:"threat_level"`     // 0-1
-	WeatherSafe      bool    `json:"weather_safe"`
-	FuelSufficient   bool    `json:"fuel_sufficient"`
-	MissionViable    bool    `json:"mission_viable"`
-	ReplanRequired   bool    `json:"replan_required"`
-	Reason           string  `json:"reason"`
-	LastUpdate       time.Time `json:"last_update"`
+	Mode           string    `json:"mode"`         // normal, evasive, abort, loiter
+	Confidence     float64   `json:"confidence"`   // 0-1
+	ThreatLevel    float64   `json:"threat_level"` // 0-1
+	WeatherSafe    bool      `json:"weather_safe"`
+	FuelSufficient bool      `json:"fuel_sufficient"`
+	MissionViable  bool      `json:"mission_viable"`
+	ReplanRequired bool      `json:"replan_required"`
+	Reason         string    `json:"reason"`
+	LastUpdate     time.Time `json:"last_update"`
 }
 
 // DecisionRecord logs a decision
 type DecisionRecord struct {
-	ID          string        `json:"id"`
-	Timestamp   time.Time     `json:"timestamp"`
-	Type        string        `json:"type"`
-	Decision    string        `json:"decision"`
-	Reason      string        `json:"reason"`
-	Confidence  float64       `json:"confidence"`
-	Input       interface{}   `json:"input"`
-	Result      interface{}   `json:"result"`
-	LatencyMs   float64       `json:"latency_ms"`
+	ID         string      `json:"id"`
+	Timestamp  time.Time   `json:"timestamp"`
+	Type       string      `json:"type"`
+	Decision   string      `json:"decision"`
+	Reason     string      `json:"reason"`
+	Confidence float64     `json:"confidence"`
+	Input      interface{} `json:"input"`
+	Result     interface{} `json:"result"`
+	LatencyMs  float64     `json:"latency_ms"`
 }
 
 // ThreatResponse describes how the system responded to a threat
@@ -238,9 +238,9 @@ func (afc *AutonomousFlightController) evaluateSituation() {
 
 	// Evaluate conditions
 	decision := DecisionState{
-		Mode:           "normal",
-		Confidence:     0.95,
-		LastUpdate:     time.Now(),
+		Mode:       "normal",
+		Confidence: 0.95,
+		LastUpdate: time.Now(),
 	}
 
 	// Check fuel

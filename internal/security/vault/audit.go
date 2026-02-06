@@ -18,35 +18,35 @@ import (
 
 // AuditEvent represents a security audit log entry
 type AuditEvent struct {
-	ID            string        `json:"id"`
-	Timestamp     time.Time     `json:"timestamp"`
-	Action        string        `json:"action"`
-	Actor         string        `json:"actor"`
-	ActorIP       string        `json:"actor_ip,omitempty"`
-	UserAgent     string        `json:"user_agent,omitempty"`
-	Resource      string        `json:"resource,omitempty"`
-	ResourceID    string        `json:"resource_id,omitempty"`
-	SecurityLevel SecurityLevel `json:"security_level,omitempty"`
-	Success       bool          `json:"success"`
-	Details       string        `json:"details,omitempty"`
-	FIDO2Used     bool          `json:"fido2_used,omitempty"`
-	SessionID     string        `json:"session_id,omitempty"`
-	Duration      time.Duration `json:"duration_ns,omitempty"`
+	ID            string                 `json:"id"`
+	Timestamp     time.Time              `json:"timestamp"`
+	Action        string                 `json:"action"`
+	Actor         string                 `json:"actor"`
+	ActorIP       string                 `json:"actor_ip,omitempty"`
+	UserAgent     string                 `json:"user_agent,omitempty"`
+	Resource      string                 `json:"resource,omitempty"`
+	ResourceID    string                 `json:"resource_id,omitempty"`
+	SecurityLevel SecurityLevel          `json:"security_level,omitempty"`
+	Success       bool                   `json:"success"`
+	Details       string                 `json:"details,omitempty"`
+	FIDO2Used     bool                   `json:"fido2_used,omitempty"`
+	SessionID     string                 `json:"session_id,omitempty"`
+	Duration      time.Duration          `json:"duration_ns,omitempty"`
 	Metadata      map[string]interface{} `json:"metadata,omitempty"`
 }
 
 // AuditLogger handles security audit logging
 type AuditLogger struct {
-	mu          sync.Mutex
-	file        *os.File
-	filePath    string
-	events      []AuditEvent
-	maxInMemory int
-	rotateSize  int64 // bytes
+	mu            sync.Mutex
+	file          *os.File
+	filePath      string
+	events        []AuditEvent
+	maxInMemory   int
+	rotateSize    int64 // bytes
 	retentionDays int
-	eventChan   chan AuditEvent
-	stopCh      chan struct{}
-	wg          sync.WaitGroup
+	eventChan     chan AuditEvent
+	stopCh        chan struct{}
+	wg            sync.WaitGroup
 }
 
 // AuditLoggerConfig holds audit logger configuration
@@ -366,9 +366,9 @@ func (al *AuditLogger) GetStatistics() AuditStatistics {
 	defer al.mu.Unlock()
 
 	stats := AuditStatistics{
-		TotalEvents:   len(al.events),
-		ByAction:      make(map[string]int),
-		ByActor:       make(map[string]int),
+		TotalEvents:     len(al.events),
+		ByAction:        make(map[string]int),
+		ByActor:         make(map[string]int),
 		BySecurityLevel: make(map[SecurityLevel]int),
 	}
 
@@ -429,18 +429,18 @@ type AuditStatistics struct {
 
 // Common audit action constants
 const (
-	AuditActionStoreSecret     = "store_secret"
-	AuditActionRetrieveSecret  = "retrieve_secret"
-	AuditActionDeleteSecret    = "delete_secret"
-	AuditActionListSecrets     = "list_secrets"
-	AuditActionVaultInit       = "vault_init"
-	AuditActionVaultSeal       = "vault_seal"
-	AuditActionVaultUnseal     = "vault_unseal"
-	AuditActionFIDO2Register   = "fido2_register"
+	AuditActionStoreSecret       = "store_secret"
+	AuditActionRetrieveSecret    = "retrieve_secret"
+	AuditActionDeleteSecret      = "delete_secret"
+	AuditActionListSecrets       = "list_secrets"
+	AuditActionVaultInit         = "vault_init"
+	AuditActionVaultSeal         = "vault_seal"
+	AuditActionVaultUnseal       = "vault_unseal"
+	AuditActionFIDO2Register     = "fido2_register"
 	AuditActionFIDO2Authenticate = "fido2_authenticate"
-	AuditActionFIDO2Revoke     = "fido2_revoke"
-	AuditActionAccessDenied    = "access_denied"
-	AuditActionSuspiciousAccess = "suspicious_access"
+	AuditActionFIDO2Revoke       = "fido2_revoke"
+	AuditActionAccessDenied      = "access_denied"
+	AuditActionSuspiciousAccess  = "suspicious_access"
 )
 
 // FormatEvent formats an audit event for display

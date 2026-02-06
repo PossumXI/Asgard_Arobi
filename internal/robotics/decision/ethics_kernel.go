@@ -14,12 +14,12 @@ import (
 
 // EthicalConstraint represents a formal ethical constraint with mathematical guarantee
 type EthicalConstraint struct {
-	ID          string  `json:"id"`
-	Name        string  `json:"name"`
-	Description string  `json:"description"`
-	Priority    int     `json:"priority"` // Lower = higher priority (1 = absolute)
-	Enabled     bool    `json:"enabled"`
-	Violations  int64   `json:"violations"`
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Priority    int    `json:"priority"` // Lower = higher priority (1 = absolute)
+	Enabled     bool   `json:"enabled"`
+	Violations  int64  `json:"violations"`
 }
 
 // AsimovLaw represents the three laws of robotics
@@ -36,23 +36,23 @@ const (
 
 // EthicalDecision represents the result of an ethical evaluation
 type EthicalDecision struct {
-	Approved         bool                  `json:"approved"`
-	Confidence       float64               `json:"confidence"`
-	Reasoning        string                `json:"reasoning"`
-	ViolatedLaws     []AsimovLaw           `json:"violatedLaws"`
-	Constraints      []EthicalConstraint   `json:"constraints"`
-	RiskAssessment   RiskAssessment        `json:"riskAssessment"`
-	Timestamp        time.Time             `json:"timestamp"`
-	ProcessingTimeNs int64                 `json:"processingTimeNs"`
+	Approved         bool                `json:"approved"`
+	Confidence       float64             `json:"confidence"`
+	Reasoning        string              `json:"reasoning"`
+	ViolatedLaws     []AsimovLaw         `json:"violatedLaws"`
+	Constraints      []EthicalConstraint `json:"constraints"`
+	RiskAssessment   RiskAssessment      `json:"riskAssessment"`
+	Timestamp        time.Time           `json:"timestamp"`
+	ProcessingTimeNs int64               `json:"processingTimeNs"`
 }
 
 // RiskAssessment evaluates potential harm from an action
 type RiskAssessment struct {
-	HarmToTargetRisk   float64 `json:"harmToTargetRisk"`   // 0-1, risk of harming rescue target
+	HarmToTargetRisk    float64 `json:"harmToTargetRisk"`    // 0-1, risk of harming rescue target
 	HarmToBystanderRisk float64 `json:"harmToBystanderRisk"` // 0-1, risk of harming bystanders
-	HarmToRobotRisk    float64 `json:"harmToRobotRisk"`    // 0-1, risk of robot damage
-	MissionFailureRisk float64 `json:"missionFailureRisk"` // 0-1, risk of failing mission
-	OverallRiskScore   float64 `json:"overallRiskScore"`   // Weighted combination
+	HarmToRobotRisk     float64 `json:"harmToRobotRisk"`     // 0-1, risk of robot damage
+	MissionFailureRisk  float64 `json:"missionFailureRisk"`  // 0-1, risk of failing mission
+	OverallRiskScore    float64 `json:"overallRiskScore"`    // Weighted combination
 }
 
 // BiasMetrics tracks fairness and bias in decision-making
@@ -78,8 +78,8 @@ type EthicsKernel struct {
 	biasMetrics BiasMetrics
 
 	// Performance tracking
-	totalDecisions    int64
-	averageLatencyNs  int64
+	totalDecisions   int64
+	averageLatencyNs int64
 
 	// Configuration
 	strictMode bool // If true, any constraint violation blocks action

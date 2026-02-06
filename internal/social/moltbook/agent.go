@@ -18,13 +18,13 @@ import (
 
 // AgentIdentity holds the mascot's personality configuration
 type AgentIdentity struct {
-	Name        string   `json:"name"`
-	Handle      string   `json:"handle"`
-	Tagline     string   `json:"tagline"`
-	Bio         string   `json:"bio"`
-	Personality []string `json:"personality_traits"`
-	Tone        string   `json:"tone"`
-	Mission     string   `json:"mission"`
+	Name        string    `json:"name"`
+	Handle      string    `json:"handle"`
+	Tagline     string    `json:"tagline"`
+	Bio         string    `json:"bio"`
+	Personality []string  `json:"personality_traits"`
+	Tone        string    `json:"tone"`
+	Mission     string    `json:"mission"`
 	CreatedAt   time.Time `json:"created_at"`
 }
 
@@ -436,11 +436,11 @@ func (a *MoltbookAgent) ToJSON() ([]byte, error) {
 	defer a.mu.RUnlock()
 
 	state := map[string]interface{}{
-		"identity":       a.identity,
-		"stats":          a.GetStats(),
-		"recent_posts":   a.GetRecentPosts(10),
-		"content_queue":  a.contentQueue,
-		"guidelines":     a.ContentGuidelines(),
+		"identity":      a.identity,
+		"stats":         a.GetStats(),
+		"recent_posts":  a.GetRecentPosts(10),
+		"content_queue": a.contentQueue,
+		"guidelines":    a.ContentGuidelines(),
 	}
 
 	return json.MarshalIndent(state, "", "  ")

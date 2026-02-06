@@ -21,16 +21,16 @@ const (
 
 // MotorConfig holds motor configuration parameters
 type MotorConfig struct {
-	Type              MotorType `yaml:"type"`
-	KVRating          float64   `yaml:"kv_rating"`           // RPM per volt
-	MaxPowerWatts     float64   `yaml:"max_power_watts"`     // Maximum power output
-	PeakEfficiency    float64   `yaml:"efficiency_peak"`     // Peak efficiency (0.0-1.0)
-	NoLoadCurrent     float64   `yaml:"no_load_current"`     // No-load current draw (A)
-	WindingResistance float64   `yaml:"winding_resistance"`  // Phase resistance (Ohms)
-	ThermalMass       float64   `yaml:"thermal_mass_j_per_k"` // Thermal mass (J/K)
-	MaxWindingTempC   float64   `yaml:"max_winding_temp_c"`  // Max winding temperature
-	CoolingCoeff      float64   `yaml:"cooling_coefficient"` // Cooling effectiveness (W/K)
-	EfficiencyMap     []EfficiencyPoint `yaml:"efficiency_map"` // Load vs efficiency
+	Type              MotorType         `yaml:"type"`
+	KVRating          float64           `yaml:"kv_rating"`            // RPM per volt
+	MaxPowerWatts     float64           `yaml:"max_power_watts"`      // Maximum power output
+	PeakEfficiency    float64           `yaml:"efficiency_peak"`      // Peak efficiency (0.0-1.0)
+	NoLoadCurrent     float64           `yaml:"no_load_current"`      // No-load current draw (A)
+	WindingResistance float64           `yaml:"winding_resistance"`   // Phase resistance (Ohms)
+	ThermalMass       float64           `yaml:"thermal_mass_j_per_k"` // Thermal mass (J/K)
+	MaxWindingTempC   float64           `yaml:"max_winding_temp_c"`   // Max winding temperature
+	CoolingCoeff      float64           `yaml:"cooling_coefficient"`  // Cooling effectiveness (W/K)
+	EfficiencyMap     []EfficiencyPoint `yaml:"efficiency_map"`       // Load vs efficiency
 }
 
 // EfficiencyPoint represents a point on the efficiency curve

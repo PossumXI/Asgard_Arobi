@@ -36,12 +36,12 @@ type JSBSimConfig struct {
 type JSBSimSimulator struct {
 	mu sync.RWMutex
 
-	config       JSBSimConfig
-	process      *exec.Cmd
-	stdin        io.WriteCloser
-	stdout       io.ReadCloser
-	conn         net.Conn
-	connected    bool
+	config    JSBSimConfig
+	process   *exec.Cmd
+	stdin     io.WriteCloser
+	stdout    io.ReadCloser
+	conn      net.Conn
+	connected bool
 
 	currentState *SimulatorState
 	running      bool
@@ -476,7 +476,7 @@ func (js *JSBSimSimulator) parseLine(line string) {
 	js.currentState.Longitude = parseFloat(parts[2])
 	js.currentState.Altitude = parseFloat(parts[3]) * 0.3048 // ft to m
 
-	js.currentState.Roll = parseFloat(parts[4]) * 0.0174533   // deg to rad
+	js.currentState.Roll = parseFloat(parts[4]) * 0.0174533 // deg to rad
 	js.currentState.Pitch = parseFloat(parts[5]) * 0.0174533
 	js.currentState.Yaw = parseFloat(parts[6]) * 0.0174533
 

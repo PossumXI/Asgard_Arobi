@@ -22,33 +22,33 @@ import (
 type XPlaneDataRef int
 
 const (
-	DataRefTimes              XPlaneDataRef = 1  // times
-	DataRefSpeeds             XPlaneDataRef = 3  // speeds
-	DataRefMachVVI            XPlaneDataRef = 4  // Mach, VVI, G-load
-	DataRefAtmosphere         XPlaneDataRef = 5  // atmosphere
-	DataRefSystemPressures    XPlaneDataRef = 6  // system pressures
-	DataRefJoystickAilElv     XPlaneDataRef = 8  // joystick ail/elv/rud
-	DataRefOtherFlightControls XPlaneDataRef = 9 // other flight controls
-	DataRefArtStab            XPlaneDataRef = 10 // art stab ail/elv/rud
-	DataRefFlightCon          XPlaneDataRef = 11 // flight con ail/elv/rud
-	DataRefWingSweepThrust    XPlaneDataRef = 12 // wing sweep/thrust vect
-	DataRefTrimFlap           XPlaneDataRef = 13 // trim/flap/slat/s-brakes
-	DataRefGear               XPlaneDataRef = 14 // gear/brakes
-	DataRefAngularMoments     XPlaneDataRef = 15 // angular moments
-	DataRefAngularVelocities  XPlaneDataRef = 16 // angular velocities
-	DataRefPitchRollHeading   XPlaneDataRef = 17 // pitch, roll, heading
-	DataRefLatLonAlt          XPlaneDataRef = 20 // lat, lon, alt
-	DataRefLocVelDistTraveled XPlaneDataRef = 21 // loc, vel, dist traveled
+	DataRefTimes               XPlaneDataRef = 1  // times
+	DataRefSpeeds              XPlaneDataRef = 3  // speeds
+	DataRefMachVVI             XPlaneDataRef = 4  // Mach, VVI, G-load
+	DataRefAtmosphere          XPlaneDataRef = 5  // atmosphere
+	DataRefSystemPressures     XPlaneDataRef = 6  // system pressures
+	DataRefJoystickAilElv      XPlaneDataRef = 8  // joystick ail/elv/rud
+	DataRefOtherFlightControls XPlaneDataRef = 9  // other flight controls
+	DataRefArtStab             XPlaneDataRef = 10 // art stab ail/elv/rud
+	DataRefFlightCon           XPlaneDataRef = 11 // flight con ail/elv/rud
+	DataRefWingSweepThrust     XPlaneDataRef = 12 // wing sweep/thrust vect
+	DataRefTrimFlap            XPlaneDataRef = 13 // trim/flap/slat/s-brakes
+	DataRefGear                XPlaneDataRef = 14 // gear/brakes
+	DataRefAngularMoments      XPlaneDataRef = 15 // angular moments
+	DataRefAngularVelocities   XPlaneDataRef = 16 // angular velocities
+	DataRefPitchRollHeading    XPlaneDataRef = 17 // pitch, roll, heading
+	DataRefLatLonAlt           XPlaneDataRef = 20 // lat, lon, alt
+	DataRefLocVelDistTraveled  XPlaneDataRef = 21 // loc, vel, dist traveled
 )
 
 // XPlaneSimulator implements Simulator for X-Plane 11/12
 type XPlaneSimulator struct {
 	mu sync.RWMutex
 
-	config      SimulationConfig
-	conn        *net.UDPConn
-	remoteAddr  *net.UDPAddr
-	connected   bool
+	config     SimulationConfig
+	conn       *net.UDPConn
+	remoteAddr *net.UDPAddr
+	connected  bool
 
 	// Current state
 	currentState *SimulatorState
@@ -59,7 +59,7 @@ type XPlaneSimulator struct {
 	running        bool
 
 	// Statistics
-	updateCount int
+	updateCount  int
 	totalLatency time.Duration
 
 	// Channels
@@ -335,7 +335,7 @@ func (xp *XPlaneSimulator) GetSensorReading(sensorType fusion.SensorType) (*fusi
 		})
 		cov := mat.NewSymDense(6, nil)
 		for i := 0; i < 3; i++ {
-			cov.SetSym(i, i, 2.5)   // Position uncertainty (m)
+			cov.SetSym(i, i, 2.5)     // Position uncertainty (m)
 			cov.SetSym(i+3, i+3, 0.1) // Velocity uncertainty (m/s)
 		}
 		reading.Data = data
@@ -353,7 +353,7 @@ func (xp *XPlaneSimulator) GetSensorReading(sensorType fusion.SensorType) (*fusi
 		})
 		cov := mat.NewSymDense(6, nil)
 		for i := 0; i < 3; i++ {
-			cov.SetSym(i, i, 0.01)    // Attitude uncertainty (rad)
+			cov.SetSym(i, i, 0.01)      // Attitude uncertainty (rad)
 			cov.SetSym(i+3, i+3, 0.001) // Rate uncertainty (rad/s)
 		}
 		reading.Data = data
@@ -535,9 +535,9 @@ func (xp *XPlaneSimulator) setPosition(pos [3]float64) error {
 	binary.Write(buf, binary.LittleEndian, float64(pos[1])) // lon
 	binary.Write(buf, binary.LittleEndian, float64(pos[2])) // alt
 
-	binary.Write(buf, binary.LittleEndian, float32(0)) // pitch
-	binary.Write(buf, binary.LittleEndian, float32(0)) // roll
-	binary.Write(buf, binary.LittleEndian, float32(0)) // heading
+	binary.Write(buf, binary.LittleEndian, float32(0))  // pitch
+	binary.Write(buf, binary.LittleEndian, float32(0))  // roll
+	binary.Write(buf, binary.LittleEndian, float32(0))  // heading
 	binary.Write(buf, binary.LittleEndian, float32(-1)) // gear
 
 	_, err := xp.conn.WriteToUDP(buf.Bytes(), xp.remoteAddr)

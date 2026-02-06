@@ -25,17 +25,17 @@ import (
 
 // FIDO2Credential represents a registered FIDO2 credential
 type FIDO2Credential struct {
-	ID                string    `json:"id"`
-	UserID            string    `json:"user_id"`
-	CredentialID      []byte    `json:"credential_id"`
-	PublicKey         []byte    `json:"public_key"`
-	SignCount         uint32    `json:"sign_count"`
-	AAGUID            string    `json:"aaguid,omitempty"`
-	AttestationType   string    `json:"attestation_type"`
-	CreatedAt         time.Time `json:"created_at"`
-	LastUsed          time.Time `json:"last_used"`
-	DeviceName        string    `json:"device_name,omitempty"`
-	TransportType     string    `json:"transport_type,omitempty"` // usb, nfc, ble, internal
+	ID              string    `json:"id"`
+	UserID          string    `json:"user_id"`
+	CredentialID    []byte    `json:"credential_id"`
+	PublicKey       []byte    `json:"public_key"`
+	SignCount       uint32    `json:"sign_count"`
+	AAGUID          string    `json:"aaguid,omitempty"`
+	AttestationType string    `json:"attestation_type"`
+	CreatedAt       time.Time `json:"created_at"`
+	LastUsed        time.Time `json:"last_used"`
+	DeviceName      string    `json:"device_name,omitempty"`
+	TransportType   string    `json:"transport_type,omitempty"` // usb, nfc, ble, internal
 }
 
 // FIDO2Challenge represents a WebAuthn challenge
@@ -51,19 +51,19 @@ type FIDO2Challenge struct {
 
 // FIDO2AssertionRequest represents an authentication assertion request
 type FIDO2AssertionRequest struct {
-	CredentialID    []byte `json:"credential_id"`
-	ClientDataJSON  []byte `json:"client_data_json"`
+	CredentialID      []byte `json:"credential_id"`
+	ClientDataJSON    []byte `json:"client_data_json"`
 	AuthenticatorData []byte `json:"authenticator_data"`
-	Signature       []byte `json:"signature"`
-	UserHandle      []byte `json:"user_handle,omitempty"`
+	Signature         []byte `json:"signature"`
+	UserHandle        []byte `json:"user_handle,omitempty"`
 }
 
 // FIDO2RegistrationRequest represents a credential registration request
 type FIDO2RegistrationRequest struct {
-	UserID          string `json:"user_id"`
-	UserName        string `json:"user_name"`
-	UserDisplayName string `json:"user_display_name"`
-	DeviceName      string `json:"device_name"`
+	UserID              string               `json:"user_id"`
+	UserName            string               `json:"user_name"`
+	UserDisplayName     string               `json:"user_display_name"`
+	DeviceName          string               `json:"device_name"`
 	AttestationResponse *AttestationResponse `json:"attestation_response"`
 }
 
@@ -75,33 +75,33 @@ type AttestationResponse struct {
 
 // FIDO2Manager handles FIDO2/WebAuthn authentication
 type FIDO2Manager struct {
-	mu            sync.RWMutex
-	credentials   map[string][]*FIDO2Credential // userID -> credentials
-	challenges    map[string]*FIDO2Challenge    // challengeID -> challenge
-	config        FIDO2Config
-	auditLog      *AuditLogger
+	mu          sync.RWMutex
+	credentials map[string][]*FIDO2Credential // userID -> credentials
+	challenges  map[string]*FIDO2Challenge    // challengeID -> challenge
+	config      FIDO2Config
+	auditLog    *AuditLogger
 }
 
 // FIDO2Config holds FIDO2 configuration
 type FIDO2Config struct {
-	RelyingPartyID      string
-	RelyingPartyName    string
-	RelyingPartyOrigin  string
-	Timeout             int    // milliseconds
-	UserVerification    string // required, preferred, discouraged
-	AttestationPreference string // none, indirect, direct
+	RelyingPartyID          string
+	RelyingPartyName        string
+	RelyingPartyOrigin      string
+	Timeout                 int    // milliseconds
+	UserVerification        string // required, preferred, discouraged
+	AttestationPreference   string // none, indirect, direct
 	AuthenticatorAttachment string // platform, cross-platform
 }
 
 // DefaultFIDO2Config returns default FIDO2 configuration
 func DefaultFIDO2Config() FIDO2Config {
 	return FIDO2Config{
-		RelyingPartyID:      "asgard.local",
-		RelyingPartyName:    "ASGARD Security Vault",
-		RelyingPartyOrigin:  "https://asgard.local",
-		Timeout:             60000, // 60 seconds
-		UserVerification:    "required",
-		AttestationPreference: "direct",
+		RelyingPartyID:          "asgard.local",
+		RelyingPartyName:        "ASGARD Security Vault",
+		RelyingPartyOrigin:      "https://asgard.local",
+		Timeout:                 60000, // 60 seconds
+		UserVerification:        "required",
+		AttestationPreference:   "direct",
 		AuthenticatorAttachment: "cross-platform",
 	}
 }
@@ -240,12 +240,12 @@ func (m *FIDO2Manager) CompleteRegistration(ctx context.Context, req *FIDO2Regis
 
 	if m.auditLog != nil {
 		m.auditLog.LogEvent(AuditEvent{
-			Timestamp:  time.Now(),
-			Action:     "fido2_registration",
-			Actor:      req.UserID,
-			Resource:   "credential:" + credential.ID,
-			Success:    true,
-			Details:    fmt.Sprintf("Device: %s", req.DeviceName),
+			Timestamp: time.Now(),
+			Action:    "fido2_registration",
+			Actor:     req.UserID,
+			Resource:  "credential:" + credential.ID,
+			Success:   true,
+			Details:   fmt.Sprintf("Device: %s", req.DeviceName),
 		})
 	}
 
@@ -335,11 +335,11 @@ func (m *FIDO2Manager) VerifyAssertion(ctx context.Context, cred *FIDO2Credentia
 
 	if m.auditLog != nil {
 		m.auditLog.LogEvent(AuditEvent{
-			Timestamp:  time.Now(),
-			Action:     "fido2_authentication",
-			Actor:      cred.UserID,
-			Resource:   "credential:" + cred.ID,
-			Success:    true,
+			Timestamp: time.Now(),
+			Action:    "fido2_authentication",
+			Actor:     cred.UserID,
+			Resource:  "credential:" + cred.ID,
+			Success:   true,
 		})
 	}
 
@@ -426,11 +426,11 @@ func (m *FIDO2Manager) GetStatistics() map[string]interface{} {
 	}
 
 	return map[string]interface{}{
-		"registered_users":      len(m.credentials),
-		"total_credentials":     totalCreds,
-		"pending_challenges":    len(m.challenges),
-		"relying_party_id":      m.config.RelyingPartyID,
-		"user_verification":     m.config.UserVerification,
+		"registered_users":   len(m.credentials),
+		"total_credentials":  totalCreds,
+		"pending_challenges": len(m.challenges),
+		"relying_party_id":   m.config.RelyingPartyID,
+		"user_verification":  m.config.UserVerification,
 	}
 }
 

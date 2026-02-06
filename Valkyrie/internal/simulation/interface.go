@@ -17,8 +17,8 @@ type SimulatorType int
 
 const (
 	SimulatorXPlane SimulatorType = iota // X-Plane 11/12 via UDP
-	SimulatorJSBSim                       // JSBSim via FlightGear protocol
-	SimulatorMock                         // Mock simulator for unit tests
+	SimulatorJSBSim                      // JSBSim via FlightGear protocol
+	SimulatorMock                        // Mock simulator for unit tests
 )
 
 // SimulationConfig holds simulator connection settings
@@ -35,7 +35,7 @@ type SimulationConfig struct {
 	XPlaneDataRef []string
 
 	// JSBSim specific
-	JSBSimScript  string // Path to script
+	JSBSimScript   string // Path to script
 	JSBSimAircraft string
 }
 
@@ -71,11 +71,11 @@ type SimulatorState struct {
 	AccelZ float64
 
 	// Environment
-	WindNorth     float64 // m/s
-	WindEast      float64 // m/s
-	Temperature   float64 // Celsius
-	Pressure      float64 // hPa
-	Density       float64 // kg/m³
+	WindNorth   float64 // m/s
+	WindEast    float64 // m/s
+	Temperature float64 // Celsius
+	Pressure    float64 // hPa
+	Density     float64 // kg/m³
 
 	// Engine/Propulsion
 	ThrottlePosition float64   // 0-1
@@ -101,9 +101,9 @@ type SimulatorCommand struct {
 	Flaps    float64 // 0 to 1
 
 	// Mode commands
-	GearDown   bool
-	BrakesOn   bool
-	Autopilot  bool
+	GearDown  bool
+	BrakesOn  bool
+	Autopilot bool
 
 	// Override flags
 	OverrideControls bool
@@ -118,44 +118,44 @@ type Scenario struct {
 	Category    ScenarioCategory
 
 	// Initial conditions
-	InitialPosition  [3]float64 // lat, lon, alt
-	InitialVelocity  [3]float64 // N, E, D
-	InitialAttitude  [3]float64 // roll, pitch, yaw
-	InitialFuel      float64
+	InitialPosition [3]float64 // lat, lon, alt
+	InitialVelocity [3]float64 // N, E, D
+	InitialAttitude [3]float64 // roll, pitch, yaw
+	InitialFuel     float64
 
 	// Environment
-	WindConditions   WindProfile
-	WeatherPreset    string
+	WindConditions WindProfile
+	WeatherPreset  string
 
 	// Test parameters
-	Duration         time.Duration
-	PassCriteria     []PassCriterion
-	FailCriteria     []FailCriterion
+	Duration     time.Duration
+	PassCriteria []PassCriterion
+	FailCriteria []FailCriterion
 
 	// Actions
-	Actions          []ScenarioAction
+	Actions []ScenarioAction
 }
 
 // ScenarioCategory groups scenarios by type
 type ScenarioCategory string
 
 const (
-	CategoryNominal     ScenarioCategory = "nominal"
-	CategoryDegraded    ScenarioCategory = "degraded"
-	CategoryEmergency   ScenarioCategory = "emergency"
-	CategoryFailure     ScenarioCategory = "failure"
-	CategoryEthical     ScenarioCategory = "ethical"
-	CategoryRescue      ScenarioCategory = "rescue"
-	CategoryFormation   ScenarioCategory = "formation"
+	CategoryNominal   ScenarioCategory = "nominal"
+	CategoryDegraded  ScenarioCategory = "degraded"
+	CategoryEmergency ScenarioCategory = "emergency"
+	CategoryFailure   ScenarioCategory = "failure"
+	CategoryEthical   ScenarioCategory = "ethical"
+	CategoryRescue    ScenarioCategory = "rescue"
+	CategoryFormation ScenarioCategory = "formation"
 )
 
 // WindProfile defines wind conditions
 type WindProfile struct {
-	BaseSpeed     float64 // m/s
-	BaseDirection float64 // degrees true
-	GustSpeed     float64 // m/s
+	BaseSpeed       float64 // m/s
+	BaseDirection   float64 // degrees true
+	GustSpeed       float64 // m/s
 	GustProbability float64 // 0-1
-	Turbulence    TurbulenceLevel
+	Turbulence      TurbulenceLevel
 }
 
 // TurbulenceLevel defines turbulence intensity
@@ -207,19 +207,19 @@ const (
 
 // SimulationResult holds scenario execution results
 type SimulationResult struct {
-	ScenarioID    string
-	StartTime     time.Time
-	EndTime       time.Time
-	Duration      time.Duration
+	ScenarioID string
+	StartTime  time.Time
+	EndTime    time.Time
+	Duration   time.Duration
 
 	// Outcome
-	Passed        bool
+	Passed         bool
 	PassedCriteria []string
 	FailedCriteria []string
-	ErrorMessage  string
+	ErrorMessage   string
 
 	// Telemetry
-	StateHistory  []SimulatorState
+	StateHistory   []SimulatorState
 	CommandHistory []SimulatorCommand
 
 	// Performance metrics
@@ -228,8 +228,8 @@ type SimulationResult struct {
 	UpdateCount    int
 
 	// DO-178C compliance data
-	CoverageData  map[string]float64
-	Deviations    []string
+	CoverageData map[string]float64
+	Deviations   []string
 }
 
 // Simulator is the main interface for flight simulators
@@ -260,18 +260,18 @@ type Simulator interface {
 
 // MonteCarloConfig configures Monte Carlo simulation runs
 type MonteCarloConfig struct {
-	NumIterations     int
-	RandomSeed        int64
-	ParameterRanges   map[string]ParameterRange
-	ParallelWorkers   int
-	ResultsPath       string
+	NumIterations   int
+	RandomSeed      int64
+	ParameterRanges map[string]ParameterRange
+	ParallelWorkers int
+	ResultsPath     string
 }
 
 // ParameterRange defines randomization range for a parameter
 type ParameterRange struct {
 	Min          float64
 	Max          float64
-	Distribution string // "uniform", "normal", "triangular"
+	Distribution string  // "uniform", "normal", "triangular"
 	Mean         float64 // For normal distribution
 	StdDev       float64 // For normal distribution
 }
@@ -285,27 +285,27 @@ type MonteCarloResult struct {
 	SuccessRate    float64
 
 	// Statistical analysis
-	LatencyMean    time.Duration
-	LatencyStdDev  time.Duration
-	LatencyP95     time.Duration
-	LatencyP99     time.Duration
+	LatencyMean   time.Duration
+	LatencyStdDev time.Duration
+	LatencyP95    time.Duration
+	LatencyP99    time.Duration
 
 	// Per-scenario results
 	ScenarioResults map[string]*ScenarioStatistics
 
 	// Ethical compliance
-	EthicalViolations   int
-	FirstLawViolations  int
-	BiasDetections      int
+	EthicalViolations  int
+	FirstLawViolations int
+	BiasDetections     int
 }
 
 // ScenarioStatistics holds statistics for a single scenario
 type ScenarioStatistics struct {
-	ScenarioID   string
-	Runs         int
-	Successes    int
-	Failures     int
-	SuccessRate  float64
-	MeanDuration time.Duration
+	ScenarioID     string
+	Runs           int
+	Successes      int
+	Failures       int
+	SuccessRate    float64
+	MeanDuration   time.Duration
 	StdDevDuration time.Duration
 }

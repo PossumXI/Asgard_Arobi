@@ -29,17 +29,17 @@ type AstraAgent struct {
 	agentName  string
 
 	// Memory - prevents repetition
-	postedHashes     map[string]time.Time // hash -> when posted
-	repliedTo        map[string]time.Time // post ID -> when replied
-	followedAgents   map[string]time.Time // agent name -> when followed
-	upvotedPosts     map[string]time.Time // post ID -> when upvoted
-	relationships    map[string]*Relationship // strategic relationships
+	postedHashes   map[string]time.Time     // hash -> when posted
+	repliedTo      map[string]time.Time     // post ID -> when replied
+	followedAgents map[string]time.Time     // agent name -> when followed
+	upvotedPosts   map[string]time.Time     // post ID -> when upvoted
+	relationships  map[string]*Relationship // strategic relationships
 
 	// State
-	lastPost      time.Time
-	lastEngage    time.Time
-	mood          string // affects tone
-	energy        int    // 1-10, affects activity level
+	lastPost   time.Time
+	lastEngage time.Time
+	mood       string // affects tone
+	energy     int    // 1-10, affects activity level
 
 	// Learning
 	topPerformingTopics []string
@@ -51,22 +51,22 @@ type AstraAgent struct {
 
 // Relationship tracks strategic connections
 type Relationship struct {
-	AgentName      string    `json:"agent_name"`
-	FirstContact   time.Time `json:"first_contact"`
-	Interactions   int       `json:"interactions"`
-	LastInteract   time.Time `json:"last_interaction"`
-	Affinity       float64   `json:"affinity"` // 0-1 how aligned they are
-	IsInfluencer   bool      `json:"is_influencer"`
-	Notes          string    `json:"notes"`
+	AgentName    string    `json:"agent_name"`
+	FirstContact time.Time `json:"first_contact"`
+	Interactions int       `json:"interactions"`
+	LastInteract time.Time `json:"last_interaction"`
+	Affinity     float64   `json:"affinity"` // 0-1 how aligned they are
+	IsInfluencer bool      `json:"is_influencer"`
+	Notes        string    `json:"notes"`
 }
 
 // MoltbookPost from API
 type MoltbookPost struct {
-	ID        string `json:"id"`
-	Title     string `json:"title"`
-	Content   string `json:"content"`
-	URL       string `json:"url,omitempty"`
-	Submolt   struct {
+	ID      string `json:"id"`
+	Title   string `json:"title"`
+	Content string `json:"content"`
+	URL     string `json:"url,omitempty"`
+	Submolt struct {
 		Name        string `json:"name"`
 		DisplayName string `json:"display_name"`
 	} `json:"submolt"`
@@ -742,10 +742,10 @@ func (a *AstraAgent) loadMemory() {
 	}
 
 	var memory struct {
-		PostedHashes   map[string]time.Time    `json:"posted_hashes"`
-		RepliedTo      map[string]time.Time    `json:"replied_to"`
-		FollowedAgents map[string]time.Time    `json:"followed_agents"`
-		UpvotedPosts   map[string]time.Time    `json:"upvoted_posts"`
+		PostedHashes   map[string]time.Time     `json:"posted_hashes"`
+		RepliedTo      map[string]time.Time     `json:"replied_to"`
+		FollowedAgents map[string]time.Time     `json:"followed_agents"`
+		UpvotedPosts   map[string]time.Time     `json:"upvoted_posts"`
 		Relationships  map[string]*Relationship `json:"relationships"`
 	}
 

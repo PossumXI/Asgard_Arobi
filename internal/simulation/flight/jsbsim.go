@@ -22,8 +22,8 @@ type AircraftState struct {
 	Altitude  float64 `json:"altitude"`  // meters MSL
 
 	// Velocity
-	Airspeed    float64 `json:"airspeed"`     // m/s
-	GroundSpeed float64 `json:"ground_speed"` // m/s
+	Airspeed      float64 `json:"airspeed"`       // m/s
+	GroundSpeed   float64 `json:"ground_speed"`   // m/s
 	VerticalSpeed float64 `json:"vertical_speed"` // m/s
 
 	// Attitude (Euler angles)
@@ -42,9 +42,9 @@ type AircraftState struct {
 	AccelZ float64 `json:"accel_z"` // g
 
 	// Engine state
-	Throttle     float64 `json:"throttle"`      // 0-1
+	Throttle      float64 `json:"throttle"`       // 0-1
 	FuelRemaining float64 `json:"fuel_remaining"` // kg
-	EngineRPM    float64 `json:"engine_rpm"`
+	EngineRPM     float64 `json:"engine_rpm"`
 
 	// Control surfaces
 	Aileron  float64 `json:"aileron"`  // -1 to 1
@@ -53,29 +53,29 @@ type AircraftState struct {
 	Flaps    float64 `json:"flaps"`    // 0 to 1
 
 	// Mission state
-	MissionPhase   string  `json:"mission_phase"`
+	MissionPhase     string  `json:"mission_phase"`
 	DistanceToTarget float64 `json:"distance_to_target"` // meters
-	TimeToTarget   float64 `json:"time_to_target"`     // seconds
+	TimeToTarget     float64 `json:"time_to_target"`     // seconds
 
 	// Stealth metrics
-	RadarCrossSection float64 `json:"rcs"`      // m^2
-	IRSignature      float64 `json:"ir_signature"` // relative
+	RadarCrossSection float64 `json:"rcs"`          // m^2
+	IRSignature       float64 `json:"ir_signature"` // relative
 
 	Timestamp time.Time `json:"timestamp"`
 }
 
 // Waypoint represents a navigation waypoint
 type Waypoint struct {
-	ID        string  `json:"id"`
-	Name      string  `json:"name"`
-	Latitude  float64 `json:"latitude"`
-	Longitude float64 `json:"longitude"`
-	Altitude  float64 `json:"altitude"`
-	Speed     float64 `json:"speed"`     // target speed m/s
-	Heading   float64 `json:"heading"`   // optional target heading
-	Loiter    bool    `json:"loiter"`    // hold position
-	LoiterTime int    `json:"loiter_time"` // seconds
-	Action    string  `json:"action"`    // waypoint action
+	ID         string  `json:"id"`
+	Name       string  `json:"name"`
+	Latitude   float64 `json:"latitude"`
+	Longitude  float64 `json:"longitude"`
+	Altitude   float64 `json:"altitude"`
+	Speed      float64 `json:"speed"`       // target speed m/s
+	Heading    float64 `json:"heading"`     // optional target heading
+	Loiter     bool    `json:"loiter"`      // hold position
+	LoiterTime int     `json:"loiter_time"` // seconds
+	Action     string  `json:"action"`      // waypoint action
 }
 
 // FlightPlan represents a complete flight plan
@@ -90,17 +90,17 @@ type FlightPlan struct {
 
 // Threat represents a detected threat
 type Threat struct {
-	ID           string    `json:"id"`
-	Type         string    `json:"type"` // radar, sam, aircraft, etc.
-	Latitude     float64   `json:"latitude"`
-	Longitude    float64   `json:"longitude"`
-	Altitude     float64   `json:"altitude"`
-	Range        float64   `json:"range"`        // detection range meters
-	ThreatLevel  float64   `json:"threat_level"` // 0-1
-	Velocity     float64   `json:"velocity"`     // if moving
-	Heading      float64   `json:"heading"`      // if moving
-	Active       bool      `json:"active"`
-	DetectedAt   time.Time `json:"detected_at"`
+	ID          string    `json:"id"`
+	Type        string    `json:"type"` // radar, sam, aircraft, etc.
+	Latitude    float64   `json:"latitude"`
+	Longitude   float64   `json:"longitude"`
+	Altitude    float64   `json:"altitude"`
+	Range       float64   `json:"range"`        // detection range meters
+	ThreatLevel float64   `json:"threat_level"` // 0-1
+	Velocity    float64   `json:"velocity"`     // if moving
+	Heading     float64   `json:"heading"`      // if moving
+	Active      bool      `json:"active"`
+	DetectedAt  time.Time `json:"detected_at"`
 }
 
 // WeatherConditions represents current weather
@@ -128,21 +128,21 @@ type FlightSimulator struct {
 	weather  WeatherConditions
 
 	// Simulation control
-	running     bool
-	paused      bool
-	timeScale   float64 // 1.0 = real-time
-	simTime     time.Time
-	startTime   time.Time
+	running   bool
+	paused    bool
+	timeScale float64 // 1.0 = real-time
+	simTime   time.Time
+	startTime time.Time
 
 	// Autopilot
-	autopilotEngaged bool
+	autopilotEngaged  bool
 	targetWaypointIdx int
 
 	// Callbacks
-	onStateUpdate func(AircraftState)
-	onThreatDetected func(Threat)
+	onStateUpdate     func(AircraftState)
+	onThreatDetected  func(Threat)
 	onWaypointReached func(Waypoint)
-	onWeatherChange func(WeatherConditions)
+	onWeatherChange   func(WeatherConditions)
 
 	// Channels
 	stopCh chan struct{}
@@ -153,14 +153,14 @@ type FlightSimulator struct {
 func NewFlightSimulator() *FlightSimulator {
 	return &FlightSimulator{
 		aircraft: AircraftState{
-			Latitude:  37.7749,  // San Francisco
-			Longitude: -122.4194,
-			Altitude:  1000,
-			Airspeed:  50,
-			Heading:   90,
-			Throttle:  0.6,
+			Latitude:      37.7749, // San Francisco
+			Longitude:     -122.4194,
+			Altitude:      1000,
+			Airspeed:      50,
+			Heading:       90,
+			Throttle:      0.6,
 			FuelRemaining: 500,
-			MissionPhase: "idle",
+			MissionPhase:  "idle",
 		},
 		threats:   make([]Threat, 0),
 		weather:   getDefaultWeather(),
@@ -438,9 +438,9 @@ func (fs *FlightSimulator) updateFlightDynamics(dt float64) {
 	fs.aircraft.Longitude += dLon * 180 / math.Pi
 
 	// Speed dynamics (thrust vs drag)
-	thrust := fs.aircraft.Throttle * 5000 // Newtons (simplified)
+	thrust := fs.aircraft.Throttle * 5000                                          // Newtons (simplified)
 	drag := 0.5 * 1.225 * fs.aircraft.Airspeed * fs.aircraft.Airspeed * 2.0 * 0.03 // 1/2 * rho * v^2 * S * Cd
-	mass := 1000.0 // kg
+	mass := 1000.0                                                                 // kg
 	accel := (thrust - drag) / mass
 	fs.aircraft.Airspeed += accel * dt
 	fs.aircraft.Airspeed = clamp(fs.aircraft.Airspeed, 20, 200)

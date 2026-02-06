@@ -57,22 +57,22 @@ const (
 
 // VaultEntry represents a stored secret
 type VaultEntry struct {
-	ID            string        `json:"id"`
-	Name          string        `json:"name"`
-	Description   string        `json:"description,omitempty"`
-	Type          SecretType    `json:"type"`
-	SecurityLevel SecurityLevel `json:"security_level"`
-	EncryptedData string        `json:"encrypted_data"`
-	Checksum      string        `json:"checksum"`
-	CreatedAt     time.Time     `json:"created_at"`
-	UpdatedAt     time.Time     `json:"updated_at"`
-	LastAccessed  *time.Time    `json:"last_accessed,omitempty"`
-	AccessCount   int           `json:"access_count"`
-	CreatedBy     string        `json:"created_by"`
-	Tags          []string      `json:"tags,omitempty"`
+	ID            string            `json:"id"`
+	Name          string            `json:"name"`
+	Description   string            `json:"description,omitempty"`
+	Type          SecretType        `json:"type"`
+	SecurityLevel SecurityLevel     `json:"security_level"`
+	EncryptedData string            `json:"encrypted_data"`
+	Checksum      string            `json:"checksum"`
+	CreatedAt     time.Time         `json:"created_at"`
+	UpdatedAt     time.Time         `json:"updated_at"`
+	LastAccessed  *time.Time        `json:"last_accessed,omitempty"`
+	AccessCount   int               `json:"access_count"`
+	CreatedBy     string            `json:"created_by"`
+	Tags          []string          `json:"tags,omitempty"`
 	Metadata      map[string]string `json:"metadata,omitempty"`
-	ExpiresAt     *time.Time    `json:"expires_at,omitempty"`
-	Rotated       bool          `json:"rotated"`
+	ExpiresAt     *time.Time        `json:"expires_at,omitempty"`
+	Rotated       bool              `json:"rotated"`
 }
 
 // VaultConfig holds vault configuration
@@ -110,16 +110,16 @@ func DefaultVaultConfig() VaultConfig {
 
 // Vault manages secure secret storage
 type Vault struct {
-	mu            sync.RWMutex
-	entries       map[string]*VaultEntry
-	masterKey     []byte
-	config        VaultConfig
-	auditLog      *AuditLogger
-	fido2Manager  *FIDO2Manager
-	agentMonitor  *VaultAgent
-	initialized   bool
-	sealed        bool
-	gcm           cipher.AEAD
+	mu           sync.RWMutex
+	entries      map[string]*VaultEntry
+	masterKey    []byte
+	config       VaultConfig
+	auditLog     *AuditLogger
+	fido2Manager *FIDO2Manager
+	agentMonitor *VaultAgent
+	initialized  bool
+	sealed       bool
+	gcm          cipher.AEAD
 }
 
 // NewVault creates a new vault instance

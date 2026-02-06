@@ -14,10 +14,10 @@ import (
 type BatteryChemistry int
 
 const (
-	ChemistryLiPo BatteryChemistry = iota // Lithium Polymer
-	ChemistryLiFe                         // Lithium Iron Phosphate
-	ChemistryLiIon                        // Lithium Ion
-	ChemistryLiHV                         // High Voltage LiPo
+	ChemistryLiPo  BatteryChemistry = iota // Lithium Polymer
+	ChemistryLiFe                          // Lithium Iron Phosphate
+	ChemistryLiIon                         // Lithium Ion
+	ChemistryLiHV                          // High Voltage LiPo
 )
 
 func (c BatteryChemistry) String() string {
@@ -108,8 +108,8 @@ type BatteryModel struct {
 	dischargeCurves map[float64][]VoltageSOCPoint
 
 	// Temperature coefficients
-	tempCoeffCapacity    float64 // Capacity reduction per degree C
-	tempCoeffResistance  float64 // Resistance increase per degree C
+	tempCoeffCapacity   float64 // Capacity reduction per degree C
+	tempCoeffResistance float64 // Resistance increase per degree C
 
 	// Aging model
 	cycleCount  int
@@ -129,8 +129,8 @@ func NewBatteryModel(config BatteryConfig) *BatteryModel {
 			Timestamp:        time.Now(),
 		},
 		dischargeCurves:     make(map[float64][]VoltageSOCPoint),
-		tempCoeffCapacity:   0.002,  // 0.2% capacity loss per degree C below 25C
-		tempCoeffResistance: 0.005,  // 0.5% resistance increase per degree C
+		tempCoeffCapacity:   0.002, // 0.2% capacity loss per degree C below 25C
+		tempCoeffResistance: 0.005, // 0.5% resistance increase per degree C
 	}
 
 	// Initialize default discharge curves based on chemistry

@@ -15,11 +15,11 @@ import (
 type ObjectClass string
 
 const (
-	ClassHuman     ObjectClass = "human"
-	ClassVehicle   ObjectClass = "vehicle"
-	ClassDebris    ObjectClass = "debris"
-	ClassObstacle  ObjectClass = "obstacle"
-	ClassUnknown   ObjectClass = "unknown"
+	ClassHuman    ObjectClass = "human"
+	ClassVehicle  ObjectClass = "vehicle"
+	ClassDebris   ObjectClass = "debris"
+	ClassObstacle ObjectClass = "obstacle"
+	ClassUnknown  ObjectClass = "unknown"
 )
 
 // Vector3 represents a 3D vector
@@ -82,20 +82,20 @@ type PredictedPoint struct {
 
 // TrackedObject represents an object being tracked in 360-degree space
 type TrackedObject struct {
-	ID             string            `json:"id"`
-	ClassType      ObjectClass       `json:"classType"`
-	Position       Vector3           `json:"position"`
-	Velocity       Vector3           `json:"velocity"`
-	Acceleration   Vector3           `json:"acceleration"`
-	BoundingBox    BoundingBox3D     `json:"boundingBox"`
-	Confidence     float64           `json:"confidence"`
-	FirstSeen      time.Time         `json:"firstSeen"`
-	LastSeen       time.Time         `json:"lastSeen"`
-	TrackAge       int               `json:"trackAge"`
-	KalmanState    *KalmanState9D    `json:"-"` // Internal Kalman state
-	PredictedPath  []PredictedPoint  `json:"predictedPath"`
-	ThreatLevel    float64           `json:"threatLevel"`
-	RescuePriority float64           `json:"rescuePriority"`
+	ID             string                 `json:"id"`
+	ClassType      ObjectClass            `json:"classType"`
+	Position       Vector3                `json:"position"`
+	Velocity       Vector3                `json:"velocity"`
+	Acceleration   Vector3                `json:"acceleration"`
+	BoundingBox    BoundingBox3D          `json:"boundingBox"`
+	Confidence     float64                `json:"confidence"`
+	FirstSeen      time.Time              `json:"firstSeen"`
+	LastSeen       time.Time              `json:"lastSeen"`
+	TrackAge       int                    `json:"trackAge"`
+	KalmanState    *KalmanState9D         `json:"-"` // Internal Kalman state
+	PredictedPath  []PredictedPoint       `json:"predictedPath"`
+	ThreatLevel    float64                `json:"threatLevel"`
+	RescuePriority float64                `json:"rescuePriority"`
 	Metadata       map[string]interface{} `json:"metadata"`
 }
 
@@ -108,7 +108,7 @@ type KalmanState9D struct {
 
 // SensorFusionResult holds information about sensor coverage
 type SensorFusionResult struct {
-	CameraCoverage   float64 `json:"cameraCoverage"`   // Percentage of 360 covered
+	CameraCoverage   float64 `json:"cameraCoverage"` // Percentage of 360 covered
 	LidarCoverage    float64 `json:"lidarCoverage"`
 	DepthCoverage    float64 `json:"depthCoverage"`
 	FusionConfidence float64 `json:"fusionConfidence"`
@@ -151,20 +151,20 @@ func DefaultScanner360Config() Scanner360Config {
 type Scanner360 struct {
 	mu sync.RWMutex
 
-	config      Scanner360Config
-	tracks      map[string]*TrackedObject
-	octree      *Octree
-	lastScan    *ScanResult360
-	trackIDSeq  int64
+	config     Scanner360Config
+	tracks     map[string]*TrackedObject
+	octree     *Octree
+	lastScan   *ScanResult360
+	trackIDSeq int64
 
 	// Sensor interfaces (would be implemented by actual hardware)
-	cameraFeed  chan []byte
-	lidarFeed   chan []Vector3
-	depthFeed   chan [][]float64
+	cameraFeed chan []byte
+	lidarFeed  chan []Vector3
+	depthFeed  chan [][]float64
 
 	// Processing metrics
-	avgLatency  time.Duration
-	frameCount  int64
+	avgLatency time.Duration
+	frameCount int64
 }
 
 // NewScanner360 creates a new 360-degree scanner

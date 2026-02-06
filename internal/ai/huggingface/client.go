@@ -20,9 +20,9 @@ const (
 	InferenceAPIURL = "https://api-inference.huggingface.co/models"
 
 	// Pre-trained models for ASGARD tasks
-	ModelTerrainClassification = "microsoft/resnet-50"                    // Image classification
-	ModelObjectDetection       = "facebook/detr-resnet-50"                // Object detection
-	ModelTextGeneration        = "microsoft/DialoGPT-medium"              // Conversational AI
+	ModelTerrainClassification = "microsoft/resnet-50"       // Image classification
+	ModelObjectDetection       = "facebook/detr-resnet-50"   // Object detection
+	ModelTextGeneration        = "microsoft/DialoGPT-medium" // Conversational AI
 	ModelSentimentAnalysis     = "nlptown/bert-base-multilingual-uncased-sentiment"
 	ModelZeroShotClassify      = "facebook/bart-large-mnli"               // Zero-shot classification
 	ModelFeatureExtraction     = "sentence-transformers/all-MiniLM-L6-v2" // Embeddings
@@ -106,20 +106,20 @@ type DetectedObstacle struct {
 
 // ThreatAssessment from AI analysis
 type ThreatAssessment struct {
-	ThreatType     string  `json:"threat_type"`
-	ThreatLevel    float64 `json:"threat_level"` // 0-1
-	RecommendedAction string `json:"recommended_action"`
-	Confidence     float64 `json:"confidence"`
-	TimeToImpact   float64 `json:"time_to_impact_seconds"`
+	ThreatType        string  `json:"threat_type"`
+	ThreatLevel       float64 `json:"threat_level"` // 0-1
+	RecommendedAction string  `json:"recommended_action"`
+	Confidence        float64 `json:"confidence"`
+	TimeToImpact      float64 `json:"time_to_impact_seconds"`
 }
 
 // FlightDecision from AI reasoning
 type FlightDecision struct {
-	Action       string  `json:"action"`
-	Reasoning    string  `json:"reasoning"`
-	Confidence   float64 `json:"confidence"`
-	Priority     int     `json:"priority"`
-	SafetyScore  float64 `json:"safety_score"`
+	Action      string  `json:"action"`
+	Reasoning   string  `json:"reasoning"`
+	Confidence  float64 `json:"confidence"`
+	Priority    int     `json:"priority"`
+	SafetyScore float64 `json:"safety_score"`
 }
 
 // NewClient creates a new HuggingFace client

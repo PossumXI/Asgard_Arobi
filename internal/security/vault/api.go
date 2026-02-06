@@ -141,9 +141,9 @@ func (api *VaultAPI) handleStats(w http.ResponseWriter, r *http.Request) {
 	api.jsonResponse(w, http.StatusOK, APIResponse{
 		Success: true,
 		Data: map[string]interface{}{
-			"vault":  vaultStats,
-			"fido2":  fido2Stats,
-			"agent":  agentStats,
+			"vault": vaultStats,
+			"fido2": fido2Stats,
+			"agent": agentStats,
 		},
 	})
 }

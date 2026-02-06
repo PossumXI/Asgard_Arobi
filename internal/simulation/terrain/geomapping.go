@@ -19,16 +19,16 @@ import (
 type TerrainType string
 
 const (
-	TerrainUrban      TerrainType = "urban"
-	TerrainSuburban   TerrainType = "suburban"
-	TerrainRural      TerrainType = "rural"
-	TerrainForest     TerrainType = "forest"
-	TerrainDesert     TerrainType = "desert"
-	TerrainMountain   TerrainType = "mountain"
-	TerrainWater      TerrainType = "water"
-	TerrainWetland    TerrainType = "wetland"
-	TerrainFarmland   TerrainType = "farmland"
-	TerrainUnknown    TerrainType = "unknown"
+	TerrainUrban    TerrainType = "urban"
+	TerrainSuburban TerrainType = "suburban"
+	TerrainRural    TerrainType = "rural"
+	TerrainForest   TerrainType = "forest"
+	TerrainDesert   TerrainType = "desert"
+	TerrainMountain TerrainType = "mountain"
+	TerrainWater    TerrainType = "water"
+	TerrainWetland  TerrainType = "wetland"
+	TerrainFarmland TerrainType = "farmland"
+	TerrainUnknown  TerrainType = "unknown"
 )
 
 // Coordinate represents a geographic point
@@ -41,32 +41,32 @@ type Coordinate struct {
 // TerrainCell represents a terrain grid cell
 type TerrainCell struct {
 	Coordinate
-	TerrainType    TerrainType `json:"terrain_type"`
-	Elevation      float64     `json:"elevation"`       // meters
-	Slope          float64     `json:"slope"`           // degrees
-	Aspect         float64     `json:"aspect"`          // degrees (direction slope faces)
-	Roughness      float64     `json:"roughness"`       // 0-1
-	Vegetation     float64     `json:"vegetation"`      // 0-1 density
-	PopulationDensity float64  `json:"population_density"` // people per sq km
-	IsSafe         bool        `json:"is_safe"`         // safe for operations
-	Obstacles      []Obstacle  `json:"obstacles"`
+	TerrainType       TerrainType `json:"terrain_type"`
+	Elevation         float64     `json:"elevation"`          // meters
+	Slope             float64     `json:"slope"`              // degrees
+	Aspect            float64     `json:"aspect"`             // degrees (direction slope faces)
+	Roughness         float64     `json:"roughness"`          // 0-1
+	Vegetation        float64     `json:"vegetation"`         // 0-1 density
+	PopulationDensity float64     `json:"population_density"` // people per sq km
+	IsSafe            bool        `json:"is_safe"`            // safe for operations
+	Obstacles         []Obstacle  `json:"obstacles"`
 }
 
 // Obstacle detected in terrain
 type Obstacle struct {
 	Type      string     `json:"type"`
 	Position  Coordinate `json:"position"`
-	Height    float64    `json:"height"`    // meters
-	Radius    float64    `json:"radius"`    // meters
+	Height    float64    `json:"height"`     // meters
+	Radius    float64    `json:"radius"`     // meters
 	IsDynamic bool       `json:"is_dynamic"` // moving obstacle
 }
 
 // LandingZone assessment result
 type LandingZone struct {
 	Center       Coordinate  `json:"center"`
-	Radius       float64     `json:"radius"`        // meters
+	Radius       float64     `json:"radius"` // meters
 	SurfaceType  TerrainType `json:"surface_type"`
-	Slope        float64     `json:"slope"`         // degrees
+	Slope        float64     `json:"slope"` // degrees
 	Obstructions int         `json:"obstructions"`
 	WindExposure float64     `json:"wind_exposure"` // 0-1
 	SafetyScore  float64     `json:"safety_score"`  // 0-1
@@ -77,10 +77,10 @@ type LandingZone struct {
 // FlightCorridor represents a safe flight path
 type FlightCorridor struct {
 	Waypoints    []Coordinate `json:"waypoints"`
-	MinAltitude  float64      `json:"min_altitude"`  // meters AGL
+	MinAltitude  float64      `json:"min_altitude"` // meters AGL
 	MaxAltitude  float64      `json:"max_altitude"`
-	Width        float64      `json:"width"`         // meters
-	SafetyScore  float64      `json:"safety_score"`  // 0-1
+	Width        float64      `json:"width"`        // meters
+	SafetyScore  float64      `json:"safety_score"` // 0-1
 	TerrainClear bool         `json:"terrain_clear"`
 	NoFlyZones   []NoFlyZone  `json:"no_fly_zones"`
 }
@@ -91,8 +91,8 @@ type NoFlyZone struct {
 	Name       string     `json:"name"`
 	Type       string     `json:"type"` // military, civilian, emergency, tfr
 	Center     Coordinate `json:"center"`
-	Radius     float64    `json:"radius"`     // meters
-	FloorAlt   float64    `json:"floor_alt"`  // meters
+	Radius     float64    `json:"radius"`    // meters
+	FloorAlt   float64    `json:"floor_alt"` // meters
 	CeilingAlt float64    `json:"ceiling_alt"`
 	Active     bool       `json:"active"`
 	ValidFrom  time.Time  `json:"valid_from"`
@@ -296,13 +296,13 @@ func (gm *GeoMapper) inferTerrainType(lat, lon, elevation float64) TerrainType {
 		lat, lon float64
 		radius   float64
 	}{
-		{40.7128, -74.0060, 0.3},   // New York
-		{34.0522, -118.2437, 0.4},  // Los Angeles
-		{41.8781, -87.6298, 0.3},   // Chicago
-		{29.7604, -95.3698, 0.3},   // Houston
-		{33.4484, -112.0740, 0.3},  // Phoenix
-		{39.7392, -104.9903, 0.2},  // Denver
-		{47.6062, -122.3321, 0.2},  // Seattle
+		{40.7128, -74.0060, 0.3},  // New York
+		{34.0522, -118.2437, 0.4}, // Los Angeles
+		{41.8781, -87.6298, 0.3},  // Chicago
+		{29.7604, -95.3698, 0.3},  // Houston
+		{33.4484, -112.0740, 0.3}, // Phoenix
+		{39.7392, -104.9903, 0.2}, // Denver
+		{47.6062, -122.3321, 0.2}, // Seattle
 	}
 
 	for _, city := range cities {
@@ -361,9 +361,9 @@ func (gm *GeoMapper) isWater(lat, lon float64) bool {
 	greatLakes := []struct {
 		lat, lon, radius float64
 	}{
-		{43.0, -82.0, 2.0},  // Lake Erie/Huron
-		{44.0, -86.0, 2.0},  // Lake Michigan
-		{47.0, -88.0, 1.5},  // Lake Superior
+		{43.0, -82.0, 2.0}, // Lake Erie/Huron
+		{44.0, -86.0, 2.0}, // Lake Michigan
+		{47.0, -88.0, 1.5}, // Lake Superior
 	}
 
 	for _, lake := range greatLakes {
@@ -575,12 +575,12 @@ func (gm *GeoMapper) GetMetrics() map[string]interface{} {
 	}
 
 	return map[string]interface{}{
-		"total_queries": gm.queriesTotal,
-		"cache_hits":    gm.cacheHits,
-		"cache_misses":  gm.cacheMisses,
-		"cache_size":    len(gm.terrainCache),
+		"total_queries":  gm.queriesTotal,
+		"cache_hits":     gm.cacheHits,
+		"cache_misses":   gm.cacheMisses,
+		"cache_size":     len(gm.terrainCache),
 		"cache_hit_rate": hitRate,
-		"no_fly_zones":  len(gm.noFlyZones),
+		"no_fly_zones":   len(gm.noFlyZones),
 	}
 }
 

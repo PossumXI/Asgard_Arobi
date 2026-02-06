@@ -32,13 +32,13 @@ type AccessEvent struct {
 type AnomalyType string
 
 const (
-	AnomalyTypeRapidAccess     AnomalyType = "rapid_access"
-	AnomalyTypeUnusualTime     AnomalyType = "unusual_time"
-	AnomalyTypeBruteForce      AnomalyType = "brute_force"
+	AnomalyTypeRapidAccess      AnomalyType = "rapid_access"
+	AnomalyTypeUnusualTime      AnomalyType = "unusual_time"
+	AnomalyTypeBruteForce       AnomalyType = "brute_force"
 	AnomalyTypeElevationAttempt AnomalyType = "elevation_attempt"
 	AnomalyTypeDataExfiltration AnomalyType = "data_exfiltration"
-	AnomalyTypeNewLocation     AnomalyType = "new_location"
-	AnomalyTypeFailedFIDO2     AnomalyType = "failed_fido2"
+	AnomalyTypeNewLocation      AnomalyType = "new_location"
+	AnomalyTypeFailedFIDO2      AnomalyType = "failed_fido2"
 )
 
 // SecurityAnomaly represents a detected security anomaly
@@ -57,9 +57,9 @@ type SecurityAnomaly struct {
 // VaultAgentConfig holds agent configuration
 type VaultAgentConfig struct {
 	// Rate limiting thresholds
-	MaxAccessPerMinute     int
-	MaxFailedAttempts      int
-	SuspiciousTimeWindow   time.Duration
+	MaxAccessPerMinute   int
+	MaxFailedAttempts    int
+	SuspiciousTimeWindow time.Duration
 
 	// Analysis settings
 	EnableBehaviorAnalysis bool
@@ -67,53 +67,53 @@ type VaultAgentConfig struct {
 	LearningPeriod         time.Duration
 
 	// Alert thresholds
-	AlertOnFailedFIDO2     bool
+	AlertOnFailedFIDO2        bool
 	AlertOnHighSecurityAccess bool
-	AlertOnUnusualTime     bool
+	AlertOnUnusualTime        bool
 }
 
 // DefaultVaultAgentConfig returns default configuration
 func DefaultVaultAgentConfig() VaultAgentConfig {
 	return VaultAgentConfig{
-		MaxAccessPerMinute:       30,
-		MaxFailedAttempts:        5,
-		SuspiciousTimeWindow:     time.Minute,
-		EnableBehaviorAnalysis:   true,
-		EnableAnomalyDetection:   true,
-		LearningPeriod:           7 * 24 * time.Hour, // 1 week
-		AlertOnFailedFIDO2:       true,
+		MaxAccessPerMinute:        30,
+		MaxFailedAttempts:         5,
+		SuspiciousTimeWindow:      time.Minute,
+		EnableBehaviorAnalysis:    true,
+		EnableAnomalyDetection:    true,
+		LearningPeriod:            7 * 24 * time.Hour, // 1 week
+		AlertOnFailedFIDO2:        true,
 		AlertOnHighSecurityAccess: true,
-		AlertOnUnusualTime:       true,
+		AlertOnUnusualTime:        true,
 	}
 }
 
 // UserBehaviorProfile represents learned behavior for a user
 type UserBehaviorProfile struct {
-	UserID             string
-	FirstSeen          time.Time
-	LastSeen           time.Time
-	TotalAccesses      int
-	TypicalHours       []int // hours of day (0-23) when user is active
-	TypicalDays        []int // days of week (0-6) when user is active
-	AccessedSecrets    map[string]int // secretID -> access count
-	CommonIPs          map[string]int
-	AverageAccessRate  float64 // accesses per hour
-	FailedAttempts     int
+	UserID            string
+	FirstSeen         time.Time
+	LastSeen          time.Time
+	TotalAccesses     int
+	TypicalHours      []int          // hours of day (0-23) when user is active
+	TypicalDays       []int          // days of week (0-6) when user is active
+	AccessedSecrets   map[string]int // secretID -> access count
+	CommonIPs         map[string]int
+	AverageAccessRate float64 // accesses per hour
+	FailedAttempts    int
 }
 
 // VaultAgent monitors vault access and detects anomalies
 type VaultAgent struct {
-	mu            sync.RWMutex
-	vault         *Vault
-	config        VaultAgentConfig
-	events        []AccessEvent
-	anomalies     []SecurityAnomaly
-	profiles      map[string]*UserBehaviorProfile
-	eventChan     chan AccessEvent
-	anomalyChan   chan SecurityAnomaly
-	stopCh        chan struct{}
-	wg            sync.WaitGroup
-	running       bool
+	mu          sync.RWMutex
+	vault       *Vault
+	config      VaultAgentConfig
+	events      []AccessEvent
+	anomalies   []SecurityAnomaly
+	profiles    map[string]*UserBehaviorProfile
+	eventChan   chan AccessEvent
+	anomalyChan chan SecurityAnomaly
+	stopCh      chan struct{}
+	wg          sync.WaitGroup
+	running     bool
 }
 
 // NewVaultAgent creates a new vault monitoring agent
@@ -394,11 +394,11 @@ func (a *VaultAgent) respondToAnomaly(anomaly SecurityAnomaly) {
 	// Log to vault audit
 	if a.vault != nil && a.vault.auditLog != nil {
 		a.vault.auditLog.LogEvent(AuditEvent{
-			Timestamp:     time.Now(),
-			Action:        AuditActionSuspiciousAccess,
-			Actor:         anomaly.Actor,
-			Success:       false,
-			Details:       anomaly.Description,
+			Timestamp: time.Now(),
+			Action:    AuditActionSuspiciousAccess,
+			Actor:     anomaly.Actor,
+			Success:   false,
+			Details:   anomaly.Description,
 		})
 	}
 }
@@ -559,11 +559,11 @@ func (a *VaultAgent) GetStatistics() map[string]interface{} {
 	}
 
 	return map[string]interface{}{
-		"events_tracked":       len(a.events),
-		"anomalies_detected":   len(a.anomalies),
-		"user_profiles":        len(a.profiles),
+		"events_tracked":        len(a.events),
+		"anomalies_detected":    len(a.anomalies),
+		"user_profiles":         len(a.profiles),
 		"anomalies_by_severity": anomaliesBySeverity,
-		"running":              a.running,
+		"running":               a.running,
 	}
 }
 

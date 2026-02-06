@@ -24,13 +24,13 @@ type PriorityComponents struct {
 
 // RescuePriorityScore represents the calculated priority for rescuing a target
 type RescuePriorityScore struct {
-	TargetID          string             `json:"targetId"`
-	TotalScore        float64            `json:"totalScore"`        // 0-1, higher = higher priority
-	Components        PriorityComponents `json:"components"`
-	EthicalApproval   bool               `json:"ethicalApproval"`
-	RecommendedAction string             `json:"recommendedAction"`
-	EstimatedTime     time.Duration      `json:"estimatedTime"`
-	SuccessProbability float64           `json:"successProbability"`
+	TargetID           string             `json:"targetId"`
+	TotalScore         float64            `json:"totalScore"` // 0-1, higher = higher priority
+	Components         PriorityComponents `json:"components"`
+	EthicalApproval    bool               `json:"ethicalApproval"`
+	RecommendedAction  string             `json:"recommendedAction"`
+	EstimatedTime      time.Duration      `json:"estimatedTime"`
+	SuccessProbability float64            `json:"successProbability"`
 }
 
 // HunoidState represents the current state of the Hunoid robot
@@ -177,10 +177,10 @@ func (rp *RescuePrioritizer) calculateSinglePriority(
 
 // MonteCarloResult holds results from Monte Carlo simulation
 type MonteCarloResult struct {
-	successRate       float64
-	meanRescueTime    time.Duration
-	varianceTime      time.Duration
-	violations        int
+	successRate    float64
+	meanRescueTime time.Duration
+	varianceTime   time.Duration
+	violations     int
 }
 
 // runMonteCarloSimulation runs Monte Carlo simulation for rescue success

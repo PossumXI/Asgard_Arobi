@@ -145,8 +145,8 @@ type PropulsionSystem interface {
 	GetHealth() *PropulsionHealth
 
 	// Commands
-	SetThrustCommand(thrust float64) error     // 0.0-1.0 normalized
-	SetThrustVector(vector [3]float64) error   // For vectored thrust
+	SetThrustCommand(thrust float64) error   // 0.0-1.0 normalized
+	SetThrustVector(vector [3]float64) error // For vectored thrust
 	EmergencyShutdown() error
 
 	// Predictions
