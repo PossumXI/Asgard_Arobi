@@ -196,7 +196,7 @@ jobs:
         include:
           - name: valkyrie
             dockerfile: Valkyrie/Dockerfile
-            context: .
+            context: Valkyrie
           - name: pricilla
             dockerfile: Pricilla/Dockerfile
             context: .
