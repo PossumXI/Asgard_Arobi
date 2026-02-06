@@ -20,6 +20,9 @@ RUN go mod download
 # Copy entire source (needed for internal packages)
 COPY . .
 
+# Ensure configs directory exists (may not have config files yet)
+RUN mkdir -p Pricilla/configs
+
 # Build Pricilla with optimizations
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
     -ldflags="-w -s -X main.version=1.0.0 -X main.buildTime=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
@@ -40,8 +43,8 @@ WORKDIR /app
 # Copy binary from builder
 COPY --from=builder /app/pricilla .
 
-# Copy Pricilla configs if they exist
-COPY --from=builder /app/Pricilla/configs ./configs 2>/dev/null || true
+# Copy Pricilla configs
+COPY --from=builder /app/Pricilla/configs ./configs
 
 # Create directories
 RUN mkdir -p logs data && chown -R pricilla:pricilla /app

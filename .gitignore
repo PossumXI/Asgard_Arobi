@@ -87,6 +87,8 @@ secrets.yaml
 !Control_net/kubernetes/secrets.yaml.example
 *_access_keys*.txt
 founder/
+test/e2e/service-manager.ts
+
 
 # Database files
 *.db
