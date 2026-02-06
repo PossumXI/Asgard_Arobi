@@ -1,0 +1,307 @@
+# ASGARD Government/Defense Package Configuration
+# Version: 1.0.0
+# Classification: RESTRICTED
+# Copyright 2026 Arobi. All Rights Reserved.
+
+package:
+  name: "asgard-government"
+  version: "1.0.0"
+  type: "government"
+  classification: "RESTRICTED"
+  description: "Full-featured defense and government package"
+
+# All Services Enabled
+services:
+  gov_client:
+    enabled: true
+    type: "electron"
+    port: 3002
+    features:
+      - full_mission_control
+      - satellite_imagery
+      - valkyrie_management
+      - hunoid_coordination
+      - threat_perception
+      - rescue_operations
+      - encrypted_communications
+      - audit_logging
+
+  valkyrie:
+    enabled: true
+    api_port: 8093
+    grpc_port: 9093
+    features:
+      - autonomous_flight
+      - formation_flight
+      - sensor_fusion
+      - emergency_procedures
+      - propulsion_management
+      - energy_optimization
+    security:
+      require_authentication: true
+      encryption: "AES-256-GCM"
+      certificate_pinning: true
+
+  hunoid:
+    enabled: true
+    api_port: 8090
+    grpc_port: 9092
+    features:
+      - 360_perception
+      - rescue_prioritization
+      - ethics_kernel
+      - object_tracking
+      - trajectory_prediction
+      - swarm_coordination
+    security:
+      require_authentication: true
+      ethics_override: false  # Cannot disable ethics
+
+  giru_security:
+    enabled: true
+    api_port: 9090
+    metrics_port: 9091
+    features:
+      - network_monitoring
+      - threat_detection
+      - shadow_stack_analysis
+      - red_team_capabilities
+      - blue_team_defense
+      - steganography
+    security:
+      require_authentication: true
+      audit_all_actions: true
+
+  giru_jarvis:
+    enabled: true
+    port: 7777
+    websocket_port: 7778
+    features:
+      - voice_assistant
+      - full_command_set
+      - mission_control
+      - valkyrie_commands
+      - hunoid_commands
+      - security_queries
+    security:
+      require_authentication: true
+      command_confirmation: true
+
+  pricilla:
+    enabled: true
+    api_port: 8089
+    grpc_port: 9089
+    features:
+      - trajectory_prediction
+      - intercept_calculation
+      - kalman_filtering
+      - monte_carlo_analysis
+    security:
+      require_authentication: true
+
+  nysus:
+    enabled: true
+    api_port: 8080
+    websocket_port: 8085
+    features:
+      - central_command
+      - mission_orchestration
+      - system_coordination
+      - threat_management
+    security:
+      require_authentication: true
+      multi_factor: true
+
+  silenus:
+    enabled: true
+    port: 9093
+    features:
+      - satellite_operations
+      - imagery_processing
+      - orbital_tracking
+      - communication_relay
+
+# Security Configuration
+security:
+  authentication:
+    type: "multi_factor"
+    factors:
+      primary:
+        type: "access_code"
+        issuer: "administrator"
+        expiry_days: 90
+      secondary:
+        type: "fido2"
+        require_hardware_key: true
+        supported_authenticators:
+          - yubikey
+          - titan
+          - feitian
+
+  authorization:
+    default_role: "none"
+    roles:
+      operator:
+        - read_all_status
+        - basic_mission_control
+        - view_telemetry
+        - voice_commands
+
+      mission_commander:
+        - operator
+        - full_mission_control
+        - valkyrie_control
+        - hunoid_control
+        - rescue_operations
+
+      administrator:
+        - mission_commander
+        - system_configuration
+        - user_management
+        - access_code_generation
+        - audit_review
+
+  encryption:
+    at_rest: "AES-256"
+    in_transit: "TLS-1.3"
+    key_management: "HSM"
+
+  audit:
+    enabled: true
+    log_all_actions: true
+    tamper_proof: true
+    retention_years: 7
+
+# API Access (Full)
+api:
+  all_endpoints_available: true
+  authentication_required: true
+  endpoints:
+    mission:
+      - "/api/missions/*"
+      - "/api/missions/create"
+      - "/api/missions/execute"
+      - "/api/missions/abort"
+
+    valkyrie:
+      - "/api/valkyrie/status"
+      - "/api/valkyrie/command"
+      - "/api/valkyrie/telemetry"
+      - "/api/valkyrie/emergency"
+
+    hunoid:
+      - "/api/hunoid/status"
+      - "/api/hunoid/perception"
+      - "/api/hunoid/rescue"
+      - "/api/hunoid/ethics"
+
+    satellite:
+      - "/api/satellite/imagery"
+      - "/api/satellite/tracking"
+      - "/api/satellite/relay"
+
+    security:
+      - "/api/security/threats"
+      - "/api/security/alerts"
+      - "/api/security/audit"
+
+# Ethics Configuration
+ethics:
+  kernel_enabled: true
+  cannot_disable: true
+  asimov_laws:
+    first_law:
+      enabled: true
+      priority: 1
+      description: "A robot may not injure a human being or allow harm through inaction"
+    second_law:
+      enabled: true
+      priority: 2
+      description: "A robot must obey orders unless they conflict with the First Law"
+    third_law:
+      enabled: true
+      priority: 3
+      description: "A robot must protect itself unless this conflicts with Laws 1 or 2"
+
+  bias_protection:
+    enabled: true
+    prohibited_factors:
+      - age
+      - gender
+      - race
+      - ethnicity
+      - religion
+      - nationality
+      - wealth
+      - status
+      - disability
+      - appearance
+
+  audit:
+    log_all_decisions: true
+    require_explanation: true
+    human_review_threshold: 0.7  # Confidence below this requires human review
+
+# Rescue Prioritization
+rescue:
+  algorithm: "monte_carlo"
+  iterations: 500
+  factors:
+    survivability_weight: 0.30
+    accessibility_weight: 0.25
+    success_probability_weight: 0.25
+    time_urgency_weight: 0.20
+
+  constraints:
+    max_latency_ms: 100
+    ethics_validation: true
+    bias_check: true
+
+# Telemetry (Full)
+telemetry:
+  enabled: true
+  update_rate_hz: 10
+  data_retention_days: 365
+  all_metrics_exposed: true
+  encryption: true
+
+# Performance Requirements
+performance:
+  latency:
+    perception_360_ms: 100
+    ethics_decision_ms: 10
+    rescue_priority_ms: 50
+    sensor_fusion_ms: 10
+    motor_response_ms: 20
+
+  reliability:
+    target_availability: 0.9999
+    mtbf_hours: 1000
+
+# Compliance
+compliance:
+  standards:
+    - "DO-178C DAL-B"
+    - "MIL-STD-882E"
+    - "FedRAMP High"
+    - "IL5"
+
+  documentation:
+    test_matrix: "Documentation/DO178C_Test_Matrix.md"
+    ethics_guidelines: "Agent_guide_manifest_2.md"
+    architecture: "DUAL_PACKAGE_ARCHITECTURE.md"
+
+# Deployment
+deployment:
+  type: "electron"
+  platforms:
+    - windows
+    - macos
+    - linux
+  code_signing: true
+  auto_update: true
+  air_gap_support: true
+  distribution:
+    method: "secure_portal"
+    url: "/gov/download"
+    access_code_required: true

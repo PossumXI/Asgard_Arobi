@@ -169,6 +169,29 @@ Open the monitor dashboard to see Giru's activities in real-time:
 | "Return to base" / "RTB" | Emergency return home |
 | "Emergency land" | Land immediately |
 | "Autopilot status" | Check autonomous system |
+| "Battery status" | Propulsion energy levels |
+| "Energy reserves" | Reserve protection status |
+
+### Hunoid Robotics Control (NEW)
+
+The Hunoid 360-degree perception system provides intelligent rescue prioritization with sub-100ms response time.
+
+| Say This | Giru Does This |
+|----------|----------------|
+| "Hunoid scan" | Run 360-degree perception scan |
+| "People in danger?" | Get rescue priority list |
+| "Rescue status" | Current rescue priorities |
+| "Threats detected?" | Check threat levels |
+| "Track target ID" | Track specific object |
+| "Nearest human" | Find closest person |
+| "Ethics check" | Verify rescue action ethics |
+
+**Rescue Prioritization Factors:**
+- Survivability Score - How likely target survives without help
+- Accessibility Score - How easy to reach the target
+- Rescue Success Score - Monte Carlo success probability
+- Time Urgency Score - Inverse of time before critical
+- Multiple Rescue Bonus - Can save multiple targets nearby?
 
 ### Flight Assistance for Passengers (NEW)
 
@@ -378,6 +401,40 @@ Giru(jarvis)/
               │   Groq    │                  │  Gemini   │              │   Claude    │
               │   (Free)  │                  │  (Free)   │              │  (Premium)  │
               └───────────┘                  └───────────┘              └─────────────┘
+```
+
+### ASGARD Integration Architecture
+
+GIRU JARVIS acts as the intelligent voice interface to the entire ASGARD ecosystem:
+
+```
+                              ┌─────────────────┐
+                              │  GIRU JARVIS    │
+                              │  Voice Control  │
+                              └────────┬────────┘
+                                       │
+       ┌───────────────────────────────┼───────────────────────────────┐
+       │                               │                               │
+┌──────▼──────┐                ┌───────▼───────┐               ┌──────▼──────┐
+│  VALKYRIE   │                │    HUNOID     │               │  PRICILLA   │
+│   Flight    │                │   Robotics    │               │  Guidance   │
+│  Control    │                │   Control     │               │   System    │
+└──────┬──────┘                └───────┬───────┘               └──────┬──────┘
+       │                               │                               │
+       │ • Propulsion                  │ • 360° Perception             │ • Trajectory
+       │ • Energy Mgmt                 │ • Rescue Priority             │ • Terminal
+       │ • Thermal                     │ • Monte Carlo Sim             │ • Stealth
+       │ • Flight Assist               │ • Ethics Kernel               │ • Orbit
+       │                               │                               │
+       └───────────────────────────────┴───────────────────────────────┘
+                                       │
+                    ┌──────────────────┼──────────────────┐
+                    │                  │                  │
+             ┌──────▼──────┐    ┌──────▼──────┐    ┌──────▼──────┐
+             │   NYSUS     │    │   SILENUS   │    │    GIRU     │
+             │  Central    │    │  Satellite  │    │  Security   │
+             │  Command    │    │   Network   │    │   System    │
+             └─────────────┘    └─────────────┘    └─────────────┘
 ```
 
 ## Database Schema

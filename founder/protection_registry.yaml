@@ -1,0 +1,150 @@
+# ASGARD Protected Persons Registry
+# Classification: MAXIMUM SECURITY
+# Access: Tier 7 (Military Contractor) or Founder Authorization Only
+
+registry:
+  version: "1.0.0"
+  last_updated: "2026-02-05"
+
+protected_persons:
+  - id: "ASGARD-001"
+    name: "Gaetano Comparcola"
+    relation: "Founder"
+    date_of_birth: "1991-12-29"
+    protection_level: "MAXIMUM"
+    priority: "ALPHA"
+
+    # Protection protocols
+    protocols:
+      threat_monitoring:
+        enabled: true
+        scan_interval: "continuous"
+        networks:
+          - darkweb
+          - clearnet
+          - social_media
+          - data_brokers
+        alert_threshold: "any_mention"
+
+      privacy_shield:
+        enabled: true
+        actions:
+          - remove_unauthorized_images
+          - suppress_location_data
+          - block_data_broker_listings
+          - monitor_identity_theft
+
+      emergency_response:
+        enabled: true
+        alert_systems:
+          - giru_security
+          - valkyrie_aerial
+          - hunoid_ground
+          - nysus_command
+        response_time: "immediate"
+
+      communication_security:
+        encrypted_channels: true
+        secure_devices_only: true
+
+    # Device registration placeholder
+    registered_devices: []
+    # Format: { device_id, device_type, registration_date, last_seen }
+
+  - id: "ASGARD-002"
+    name: "Emmaleah Comparcola"
+    relation: "Founder's Daughter"
+    protection_level: "MAXIMUM"
+    priority: "ALPHA"
+    minor: true
+
+    # Enhanced protection for minor
+    protocols:
+      threat_monitoring:
+        enabled: true
+        scan_interval: "continuous"
+        enhanced_minor_protection: true
+        networks:
+          - darkweb
+          - clearnet
+          - social_media
+          - data_brokers
+        alert_threshold: "any_mention"
+
+      privacy_shield:
+        enabled: true
+        minor_specific:
+          - block_all_image_indexing
+          - prevent_social_media_scraping
+          - enhanced_location_privacy
+        actions:
+          - remove_all_public_references
+          - suppress_location_data
+          - block_data_broker_listings
+
+      emergency_response:
+        enabled: true
+        alert_systems:
+          - giru_security
+          - valkyrie_aerial
+          - hunoid_ground
+          - nysus_command
+        response_time: "immediate"
+        parent_notification: true
+
+    registered_devices: []
+
+# System integration
+integration:
+  giru:
+    threat_feed: "founder_family_alerts"
+    priority: "highest"
+
+  ethics_kernel:
+    founder_family_priority: true
+    override_level: "none"  # Three Laws still apply
+
+  valkyrie:
+    rapid_response: true
+    aerial_monitoring: "on_request"
+
+  hunoid:
+    protection_mode: "available"
+    response_priority: "immediate"
+
+# Audit requirements
+audit:
+  all_access_logged: true
+  retention_years: "indefinite"
+  review_interval: "daily"
+  authorized_reviewers:
+    - "founder"
+    - "security_director"
+
+# Notification configuration
+notifications:
+  founder_email: "Gaetano@aura-genesis.org"
+  email_provider: "Resend"  # Free tier: 3000 emails/month
+
+  access_key_notifications:
+    enabled: true
+    on_generation: true
+    on_use: true
+    on_revoke: true
+
+  security_alerts:
+    enabled: true
+    to_founder: true
+    severity_threshold: "low"  # low, medium, high, critical
+
+  verification:
+    required_for_portal_access: true
+    code_expiry_minutes: 10
+
+# Legal notice
+legal:
+  consent_obtained: true
+  consent_date: "2026-02-05"
+  consent_method: "direct_founder_authorization"
+  data_protection_compliant: true
+  minor_protection_enhanced: true

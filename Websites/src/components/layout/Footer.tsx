@@ -27,7 +27,7 @@ const footerLinks = {
 const socialLinks = [
   { icon: Twitter, href: 'https://twitter.com/auragenesis', label: 'Twitter' },
   { icon: Github, href: 'https://github.com/aura-genesis', label: 'GitHub' },
-  { icon: Linkedin, href: 'https://linkedin.com/company/aura-genesis', label: 'LinkedIn' },
+  { icon: Linkedin, href: 'https://www.linkedin.com/company/apisnet', label: 'LinkedIn' },
   { icon: Mail, href: 'mailto:Gaetano@aura-genesis.org', label: 'Email' },
 ];
 
@@ -171,7 +171,7 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="mt-8 pt-8 border-t border-asgard-200 dark:border-asgard-800 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-asgard-500 dark:text-asgard-400">
-            Founded by <span className="font-medium text-asgard-700 dark:text-asgard-300">Gaetano Comparcola</span>
+            All Rights Reserved By. <span className="font-medium text-asgard-700 dark:text-asgard-300">Arobi ©2025-2026</span>
           </p>
           <a 
             href="mailto:Gaetano@aura-genesis.org"

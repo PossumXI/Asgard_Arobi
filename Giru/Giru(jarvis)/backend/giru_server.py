@@ -45,13 +45,22 @@ try:
 except ImportError:
     pass  # dotenv not installed, use system env vars
 
+import logging
 import psutil
 import pyaudio
 import pyttsx3
 import requests
 import speech_recognition as sr
 import websockets
+import websockets.exceptions
 import wikipedia
+
+# Configure websockets logging to suppress expected handshake errors from health checks
+# These errors occur when clients connect without completing the WebSocket handshake
+# (e.g., Docker health checks, monitoring probes, or clients that disconnect early)
+logging.getLogger("websockets").setLevel(logging.CRITICAL)
+logging.getLogger("websockets.server").setLevel(logging.CRITICAL)
+logging.getLogger("websockets.protocol").setLevel(logging.CRITICAL)
 
 PYWHATKIT_AVAILABLE = False
 PYWHATKIT_ERROR = None
@@ -1666,11 +1675,21 @@ async def handle_message(message: str, tts_queue: "queue.Queue[str]") -> None:
 
 
 async def handler(websocket) -> None:
+    """Handle WebSocket client connections with proper error handling."""
     CLIENTS.add(websocket)
     await broadcast({"type": "log", "message": "Client connected."})
     try:
         async for message in websocket:
             await handle_message(message, handler.tts_queue)
+    except websockets.exceptions.ConnectionClosedError:
+        # Client disconnected normally or abnormally - this is expected
+        pass
+    except websockets.exceptions.ConnectionClosedOK:
+        # Client closed connection gracefully
+        pass
+    except Exception as e:
+        # Log unexpected errors but don't crash
+        log_sync(f"WebSocket handler error: {type(e).__name__}: {e}", "error")
     finally:
         CLIENTS.discard(websocket)
         await broadcast({"type": "log", "message": "Client disconnected."})
@@ -1748,6 +1767,7 @@ async def main() -> None:
     # Start main WebSocket server
     # Bind to 0.0.0.0 to accept connections from outside Docker container
     bind_host = "0.0.0.0" if os.getenv("GIRU_DOCKER") else "127.0.0.1"
+
     async with websockets.serve(handler, bind_host, port):
         log_sync(f"Giru JARVIS backend listening on ws://{bind_host}:{port}")
         await asyncio.Future()

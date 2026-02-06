@@ -139,6 +139,37 @@ docker run -p 8093:8093 -p 9093:9093 valkyrie:latest
 - Tiered access (Public, Basic, Operator, Commander, Admin)
 - Flight data recording
 
+### Propulsion System (NEW)
+
+The propulsion system provides comprehensive energy management and motor control:
+
+**Electric Propulsion:**
+- LiPo/LiFe/Lion/LiHV battery chemistry support
+- Coulomb counting state-of-charge estimation
+- Temperature-compensated discharge curves
+- Cell voltage monitoring and protection
+
+**Motor Control:**
+- Brushless outrunner motor modeling
+- Efficiency map interpolation (load-dependent)
+- KV-based thrust estimation
+- Thermal mass modeling and cooling
+
+**Energy Management:**
+- Tiered reserve protection system:
+  - **Mission Reserve (40% SOC)**: Objectives may be suspended
+  - **Contingency Reserve (30% SOC)**: Return-to-base required
+  - **Emergency Reserve (20% SOC)**: Nearest landing required
+  - **Absolute Minimum (10% SOC)**: Immediate autoland
+- Real-time energy optimization
+- Configurable reserve thresholds
+
+**Thermal Management:**
+- Motor winding temperature monitoring
+- ESC thermal protection
+- Battery temperature limits
+- Air cooling effectiveness modeling
+
 ## GIRU JARVIS Voice Control Integration
 
 Valkyrie integrates seamlessly with GIRU JARVIS for hands-free voice-activated flight assistance. Passengers and crew can interact naturally with the flight system.
@@ -226,6 +257,43 @@ failsafe:
   min_safe_altitude_agl: 50.0
 ```
 
+### Propulsion Configuration
+
+Edit `configs/propulsion.yaml`:
+
+```yaml
+propulsion:
+  type: electric
+  enabled: true
+  update_rate: 100.0  # Hz
+
+electric:
+  battery:
+    chemistry: lipo
+    cell_count: 6         # 6S configuration
+    parallel_count: 2
+    nominal_capacity_ah: 5.0
+    max_discharge_c: 25.0
+
+  motor:
+    type: brushless_outrunner
+    kv_rating: 1000       # RPM per volt
+    max_power_watts: 2000
+    efficiency_peak: 0.90
+
+energy:
+  reserves:
+    mission_battery_soc: 0.40
+    contingency_battery_soc: 0.30
+    emergency_battery_soc: 0.20
+    absolute_battery_soc: 0.10
+
+thermal:
+  motor_warning_temp_c: 90.0
+  motor_critical_temp_c: 110.0
+  battery_critical_temp_c: 55.0
+```
+
 ## Command Line Flags
 
 | Flag | Default | Description |
@@ -269,9 +337,18 @@ Valkyrie/
 │   ├── livefeed/          # WebSocket streaming
 │   ├── actuators/         # MAVLink controller
 │   ├── integration/       # ASGARD clients
-│   └── redundancy/        # Fault tolerance
+│   ├── redundancy/        # Fault tolerance
+│   └── propulsion/        # NEW: Propulsion system
+│       ├── interface.go   # Core interfaces
+│       ├── electric/      # Electric propulsion
+│       │   ├── battery.go # Battery modeling
+│       │   └── motor.go   # Motor control
+│       └── energy/        # Energy management
+│           └── reserves.go# Reserve protection
 ├── pkg/                   # Shared packages
-├── configs/               # Configuration files
+├── configs/
+│   ├── config.yaml        # Main configuration
+│   └── propulsion.yaml    # Propulsion settings
 ├── tests/                 # Test files
 ├── deployment/            # Docker, K8s
 └── docs/                  # Documentation

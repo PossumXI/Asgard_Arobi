@@ -544,6 +544,8 @@ function DashboardAlerts() {
             {['all', 'active', 'dispatched', 'monitoring', 'resolved'].map((status) => (
               <button
                 key={status}
+                type="button"
+                title={`Filter by ${status}`}
                 onClick={() => setFilter(status)}
                 className={cn(
                   'px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors',
@@ -666,6 +668,8 @@ function DashboardActivity() {
             {['all', 'deployment', 'satellite', 'alert', 'security', 'mission'].map((type) => (
               <button
                 key={type}
+                type="button"
+                title={`Filter by ${type}`}
                 onClick={() => setFilter(type)}
                 className={cn(
                   'px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors',
@@ -988,6 +992,8 @@ function DashboardSettings() {
                   <p className="text-sm text-asgard-500">{item.description}</p>
                 </div>
                 <button
+                  type="button"
+                  title={`Toggle ${item.label}`}
                   onClick={() => setNotifications(prev => ({ ...prev, [item.key]: !prev[item.key as keyof typeof prev] }))}
                   className={cn(
                     'w-12 h-7 rounded-full transition-colors relative',

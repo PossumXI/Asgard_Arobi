@@ -1,0 +1,107 @@
+# VALKYRIE Propulsion System Configuration
+# Copyright 2026 Arobi. All Rights Reserved.
+
+propulsion:
+  type: electric  # electric, combustion, turbine, hybrid
+  enabled: true
+  update_rate: 100.0  # Hz
+
+# Electric System Configuration
+electric:
+  battery:
+    chemistry: lipo  # lipo, life, lion, lihv
+    cell_count: 6    # 6S configuration
+    parallel_count: 2
+    nominal_capacity_ah: 5.0
+    max_discharge_c: 25.0
+    max_charge_c: 2.0
+    internal_resistance_ohms: 0.015
+
+    # Cell voltage limits
+    max_voltage_per_cell: 4.20
+    nominal_voltage_per_cell: 3.70
+    min_voltage_per_cell: 3.30
+    cutoff_voltage_per_cell: 3.00
+
+    # Thermal limits
+    max_charge_temp_c: 45.0
+    max_discharge_temp_c: 60.0
+    min_operating_temp_c: 0.0
+
+  motor:
+    type: brushless_outrunner
+    kv_rating: 1000  # RPM per volt
+    max_power_watts: 2000
+    efficiency_peak: 0.90
+    no_load_current: 1.5
+    winding_resistance: 0.015
+    thermal_mass_j_per_k: 50.0
+    max_winding_temp_c: 120.0
+    cooling_coefficient: 2.5
+    efficiency_map:
+      - load_percent: 0.1
+        efficiency: 0.60
+      - load_percent: 0.3
+        efficiency: 0.80
+      - load_percent: 0.5
+        efficiency: 0.88
+      - load_percent: 0.7
+        efficiency: 0.90
+      - load_percent: 0.9
+        efficiency: 0.87
+      - load_percent: 1.0
+        efficiency: 0.82
+
+  esc:
+    protocol: dshot600  # pwm, oneshot, dshot150, dshot300, dshot600
+    max_current_amps: 60.0
+    thermal_shutdown_temp_c: 85.0
+    response_time_ms: 2.0
+
+# Energy Management Configuration
+energy:
+  estimator:
+    update_rate: 10.0  # Hz
+    soc_process_noise: 0.001
+    fuel_process_noise: 0.001
+    temp_process_noise: 0.1
+    history_size: 100
+
+  reserves:
+    # Battery SOC thresholds
+    mission_battery_soc: 0.40      # Below this, mission objectives suspended
+    contingency_battery_soc: 0.30  # Below this, RTB required
+    emergency_battery_soc: 0.20    # Below this, nearest landing
+    absolute_battery_soc: 0.10     # Below this, immediate autoland
+
+    # Time-based reserves (minutes at cruise power)
+    mission_reserve_minutes: 10.0
+    contingency_reserve_minutes: 5.0
+    emergency_reserve_minutes: 2.0
+
+  optimizer:
+    enabled: true
+    objective_weights:
+      mission_completion: 0.4
+      energy_efficiency: 0.3
+      safety_margin: 0.3
+    update_rate: 1.0  # Hz
+
+# Thermal Management Configuration
+thermal:
+  enabled: true
+  update_rate: 10.0  # Hz
+
+  # Protection thresholds
+  motor_warning_temp_c: 90.0
+  motor_critical_temp_c: 110.0
+  battery_warning_temp_c: 50.0
+  battery_critical_temp_c: 55.0
+  esc_warning_temp_c: 70.0
+  esc_critical_temp_c: 80.0
+
+  # Cooling model
+  cooling:
+    type: air  # air, liquid
+    effectiveness_coefficient: 0.8
+    airspeed_factor: 0.1  # Cooling improvement per m/s airspeed

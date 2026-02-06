@@ -42,7 +42,7 @@ function LiveChat({ streamId }: { streamId: string }) {
           <MessageSquare className="w-5 h-5 text-hub-accent" />
           <h2 className="font-semibold text-white">Live Chat</h2>
         </div>
-        <button className="p-1 hover:bg-hub-surface rounded">
+        <button className="p-1 hover:bg-hub-surface rounded" title="More options" aria-label="More options">
           <MoreVertical className="w-4 h-4 text-gray-500" />
         </button>
       </div>
@@ -103,6 +103,8 @@ function LiveChat({ streamId }: { streamId: string }) {
                 ? 'bg-hub-accent text-white hover:bg-hub-accent/80'
                 : 'bg-hub-surface text-gray-600'
             )}
+            title="Send message"
+            aria-label="Send message"
           >
             <Send className="w-5 h-5" />
           </button>
@@ -289,12 +291,16 @@ export default function StreamView() {
                       ? 'bg-red-500/10 text-red-500' 
                       : 'hover:bg-hub-surface text-gray-400 hover:text-white'
                   )}
+                  title={isLiked ? "Unlike" : "Like"}
+                  aria-label={isLiked ? "Unlike" : "Like"}
                 >
                   <Heart className={cn('w-5 h-5', isLiked && 'fill-current')} />
                 </button>
                 <button 
                   onClick={handleShare}
                   className="p-2 rounded-lg hover:bg-hub-surface transition-colors text-gray-400 hover:text-white"
+                  title="Share stream"
+                  aria-label="Share stream"
                 >
                   <Share2 className="w-5 h-5" />
                 </button>

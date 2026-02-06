@@ -108,6 +108,11 @@ playwright-report/
 .local/
 *.local.yaml
 *.local.json
+
+# Jira VS Code extension cache
+.jira/cache/
+.jira/state/
+.jira/*.token
 # Large files (exceed GitHub 100MB limit)
 third_party/tflite/libtensorflow.zip
 third_party/tflite/*.zip

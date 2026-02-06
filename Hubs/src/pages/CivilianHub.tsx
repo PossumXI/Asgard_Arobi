@@ -70,6 +70,7 @@ export default function CivilianHub() {
         <div className="flex items-center gap-2">
           <MapPin className="w-4 h-4 text-gray-500" />
           <select
+            aria-label="Select region"
             value={selectedRegion}
             onChange={(e) => setSelectedRegion(e.target.value)}
             className="h-10 px-4 rounded-xl bg-hub-surface border border-hub-border text-white focus:outline-none focus:border-hub-accent appearance-none cursor-pointer"
@@ -83,6 +84,9 @@ export default function CivilianHub() {
         {/* Layout Toggle */}
         <div className="flex items-center gap-1 p-1 rounded-xl bg-hub-surface border border-hub-border">
           <button
+            type="button"
+            aria-label="Grid layout"
+            title="Grid layout"
             onClick={() => setLayout('grid')}
             className={cn(
               'p-2 rounded-lg transition-colors',
@@ -92,6 +96,9 @@ export default function CivilianHub() {
             <Grid className="w-4 h-4" />
           </button>
           <button
+            type="button"
+            aria-label="List layout"
+            title="List layout"
             onClick={() => setLayout('list')}
             className={cn(
               'p-2 rounded-lg transition-colors',

@@ -216,8 +216,7 @@ function SolarSystemVisualization() {
     <div className="relative">
       <canvas
         ref={canvasRef}
-        className="w-full aspect-video rounded-xl"
-        style={{ background: '#0a0a12' }}
+        className="w-full aspect-video rounded-xl solar-canvas-bg"
       />
       
       {/* Controls overlay */}

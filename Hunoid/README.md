@@ -188,6 +188,21 @@ swarmCoordinator.AssignMission(mission.ID, []string{"hunoid-001", "hunoid-002", 
 swarmCoordinator.StartMission(mission.ID)
 ```
 
+Core Applications of Monte Carlo in Rescue
+Disaster Resource Allocation: In flood or earthquake scenarios, Monte Carlo methods help determine the optimal dispatch of limited rescue units by modeling the uncertainty of road damage and victim conditions.
+Maritime Search and Rescue (SAR): These models simulate the drift of vessels, environmental factors, and target locations to predict the highest-probability areas for locating survivors.
+Avalanche Rescue: Monte Carlo is used to calculate optimal probe depths in the initial search phase and determine the maximum, efficient duration for resuscitation efforts while other victims remain buried.
+Evacuation Modeling: It is applied to determine safe, efficient, and equitable exit strategies for people needing assistance, often by modeling "Required Safe and Inclusive Escape Time" (RiSET). 
+Key Principles and Techniques
+Probabilistic Risk Analysis: Unlike deterministic models, Monte Carlo uses random sampling to generate a distribution of possible outcomes, allowing leaders to know the likelihood of success for different strategies.
+Monte Carlo Tree Search (MCTS): This technique is used for decision-making in complex environments, such as coordinating UAVs (drones) for search, by expanding a search tree to find the best immediate action.
+Multi-Objective Optimization: Methods like NSGA-II are often paired with Monte Carlo to balance conflicting goals, such as minimizing rescue time while maximizing the number of lives saved.
+Dynamic Response: These models can be updated in real-time, incorporating new data (e.g., changing weather) to update priorities during an ongoing mission. 
+Benefits
+Handling Uncertainty: They effectively manage the high levels of uncertainty in natural disasters, such as fluctuating casualty rates and blocked routes.
+Improved Efficiency: By using simulation to optimize, these methods often outperform traditional "greedy" algorithms (which only pick the closest target) in terms of overall mission success.
+Evidence-Based Decisions: They provide a quantitative basis for high-risk decisions, such as deciding when to stop searching in one area and move to anothe
+
 ### Emergency Control
 ```go
 // Stop all robots immediately

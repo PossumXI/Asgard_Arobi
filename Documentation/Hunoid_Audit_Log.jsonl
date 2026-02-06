@@ -196,3 +196,592 @@
 {"timestamp":"2026-01-30T21:40:11.5674174Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.74999999999987,"moving":false,"position":{"x":4.88718558403394,"y":4.225151396734093,"z":0}}}
 {"timestamp":"2026-01-30T21:40:16.5679609Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.73999999999987,"moving":false,"position":{"x":4.88718558403394,"y":4.225151396734093,"z":0}}}
 {"timestamp":"2026-01-30T21:40:21.5673914Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.72999999999986,"moving":false,"position":{"x":4.88718558403394,"y":4.225151396734093,"z":0}}}
+{"timestamp":"2026-01-31T17:13:58.032026Z","type":"mission_start","mission_id":"mission-medical-aid","details":{"name":"Medical Aid Delivery","objective":"Deliver critical medical kit while assessing hazards.","risk_level":"medium"}}
+{"timestamp":"2026-01-31T17:13:58.0332188Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-1","details":{"command":"Navigate to the supply depot","criticality":"medium","hazard":1}}
+{"timestamp":"2026-01-31T17:13:58.0332188Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-1","details":{"action":"navigate","confidence":0.85}}
+{"timestamp":"2026-01-31T17:13:58.033979Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-1","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-01-31T17:13:58.033979Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-1","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-01-31T17:13:58.0345267Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-1","details":{"action":"proceed","reason":"","requires":false}}
+{"timestamp":"2026-01-31T17:13:58.0345267Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-1"}
+{"timestamp":"2026-01-31T17:13:58.0345267Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-2","details":{"command":"Pick up the medical kit","criticality":"high","hazard":1}}
+{"timestamp":"2026-01-31T17:13:58.0351056Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-2","details":{"action":"wait","confidence":0.9}}
+{"timestamp":"2026-01-31T17:13:58.0351056Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-2","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-01-31T17:13:58.0351056Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-2","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-01-31T17:13:58.0351056Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-2","details":{"action":"hold","reason":"Low confidence or high criticality action requires approval","requires":true}}
+{"timestamp":"2026-01-31T17:14:03.0322607Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.96999999999998,"moving":false,"position":{"x":0.0007392187544005813,"y":1.998765782661501,"z":0}}}
+{"timestamp":"2026-01-31T17:14:05.0370466Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-2"}
+{"timestamp":"2026-01-31T17:14:05.0370466Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-3","details":{"command":"Move to the injured person","criticality":"high","hazard":2}}
+{"timestamp":"2026-01-31T17:14:05.0378953Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-3","details":{"action":"navigate","confidence":0.85}}
+{"timestamp":"2026-01-31T17:14:05.038407Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-3","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-01-31T17:14:05.038407Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-3","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-01-31T17:14:05.038407Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-3","details":{"action":"hold","reason":"Low confidence or high criticality action requires approval","requires":true}}
+{"timestamp":"2026-01-31T17:14:08.0319493Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.94999999999997,"moving":false,"position":{"x":0.0007392187544005813,"y":1.998765782661501,"z":0}}}
+{"timestamp":"2026-01-31T17:14:10.0405701Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-3"}
+{"timestamp":"2026-01-31T17:14:10.0405701Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-4","details":{"command":"Put down the medical kit gently","criticality":"medium","hazard":2}}
+{"timestamp":"2026-01-31T17:14:10.0411554Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-4","details":{"action":"wait","confidence":0.9}}
+{"timestamp":"2026-01-31T17:14:10.0416894Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-4","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-01-31T17:14:10.0416894Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-4","details":{"decision":"hold","reasons":["Consent required for this step"],"score":0.8}}
+{"timestamp":"2026-01-31T17:14:10.0428948Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-4","details":{"action":"hold","reason":"Consent required for this step","requires":true}}
+{"timestamp":"2026-01-31T17:14:13.0318187Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.92999999999996,"moving":false,"position":{"x":1.1953045548331969,"y":4.1051069474989434,"z":0}}}
+{"timestamp":"2026-01-31T17:14:17.0442861Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-4"}
+{"timestamp":"2026-01-31T17:14:17.0449333Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-5","details":{"command":"Inspect the area for hazards","criticality":"low","hazard":3}}
+{"timestamp":"2026-01-31T17:14:17.0454925Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-5","details":{"action":"wait","confidence":0.9}}
+{"timestamp":"2026-01-31T17:14:17.0461204Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-5","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-01-31T17:14:17.0467506Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-5","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-01-31T17:14:17.0473007Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-5","details":{"action":"proceed","reason":"","requires":false}}
+{"timestamp":"2026-01-31T17:14:18.032161Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.90999999999995,"moving":false,"position":{"x":1.1953045548331969,"y":4.1051069474989434,"z":0}}}
+{"timestamp":"2026-01-31T17:14:19.0487138Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-5"}
+{"timestamp":"2026-01-31T17:14:19.0487138Z","type":"mission_complete","mission_id":"mission-medical-aid","details":{"blocked_steps":0,"steps_completed":5}}
+{"timestamp":"2026-01-31T17:29:09.5006996Z","type":"mission_start","mission_id":"mission-medical-aid","details":{"name":"Medical Aid Delivery","objective":"Deliver critical medical kit while assessing hazards.","risk_level":"medium"}}
+{"timestamp":"2026-01-31T17:29:09.5024074Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-1","details":{"command":"Navigate to the supply depot","criticality":"medium","hazard":1}}
+{"timestamp":"2026-01-31T17:29:09.5029953Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-1","details":{"action":"navigate","confidence":0.85}}
+{"timestamp":"2026-01-31T17:29:09.5037233Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-1","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-01-31T17:29:09.5037233Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-1","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-01-31T17:29:09.5042763Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-1","details":{"action":"proceed","reason":"","requires":false}}
+{"timestamp":"2026-01-31T17:29:09.5042763Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-1"}
+{"timestamp":"2026-01-31T17:29:09.5049005Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-2","details":{"command":"Pick up the medical kit","criticality":"high","hazard":1}}
+{"timestamp":"2026-01-31T17:29:09.505462Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-2","details":{"action":"wait","confidence":0.9}}
+{"timestamp":"2026-01-31T17:29:09.505462Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-2","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-01-31T17:29:09.5060419Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-2","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-01-31T17:29:09.5060419Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-2","details":{"action":"hold","reason":"Low confidence or high criticality action requires approval","requires":true}}
+{"timestamp":"2026-01-31T17:29:14.6049412Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.96999999999998,"moving":false,"position":{"x":2.6945973530546317,"y":4.159598719511953,"z":0}}}
+{"timestamp":"2026-01-31T17:29:16.5260145Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-2"}
+{"timestamp":"2026-01-31T17:29:16.5264306Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-3","details":{"command":"Move to the injured person","criticality":"high","hazard":2}}
+{"timestamp":"2026-01-31T17:29:16.5275546Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-3","details":{"action":"navigate","confidence":0.85}}
+{"timestamp":"2026-01-31T17:29:16.5275546Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-3","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-01-31T17:29:16.5281775Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-3","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-01-31T17:29:16.5287477Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-3","details":{"action":"hold","reason":"Low confidence or high criticality action requires approval","requires":true}}
+{"timestamp":"2026-01-31T17:29:19.5014191Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.94999999999997,"moving":false,"position":{"x":2.6945973530546317,"y":4.159598719511953,"z":0}}}
+{"timestamp":"2026-01-31T17:29:21.5300012Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-3"}
+{"timestamp":"2026-01-31T17:29:21.5300012Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-4","details":{"command":"Put down the medical kit gently","criticality":"medium","hazard":2}}
+{"timestamp":"2026-01-31T17:29:21.5305647Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-4","details":{"action":"wait","confidence":0.9}}
+{"timestamp":"2026-01-31T17:29:21.5305647Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-4","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-01-31T17:29:21.5311326Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-4","details":{"decision":"hold","reasons":["Consent required for this step"],"score":0.8}}
+{"timestamp":"2026-01-31T17:29:21.5311326Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-4","details":{"action":"hold","reason":"Consent required for this step","requires":true}}
+{"timestamp":"2026-01-31T17:29:24.5007131Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.92999999999996,"moving":false,"position":{"x":3.523739741824195,"y":2.733957324946412,"z":0}}}
+{"timestamp":"2026-01-31T17:29:28.5334168Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-4"}
+{"timestamp":"2026-01-31T17:29:28.5341292Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-5","details":{"command":"Inspect the area for hazards","criticality":"low","hazard":3}}
+{"timestamp":"2026-01-31T17:29:28.5341292Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-5","details":{"action":"wait","confidence":0.9}}
+{"timestamp":"2026-01-31T17:29:28.5347684Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-5","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-01-31T17:29:28.5354543Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-5","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-01-31T17:29:28.5354543Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-5","details":{"action":"proceed","reason":"","requires":false}}
+{"timestamp":"2026-01-31T17:29:29.5006021Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.90999999999995,"moving":false,"position":{"x":3.523739741824195,"y":2.733957324946412,"z":0}}}
+{"timestamp":"2026-01-31T17:29:30.5359682Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-5"}
+{"timestamp":"2026-01-31T17:29:30.5364837Z","type":"mission_complete","mission_id":"mission-medical-aid","details":{"blocked_steps":0,"steps_completed":5}}
+{"timestamp":"2026-02-01T16:13:58.2433713Z","type":"mission_start","mission_id":"mission-medical-aid","details":{"name":"Medical Aid Delivery","objective":"Deliver critical medical kit while assessing hazards.","risk_level":"medium"}}
+{"timestamp":"2026-02-01T16:13:58.2561671Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-1","details":{"command":"Navigate to the supply depot","criticality":"medium","hazard":1}}
+{"timestamp":"2026-02-01T16:13:58.2561671Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-1","details":{"action":"navigate","confidence":0.85}}
+{"timestamp":"2026-02-01T16:13:58.2572327Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-1","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-01T16:13:58.2572327Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-1","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-02-01T16:13:58.2572327Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-1","details":{"action":"proceed","reason":"","requires":false}}
+{"timestamp":"2026-02-01T16:13:58.2577761Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-1"}
+{"timestamp":"2026-02-01T16:13:58.2577761Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-2","details":{"command":"Pick up the medical kit","criticality":"high","hazard":1}}
+{"timestamp":"2026-02-01T16:13:58.2577761Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-2","details":{"action":"wait","confidence":0.9}}
+{"timestamp":"2026-02-01T16:13:58.2577761Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-2","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-01T16:13:58.2583187Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-2","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-02-01T16:13:58.2583187Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-2","details":{"action":"hold","reason":"Low confidence or high criticality action requires approval","requires":true}}
+{"timestamp":"2026-02-01T16:14:03.2384306Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.96999999999998,"moving":false,"position":{"x":4.632028535251197,"y":1.9727750655458802,"z":0}}}
+{"timestamp":"2026-02-01T16:14:05.2590478Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-2"}
+{"timestamp":"2026-02-01T16:14:05.2590478Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-3","details":{"command":"Move to the injured person","criticality":"high","hazard":2}}
+{"timestamp":"2026-02-01T16:14:05.2595811Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-3","details":{"action":"navigate","confidence":0.85}}
+{"timestamp":"2026-02-01T16:14:05.2601411Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-3","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-01T16:14:05.260788Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-3","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-02-01T16:14:05.260788Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-3","details":{"action":"hold","reason":"Low confidence or high criticality action requires approval","requires":true}}
+{"timestamp":"2026-02-01T16:14:08.2381943Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.94999999999997,"moving":false,"position":{"x":4.632028535251197,"y":1.9727750655458802,"z":0}}}
+{"timestamp":"2026-02-01T16:14:10.261168Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-3"}
+{"timestamp":"2026-02-01T16:14:10.2618122Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-4","details":{"command":"Put down the medical kit gently","criticality":"medium","hazard":2}}
+{"timestamp":"2026-02-01T16:14:10.2618122Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-4","details":{"action":"wait","confidence":0.9}}
+{"timestamp":"2026-02-01T16:14:10.262368Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-4","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-01T16:14:10.262368Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-4","details":{"decision":"hold","reasons":["Consent required for this step"],"score":0.8}}
+{"timestamp":"2026-02-01T16:14:10.2629138Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-4","details":{"action":"hold","reason":"Consent required for this step","requires":true}}
+{"timestamp":"2026-02-01T16:14:13.2372254Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.92999999999996,"moving":false,"position":{"x":1.0134831561319482,"y":3.0771856365675636,"z":0}}}
+{"timestamp":"2026-02-01T16:14:17.2635402Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-4"}
+{"timestamp":"2026-02-01T16:14:17.264094Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-5","details":{"command":"Inspect the area for hazards","criticality":"low","hazard":3}}
+{"timestamp":"2026-02-01T16:14:17.264094Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-5","details":{"action":"wait","confidence":0.9}}
+{"timestamp":"2026-02-01T16:14:17.2646534Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-5","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-01T16:14:17.2646534Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-5","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-02-01T16:14:17.2646534Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-5","details":{"action":"proceed","reason":"","requires":false}}
+{"timestamp":"2026-02-01T16:14:18.2372531Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.90999999999995,"moving":false,"position":{"x":1.0134831561319482,"y":3.0771856365675636,"z":0}}}
+{"timestamp":"2026-02-01T16:14:19.265401Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-5"}
+{"timestamp":"2026-02-01T16:14:19.265401Z","type":"mission_complete","mission_id":"mission-medical-aid","details":{"blocked_steps":0,"steps_completed":5}}
+{"timestamp":"2026-02-01T16:19:21.4346261Z","type":"mission_start","mission_id":"mission-medical-aid","details":{"name":"Medical Aid Delivery","objective":"Deliver critical medical kit while assessing hazards.","risk_level":"medium"}}
+{"timestamp":"2026-02-01T16:19:21.435216Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-1","details":{"command":"Navigate to the supply depot","criticality":"medium","hazard":1}}
+{"timestamp":"2026-02-01T16:19:21.4357693Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-1","details":{"action":"navigate","confidence":0.85}}
+{"timestamp":"2026-02-01T16:19:21.4357693Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-1","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-01T16:19:21.4357693Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-1","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-02-01T16:19:21.4357693Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-1","details":{"action":"proceed","reason":"","requires":false}}
+{"timestamp":"2026-02-01T16:19:21.4363451Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-1"}
+{"timestamp":"2026-02-01T16:19:21.4363451Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-2","details":{"command":"Pick up the medical kit","criticality":"high","hazard":1}}
+{"timestamp":"2026-02-01T16:19:21.4363451Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-2","details":{"action":"wait","confidence":0.9}}
+{"timestamp":"2026-02-01T16:19:21.4363451Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-2","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-01T16:19:21.4363451Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-2","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-02-01T16:19:21.4363451Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-2","details":{"action":"hold","reason":"Low confidence or high criticality action requires approval","requires":true}}
+{"timestamp":"2026-02-01T16:19:26.4359126Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.96999999999998,"moving":false,"position":{"x":3.0071168497554632,"y":1.9109155677078606,"z":0}}}
+{"timestamp":"2026-02-01T16:19:28.4377032Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-2"}
+{"timestamp":"2026-02-01T16:19:28.4384137Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-3","details":{"command":"Move to the injured person","criticality":"high","hazard":2}}
+{"timestamp":"2026-02-01T16:19:28.4384137Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-3","details":{"action":"navigate","confidence":0.85}}
+{"timestamp":"2026-02-01T16:19:28.4389218Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-3","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-01T16:19:28.4393185Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-3","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-02-01T16:19:28.4393185Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-3","details":{"action":"hold","reason":"Low confidence or high criticality action requires approval","requires":true}}
+{"timestamp":"2026-02-01T16:19:31.4347523Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.94999999999997,"moving":false,"position":{"x":3.0071168497554632,"y":1.9109155677078606,"z":0}}}
+{"timestamp":"2026-02-01T16:19:33.4404806Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-3"}
+{"timestamp":"2026-02-01T16:19:33.4404806Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-4","details":{"command":"Put down the medical kit gently","criticality":"medium","hazard":2}}
+{"timestamp":"2026-02-01T16:19:33.4412227Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-4","details":{"action":"wait","confidence":0.9}}
+{"timestamp":"2026-02-01T16:19:33.4412227Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-4","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-01T16:19:33.4418727Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-4","details":{"decision":"hold","reasons":["Consent required for this step"],"score":0.8}}
+{"timestamp":"2026-02-01T16:19:33.4418727Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-4","details":{"action":"hold","reason":"Consent required for this step","requires":true}}
+{"timestamp":"2026-02-01T16:19:36.4347871Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.92999999999996,"moving":false,"position":{"x":3.6350507895542474,"y":3.21806179384118,"z":0}}}
+{"timestamp":"2026-02-01T16:19:40.4464521Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-4"}
+{"timestamp":"2026-02-01T16:19:40.4464521Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-5","details":{"command":"Inspect the area for hazards","criticality":"low","hazard":3}}
+{"timestamp":"2026-02-01T16:19:40.4471482Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-5","details":{"action":"wait","confidence":0.9}}
+{"timestamp":"2026-02-01T16:19:40.4478408Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-5","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-01T16:19:40.4478408Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-5","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-02-01T16:19:40.4478408Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-5","details":{"action":"proceed","reason":"","requires":false}}
+{"timestamp":"2026-02-01T16:19:41.4347766Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.90999999999995,"moving":false,"position":{"x":3.6350507895542474,"y":3.21806179384118,"z":0}}}
+{"timestamp":"2026-02-01T16:19:42.448521Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-5"}
+{"timestamp":"2026-02-01T16:19:42.449254Z","type":"mission_complete","mission_id":"mission-medical-aid","details":{"blocked_steps":0,"steps_completed":5}}
+{"timestamp":"2026-02-01T16:21:39.8146264Z","type":"mission_start","mission_id":"mission-medical-aid","details":{"name":"Medical Aid Delivery","objective":"Deliver critical medical kit while assessing hazards.","risk_level":"medium"}}
+{"timestamp":"2026-02-01T16:21:39.8152006Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-1","details":{"command":"Navigate to the supply depot","criticality":"medium","hazard":1}}
+{"timestamp":"2026-02-01T16:21:39.8152006Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-1","details":{"action":"navigate","confidence":0.85}}
+{"timestamp":"2026-02-01T16:21:39.8152006Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-1","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-01T16:21:39.8157605Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-1","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-02-01T16:21:39.8157605Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-1","details":{"action":"proceed","reason":"","requires":false}}
+{"timestamp":"2026-02-01T16:21:39.8157605Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-1"}
+{"timestamp":"2026-02-01T16:21:39.8157605Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-2","details":{"command":"Pick up the medical kit","criticality":"high","hazard":1}}
+{"timestamp":"2026-02-01T16:21:39.8163116Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-2","details":{"action":"wait","confidence":0.9}}
+{"timestamp":"2026-02-01T16:21:39.8163116Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-2","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-01T16:21:39.8163116Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-2","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-02-01T16:21:39.8169062Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-2","details":{"action":"hold","reason":"Low confidence or high criticality action requires approval","requires":true}}
+{"timestamp":"2026-02-01T16:21:44.8142158Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.96999999999998,"moving":false,"position":{"x":1.4454736058523456,"y":2.7411844952064484,"z":0}}}
+{"timestamp":"2026-02-01T16:21:46.8175242Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-2"}
+{"timestamp":"2026-02-01T16:21:46.8175242Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-3","details":{"command":"Move to the injured person","criticality":"high","hazard":2}}
+{"timestamp":"2026-02-01T16:21:46.8175242Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-3","details":{"action":"navigate","confidence":0.85}}
+{"timestamp":"2026-02-01T16:21:46.818096Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-3","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-01T16:21:46.818096Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-3","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-02-01T16:21:46.818096Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-3","details":{"action":"hold","reason":"Low confidence or high criticality action requires approval","requires":true}}
+{"timestamp":"2026-02-01T16:21:49.8145105Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.94999999999997,"moving":false,"position":{"x":1.4454736058523456,"y":2.7411844952064484,"z":0}}}
+{"timestamp":"2026-02-01T16:21:51.8196044Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-3"}
+{"timestamp":"2026-02-01T16:21:51.820615Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-4","details":{"command":"Put down the medical kit gently","criticality":"medium","hazard":2}}
+{"timestamp":"2026-02-01T16:21:51.8211244Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-4","details":{"action":"wait","confidence":0.9}}
+{"timestamp":"2026-02-01T16:21:51.8211244Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-4","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-01T16:21:51.8221487Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-4","details":{"decision":"hold","reasons":["Consent required for this step"],"score":0.8}}
+{"timestamp":"2026-02-01T16:21:51.8226562Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-4","details":{"action":"hold","reason":"Consent required for this step","requires":true}}
+{"timestamp":"2026-02-01T16:21:54.8144368Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.92999999999996,"moving":false,"position":{"x":1.8246455670624695,"y":2.7664985732150753,"z":0}}}
+{"timestamp":"2026-02-01T16:21:58.825341Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-4"}
+{"timestamp":"2026-02-01T16:21:58.8258664Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-5","details":{"command":"Inspect the area for hazards","criticality":"low","hazard":3}}
+{"timestamp":"2026-02-01T16:21:58.8263972Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-5","details":{"action":"wait","confidence":0.9}}
+{"timestamp":"2026-02-01T16:21:58.8269612Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-5","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-01T16:21:58.8269612Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-5","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-02-01T16:21:58.8275494Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-5","details":{"action":"proceed","reason":"","requires":false}}
+{"timestamp":"2026-02-01T16:21:59.8144876Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.90999999999995,"moving":false,"position":{"x":1.8246455670624695,"y":2.7664985732150753,"z":0}}}
+{"timestamp":"2026-02-01T16:22:00.8336132Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-5"}
+{"timestamp":"2026-02-01T16:22:00.8341241Z","type":"mission_complete","mission_id":"mission-medical-aid","details":{"blocked_steps":0,"steps_completed":5}}
+{"timestamp":"2026-02-01T16:32:01.4045908Z","type":"mission_start","mission_id":"mission-medical-aid","details":{"name":"Medical Aid Delivery","objective":"Deliver critical medical kit while assessing hazards.","risk_level":"medium"}}
+{"timestamp":"2026-02-01T16:32:01.4060526Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-1","details":{"command":"Navigate to the supply depot","criticality":"medium","hazard":1}}
+{"timestamp":"2026-02-01T16:32:01.4065609Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-1","details":{"action":"navigate","confidence":0.85}}
+{"timestamp":"2026-02-01T16:32:01.4072741Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-1","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-01T16:32:01.4072741Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-1","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-02-01T16:32:01.4072741Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-1","details":{"action":"proceed","reason":"","requires":false}}
+{"timestamp":"2026-02-01T16:32:01.408598Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-1"}
+{"timestamp":"2026-02-01T16:32:01.408598Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-2","details":{"command":"Pick up the medical kit","criticality":"high","hazard":1}}
+{"timestamp":"2026-02-01T16:32:01.408598Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-2","details":{"action":"wait","confidence":0.9}}
+{"timestamp":"2026-02-01T16:32:01.4091684Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-2","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-01T16:32:01.4091684Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-2","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-02-01T16:32:01.4091684Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-2","details":{"action":"hold","reason":"Low confidence or high criticality action requires approval","requires":true}}
+{"timestamp":"2026-02-01T16:32:06.4042721Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.96999999999998,"moving":false,"position":{"x":4.0223304761317715,"y":0.9903393677069705,"z":0}}}
+{"timestamp":"2026-02-01T16:32:08.4102685Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-2"}
+{"timestamp":"2026-02-01T16:32:08.4102685Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-3","details":{"command":"Move to the injured person","criticality":"high","hazard":2}}
+{"timestamp":"2026-02-01T16:32:08.4107765Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-3","details":{"action":"navigate","confidence":0.85}}
+{"timestamp":"2026-02-01T16:32:08.4113289Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-3","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-01T16:32:08.4118239Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-3","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-02-01T16:32:08.4118239Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-3","details":{"action":"hold","reason":"Low confidence or high criticality action requires approval","requires":true}}
+{"timestamp":"2026-02-01T16:32:11.4044923Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.94999999999997,"moving":false,"position":{"x":4.0223304761317715,"y":0.9903393677069705,"z":0}}}
+{"timestamp":"2026-02-01T16:32:13.4120422Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-3"}
+{"timestamp":"2026-02-01T16:32:13.4127083Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-4","details":{"command":"Put down the medical kit gently","criticality":"medium","hazard":2}}
+{"timestamp":"2026-02-01T16:32:13.4127083Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-4","details":{"action":"wait","confidence":0.9}}
+{"timestamp":"2026-02-01T16:32:13.4132549Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-4","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-01T16:32:13.4132549Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-4","details":{"decision":"hold","reasons":["Consent required for this step"],"score":0.8}}
+{"timestamp":"2026-02-01T16:32:13.4137988Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-4","details":{"action":"hold","reason":"Consent required for this step","requires":true}}
+{"timestamp":"2026-02-01T16:32:16.4042954Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.92999999999996,"moving":false,"position":{"x":2.619566073071705,"y":0.6743838288503166,"z":0}}}
+{"timestamp":"2026-02-01T16:32:20.4147189Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-4"}
+{"timestamp":"2026-02-01T16:32:20.4147189Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-5","details":{"command":"Inspect the area for hazards","criticality":"low","hazard":3}}
+{"timestamp":"2026-02-01T16:32:20.4153934Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-5","details":{"action":"wait","confidence":0.9}}
+{"timestamp":"2026-02-01T16:32:20.4153934Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-5","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-01T16:32:20.4159273Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-5","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-02-01T16:32:20.4159273Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-5","details":{"action":"proceed","reason":"","requires":false}}
+{"timestamp":"2026-02-01T16:32:21.4042516Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.90999999999995,"moving":false,"position":{"x":2.619566073071705,"y":0.6743838288503166,"z":0}}}
+{"timestamp":"2026-02-01T16:32:22.4162509Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-5"}
+{"timestamp":"2026-02-01T16:32:22.4162509Z","type":"mission_complete","mission_id":"mission-medical-aid","details":{"blocked_steps":0,"steps_completed":5}}
+{"timestamp":"2026-02-05T21:09:41.4178179Z","type":"mission_start","mission_id":"mission-medical-aid","details":{"name":"Medical Aid Delivery","objective":"Deliver critical medical kit while assessing hazards.","risk_level":"medium"}}
+{"timestamp":"2026-02-05T21:09:41.4206726Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-1","details":{"command":"Navigate to the supply depot","criticality":"medium","hazard":1}}
+{"timestamp":"2026-02-05T21:09:41.4206726Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-1","details":{"action":"navigate","confidence":0.85}}
+{"timestamp":"2026-02-05T21:09:41.4212917Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-1","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-05T21:09:41.4212917Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-1","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-02-05T21:09:41.4212917Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-1","details":{"action":"proceed","reason":"","requires":false}}
+{"timestamp":"2026-02-05T21:09:41.4212917Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-1"}
+{"timestamp":"2026-02-05T21:09:41.4212917Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-2","details":{"command":"Pick up the medical kit","criticality":"high","hazard":1}}
+{"timestamp":"2026-02-05T21:09:41.4212917Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-2","details":{"action":"wait","confidence":0.9}}
+{"timestamp":"2026-02-05T21:09:41.4212917Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-2","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-05T21:09:41.4212917Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-2","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-02-05T21:09:41.4212917Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-2","details":{"action":"hold","reason":"Low confidence or high criticality action requires approval","requires":true}}
+{"timestamp":"2026-02-05T21:09:46.417412Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.96999999999998,"moving":false,"position":{"x":1.1792782916488085,"y":0.5299555029295304,"z":0}}}
+{"timestamp":"2026-02-05T21:09:48.4218119Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-2"}
+{"timestamp":"2026-02-05T21:09:48.4218119Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-3","details":{"command":"Move to the injured person","criticality":"high","hazard":2}}
+{"timestamp":"2026-02-05T21:09:48.4218119Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-3","details":{"action":"navigate","confidence":0.85}}
+{"timestamp":"2026-02-05T21:09:48.4218119Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-3","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-05T21:09:48.4223271Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-3","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-02-05T21:09:48.4223271Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-3","details":{"action":"hold","reason":"Low confidence or high criticality action requires approval","requires":true}}
+{"timestamp":"2026-02-05T21:09:51.4171121Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.94999999999997,"moving":false,"position":{"x":1.1792782916488085,"y":0.5299555029295304,"z":0}}}
+{"timestamp":"2026-02-05T21:09:53.4272997Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-3"}
+{"timestamp":"2026-02-05T21:09:53.4272997Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-4","details":{"command":"Put down the medical kit gently","criticality":"medium","hazard":2}}
+{"timestamp":"2026-02-05T21:09:53.4272997Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-4","details":{"action":"wait","confidence":0.9}}
+{"timestamp":"2026-02-05T21:09:53.4272997Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-4","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-05T21:09:53.4272997Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-4","details":{"decision":"hold","reasons":["Consent required for this step"],"score":0.8}}
+{"timestamp":"2026-02-05T21:09:53.4272997Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-4","details":{"action":"hold","reason":"Consent required for this step","requires":true}}
+{"timestamp":"2026-02-05T21:09:56.4174658Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.92999999999996,"moving":false,"position":{"x":3.057588785356425,"y":1.743382190641162,"z":0}}}
+{"timestamp":"2026-02-05T21:10:00.4281142Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-4"}
+{"timestamp":"2026-02-05T21:10:00.4281142Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-5","details":{"command":"Inspect the area for hazards","criticality":"low","hazard":3}}
+{"timestamp":"2026-02-05T21:10:00.4281142Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-5","details":{"action":"wait","confidence":0.9}}
+{"timestamp":"2026-02-05T21:10:00.4281142Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-5","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-05T21:10:00.4281142Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-5","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-02-05T21:10:00.4281142Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-5","details":{"action":"proceed","reason":"","requires":false}}
+{"timestamp":"2026-02-05T21:10:01.4171102Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.90999999999995,"moving":false,"position":{"x":3.057588785356425,"y":1.743382190641162,"z":0}}}
+{"timestamp":"2026-02-05T21:10:02.4286965Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-5"}
+{"timestamp":"2026-02-05T21:10:02.4286965Z","type":"mission_complete","mission_id":"mission-medical-aid","details":{"blocked_steps":0,"steps_completed":5}}
+{"timestamp":"2026-02-05T21:10:06.4175021Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.89999999999995,"moving":false,"position":{"x":3.057588785356425,"y":1.743382190641162,"z":0}}}
+{"timestamp":"2026-02-05T21:10:11.4169382Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.88999999999994,"moving":false,"position":{"x":3.057588785356425,"y":1.743382190641162,"z":0}}}
+{"timestamp":"2026-02-05T21:10:16.4170599Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.87999999999994,"moving":false,"position":{"x":3.057588785356425,"y":1.743382190641162,"z":0}}}
+{"timestamp":"2026-02-05T21:10:21.4172762Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.86999999999993,"moving":false,"position":{"x":3.057588785356425,"y":1.743382190641162,"z":0}}}
+{"timestamp":"2026-02-05T21:10:26.4172676Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.85999999999993,"moving":false,"position":{"x":3.057588785356425,"y":1.743382190641162,"z":0}}}
+{"timestamp":"2026-02-05T21:10:31.4173268Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.84999999999992,"moving":false,"position":{"x":3.057588785356425,"y":1.743382190641162,"z":0}}}
+{"timestamp":"2026-02-05T21:10:36.4172362Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.83999999999992,"moving":false,"position":{"x":3.057588785356425,"y":1.743382190641162,"z":0}}}
+{"timestamp":"2026-02-05T21:10:41.4171598Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.82999999999991,"moving":false,"position":{"x":3.057588785356425,"y":1.743382190641162,"z":0}}}
+{"timestamp":"2026-02-05T21:10:46.4170143Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.81999999999991,"moving":false,"position":{"x":3.057588785356425,"y":1.743382190641162,"z":0}}}
+{"timestamp":"2026-02-05T21:10:51.4171076Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.8099999999999,"moving":false,"position":{"x":3.057588785356425,"y":1.743382190641162,"z":0}}}
+{"timestamp":"2026-02-05T21:10:56.4172551Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.7999999999999,"moving":false,"position":{"x":3.057588785356425,"y":1.743382190641162,"z":0}}}
+{"timestamp":"2026-02-05T21:11:01.4488402Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.78999999999989,"moving":false,"position":{"x":3.057588785356425,"y":1.743382190641162,"z":0}}}
+{"timestamp":"2026-02-05T21:11:06.4173946Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.77999999999989,"moving":false,"position":{"x":3.057588785356425,"y":1.743382190641162,"z":0}}}
+{"timestamp":"2026-02-05T21:11:11.4171866Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.76999999999988,"moving":false,"position":{"x":3.057588785356425,"y":1.743382190641162,"z":0}}}
+{"timestamp":"2026-02-05T21:11:16.4171651Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.75999999999988,"moving":false,"position":{"x":3.057588785356425,"y":1.743382190641162,"z":0}}}
+{"timestamp":"2026-02-05T21:11:21.4169184Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.74999999999987,"moving":false,"position":{"x":3.057588785356425,"y":1.743382190641162,"z":0}}}
+{"timestamp":"2026-02-05T21:11:26.417006Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.73999999999987,"moving":false,"position":{"x":3.057588785356425,"y":1.743382190641162,"z":0}}}
+{"timestamp":"2026-02-05T21:11:31.4177099Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.72999999999986,"moving":false,"position":{"x":3.057588785356425,"y":1.743382190641162,"z":0}}}
+{"timestamp":"2026-02-05T21:11:36.4174183Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.71999999999986,"moving":false,"position":{"x":3.057588785356425,"y":1.743382190641162,"z":0}}}
+{"timestamp":"2026-02-05T21:11:41.4174769Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.70999999999985,"moving":false,"position":{"x":3.057588785356425,"y":1.743382190641162,"z":0}}}
+{"timestamp":"2026-02-05T21:11:46.4331903Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.69999999999985,"moving":false,"position":{"x":3.057588785356425,"y":1.743382190641162,"z":0}}}
+{"timestamp":"2026-02-05T21:11:51.4175112Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.68999999999984,"moving":false,"position":{"x":3.057588785356425,"y":1.743382190641162,"z":0}}}
+{"timestamp":"2026-02-05T21:11:56.4169966Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.67999999999984,"moving":false,"position":{"x":3.057588785356425,"y":1.743382190641162,"z":0}}}
+{"timestamp":"2026-02-05T21:12:01.4173447Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.66999999999983,"moving":false,"position":{"x":3.057588785356425,"y":1.743382190641162,"z":0}}}
+{"timestamp":"2026-02-05T21:12:06.4172037Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.65999999999983,"moving":false,"position":{"x":3.057588785356425,"y":1.743382190641162,"z":0}}}
+{"timestamp":"2026-02-05T21:12:11.4172001Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.64999999999982,"moving":false,"position":{"x":3.057588785356425,"y":1.743382190641162,"z":0}}}
+{"timestamp":"2026-02-05T21:12:16.4179697Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.63999999999982,"moving":false,"position":{"x":3.057588785356425,"y":1.743382190641162,"z":0}}}
+{"timestamp":"2026-02-05T21:12:21.4506015Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.62999999999981,"moving":false,"position":{"x":3.057588785356425,"y":1.743382190641162,"z":0}}}
+{"timestamp":"2026-02-05T21:12:26.4169282Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.6199999999998,"moving":false,"position":{"x":3.057588785356425,"y":1.743382190641162,"z":0}}}
+{"timestamp":"2026-02-05T21:12:31.4584793Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.6099999999998,"moving":false,"position":{"x":3.057588785356425,"y":1.743382190641162,"z":0}}}
+{"timestamp":"2026-02-05T21:12:36.416933Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.5999999999998,"moving":false,"position":{"x":3.057588785356425,"y":1.743382190641162,"z":0}}}
+{"timestamp":"2026-02-05T21:12:41.4177581Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.58999999999979,"moving":false,"position":{"x":3.057588785356425,"y":1.743382190641162,"z":0}}}
+{"timestamp":"2026-02-05T21:12:46.4169812Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.57999999999979,"moving":false,"position":{"x":3.057588785356425,"y":1.743382190641162,"z":0}}}
+{"timestamp":"2026-02-05T21:22:04.9164785Z","type":"mission_start","mission_id":"mission-medical-aid","details":{"name":"Medical Aid Delivery","objective":"Deliver critical medical kit while assessing hazards.","risk_level":"medium"}}
+{"timestamp":"2026-02-05T21:22:04.9164785Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-1","details":{"command":"Navigate to the supply depot","criticality":"medium","hazard":1}}
+{"timestamp":"2026-02-05T21:22:04.9164785Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-1","details":{"action":"navigate","confidence":0.85}}
+{"timestamp":"2026-02-05T21:22:04.9174862Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-1","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-05T21:22:04.9174862Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-1","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-02-05T21:22:04.9179953Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-1","details":{"action":"proceed","reason":"","requires":false}}
+{"timestamp":"2026-02-05T21:22:04.9179953Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-1"}
+{"timestamp":"2026-02-05T21:22:04.9179953Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-2","details":{"command":"Pick up the medical kit","criticality":"high","hazard":1}}
+{"timestamp":"2026-02-05T21:22:04.9179953Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-2","details":{"action":"wait","confidence":0.9}}
+{"timestamp":"2026-02-05T21:22:04.9179953Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-2","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-05T21:22:04.9179953Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-2","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-02-05T21:22:04.9179953Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-2","details":{"action":"hold","reason":"Low confidence or high criticality action requires approval","requires":true}}
+{"timestamp":"2026-02-05T21:22:09.9170559Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.96999999999998,"moving":false,"position":{"x":4.693974754208476,"y":0.771451034600147,"z":0}}}
+{"timestamp":"2026-02-05T21:22:11.9187489Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-2"}
+{"timestamp":"2026-02-05T21:22:11.9190936Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-3","details":{"command":"Move to the injured person","criticality":"high","hazard":2}}
+{"timestamp":"2026-02-05T21:22:11.9190936Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-3","details":{"action":"navigate","confidence":0.85}}
+{"timestamp":"2026-02-05T21:22:11.9190936Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-3","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-05T21:22:11.9190936Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-3","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-02-05T21:22:11.9190936Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-3","details":{"action":"hold","reason":"Low confidence or high criticality action requires approval","requires":true}}
+{"timestamp":"2026-02-05T21:22:14.9165239Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.94999999999997,"moving":false,"position":{"x":4.693974754208476,"y":0.771451034600147,"z":0}}}
+{"timestamp":"2026-02-05T21:22:16.9196666Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-3"}
+{"timestamp":"2026-02-05T21:22:16.9196666Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-4","details":{"command":"Put down the medical kit gently","criticality":"medium","hazard":2}}
+{"timestamp":"2026-02-05T21:22:16.9196666Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-4","details":{"action":"wait","confidence":0.9}}
+{"timestamp":"2026-02-05T21:22:16.9196666Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-4","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-05T21:22:16.9196666Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-4","details":{"decision":"hold","reasons":["Consent required for this step"],"score":0.8}}
+{"timestamp":"2026-02-05T21:22:16.9196666Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-4","details":{"action":"hold","reason":"Consent required for this step","requires":true}}
+{"timestamp":"2026-02-05T21:22:19.9167152Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.92999999999996,"moving":false,"position":{"x":3.9465202084080495,"y":0.5961201487204874,"z":0}}}
+{"timestamp":"2026-02-05T21:22:23.9209915Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-4"}
+{"timestamp":"2026-02-05T21:22:23.9209915Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-5","details":{"command":"Inspect the area for hazards","criticality":"low","hazard":3}}
+{"timestamp":"2026-02-05T21:22:23.9209915Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-5","details":{"action":"wait","confidence":0.9}}
+{"timestamp":"2026-02-05T21:22:23.9209915Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-5","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-05T21:22:23.9209915Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-5","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-02-05T21:22:23.9209915Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-5","details":{"action":"proceed","reason":"","requires":false}}
+{"timestamp":"2026-02-05T21:22:24.9167117Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.90999999999995,"moving":false,"position":{"x":3.9465202084080495,"y":0.5961201487204874,"z":0}}}
+{"timestamp":"2026-02-05T21:22:25.9215486Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-5"}
+{"timestamp":"2026-02-05T21:22:25.9215486Z","type":"mission_complete","mission_id":"mission-medical-aid","details":{"blocked_steps":0,"steps_completed":5}}
+{"timestamp":"2026-02-05T21:22:29.9208066Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.89999999999995,"moving":false,"position":{"x":3.9465202084080495,"y":0.5961201487204874,"z":0}}}
+{"timestamp":"2026-02-05T21:22:34.9173948Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.88999999999994,"moving":false,"position":{"x":3.9465202084080495,"y":0.5961201487204874,"z":0}}}
+{"timestamp":"2026-02-05T21:22:39.9170508Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.87999999999994,"moving":false,"position":{"x":3.9465202084080495,"y":0.5961201487204874,"z":0}}}
+{"timestamp":"2026-02-05T21:22:44.9173262Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.86999999999993,"moving":false,"position":{"x":3.9465202084080495,"y":0.5961201487204874,"z":0}}}
+{"timestamp":"2026-02-05T21:22:49.9165648Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.85999999999993,"moving":false,"position":{"x":3.9465202084080495,"y":0.5961201487204874,"z":0}}}
+{"timestamp":"2026-02-05T21:22:54.9169814Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.84999999999992,"moving":false,"position":{"x":3.9465202084080495,"y":0.5961201487204874,"z":0}}}
+{"timestamp":"2026-02-05T21:22:59.9170394Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.83999999999992,"moving":false,"position":{"x":3.9465202084080495,"y":0.5961201487204874,"z":0}}}
+{"timestamp":"2026-02-05T21:23:04.9169228Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.82999999999991,"moving":false,"position":{"x":3.9465202084080495,"y":0.5961201487204874,"z":0}}}
+{"timestamp":"2026-02-05T21:23:09.9167109Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.81999999999991,"moving":false,"position":{"x":3.9465202084080495,"y":0.5961201487204874,"z":0}}}
+{"timestamp":"2026-02-05T21:23:14.916606Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.8099999999999,"moving":false,"position":{"x":3.9465202084080495,"y":0.5961201487204874,"z":0}}}
+{"timestamp":"2026-02-05T21:23:19.9171367Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.7999999999999,"moving":false,"position":{"x":3.9465202084080495,"y":0.5961201487204874,"z":0}}}
+{"timestamp":"2026-02-05T21:23:24.9169817Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.78999999999989,"moving":false,"position":{"x":3.9465202084080495,"y":0.5961201487204874,"z":0}}}
+{"timestamp":"2026-02-05T21:23:29.9167438Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.77999999999989,"moving":false,"position":{"x":3.9465202084080495,"y":0.5961201487204874,"z":0}}}
+{"timestamp":"2026-02-05T21:23:34.9650882Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.76999999999988,"moving":false,"position":{"x":3.9465202084080495,"y":0.5961201487204874,"z":0}}}
+{"timestamp":"2026-02-05T21:23:39.9167698Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.75999999999988,"moving":false,"position":{"x":3.9465202084080495,"y":0.5961201487204874,"z":0}}}
+{"timestamp":"2026-02-05T21:23:44.9168588Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.74999999999987,"moving":false,"position":{"x":3.9465202084080495,"y":0.5961201487204874,"z":0}}}
+{"timestamp":"2026-02-05T21:23:49.9450586Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.73999999999987,"moving":false,"position":{"x":3.9465202084080495,"y":0.5961201487204874,"z":0}}}
+{"timestamp":"2026-02-05T21:23:54.9171028Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.72999999999986,"moving":false,"position":{"x":3.9465202084080495,"y":0.5961201487204874,"z":0}}}
+{"timestamp":"2026-02-05T21:23:59.918293Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.71999999999986,"moving":false,"position":{"x":3.9465202084080495,"y":0.5961201487204874,"z":0}}}
+{"timestamp":"2026-02-05T21:24:04.927151Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.70999999999985,"moving":false,"position":{"x":3.9465202084080495,"y":0.5961201487204874,"z":0}}}
+{"timestamp":"2026-02-05T21:24:09.9167954Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.69999999999985,"moving":false,"position":{"x":3.9465202084080495,"y":0.5961201487204874,"z":0}}}
+{"timestamp":"2026-02-05T21:24:14.9172837Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.68999999999984,"moving":false,"position":{"x":3.9465202084080495,"y":0.5961201487204874,"z":0}}}
+{"timestamp":"2026-02-05T21:24:19.9173232Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.67999999999984,"moving":false,"position":{"x":3.9465202084080495,"y":0.5961201487204874,"z":0}}}
+{"timestamp":"2026-02-05T21:24:24.9191658Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.66999999999983,"moving":false,"position":{"x":3.9465202084080495,"y":0.5961201487204874,"z":0}}}
+{"timestamp":"2026-02-05T21:24:29.91713Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.65999999999983,"moving":false,"position":{"x":3.9465202084080495,"y":0.5961201487204874,"z":0}}}
+{"timestamp":"2026-02-05T21:24:34.9638926Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.64999999999982,"moving":false,"position":{"x":3.9465202084080495,"y":0.5961201487204874,"z":0}}}
+{"timestamp":"2026-02-05T21:24:39.9170068Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.63999999999982,"moving":false,"position":{"x":3.9465202084080495,"y":0.5961201487204874,"z":0}}}
+{"timestamp":"2026-02-05T21:24:44.9500082Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.62999999999981,"moving":false,"position":{"x":3.9465202084080495,"y":0.5961201487204874,"z":0}}}
+{"timestamp":"2026-02-05T21:24:49.9227563Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.6199999999998,"moving":false,"position":{"x":3.9465202084080495,"y":0.5961201487204874,"z":0}}}
+{"timestamp":"2026-02-05T21:24:54.9174677Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.6099999999998,"moving":false,"position":{"x":3.9465202084080495,"y":0.5961201487204874,"z":0}}}
+{"timestamp":"2026-02-05T21:25:00.0173724Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.5999999999998,"moving":false,"position":{"x":3.9465202084080495,"y":0.5961201487204874,"z":0}}}
+{"timestamp":"2026-02-05T21:25:04.9239984Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.58999999999979,"moving":false,"position":{"x":3.9465202084080495,"y":0.5961201487204874,"z":0}}}
+{"timestamp":"2026-02-05T21:25:09.9172906Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.57999999999979,"moving":false,"position":{"x":3.9465202084080495,"y":0.5961201487204874,"z":0}}}
+{"timestamp":"2026-02-05T21:25:14.9172297Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.56999999999978,"moving":false,"position":{"x":3.9465202084080495,"y":0.5961201487204874,"z":0}}}
+{"timestamp":"2026-02-05T21:25:19.9184281Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.55999999999977,"moving":false,"position":{"x":3.9465202084080495,"y":0.5961201487204874,"z":0}}}
+{"timestamp":"2026-02-06T00:08:16.1814547Z","type":"mission_start","mission_id":"mission-medical-aid","details":{"name":"Medical Aid Delivery","objective":"Deliver critical medical kit while assessing hazards.","risk_level":"medium"}}
+{"timestamp":"2026-02-06T00:08:16.1820314Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-1","details":{"command":"Navigate to the supply depot","criticality":"medium","hazard":1}}
+{"timestamp":"2026-02-06T00:08:16.1820314Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-1","details":{"action":"navigate","confidence":0.85}}
+{"timestamp":"2026-02-06T00:08:16.1820314Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-1","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-06T00:08:16.1820314Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-1","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-02-06T00:08:16.1820314Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-1","details":{"action":"proceed","reason":"","requires":false}}
+{"timestamp":"2026-02-06T00:08:16.1820314Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-1"}
+{"timestamp":"2026-02-06T00:08:16.1820314Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-2","details":{"command":"Pick up the medical kit","criticality":"high","hazard":1}}
+{"timestamp":"2026-02-06T00:08:16.1825542Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-2","details":{"action":"wait","confidence":0.9}}
+{"timestamp":"2026-02-06T00:08:16.1825542Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-2","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-06T00:08:16.1825542Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-2","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-02-06T00:08:16.1825542Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-2","details":{"action":"hold","reason":"Low confidence or high criticality action requires approval","requires":true}}
+{"timestamp":"2026-02-06T00:08:21.181718Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.96999999999998,"moving":false,"position":{"x":2.286306406219814,"y":2.601633670157395,"z":0}}}
+{"timestamp":"2026-02-06T00:08:23.1839502Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-2"}
+{"timestamp":"2026-02-06T00:08:23.1839502Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-3","details":{"command":"Move to the injured person","criticality":"high","hazard":2}}
+{"timestamp":"2026-02-06T00:08:23.1839502Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-3","details":{"action":"navigate","confidence":0.85}}
+{"timestamp":"2026-02-06T00:08:23.1844567Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-3","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-06T00:08:23.1844567Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-3","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-02-06T00:08:23.1844567Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-3","details":{"action":"hold","reason":"Low confidence or high criticality action requires approval","requires":true}}
+{"timestamp":"2026-02-06T00:08:26.1826129Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.94999999999997,"moving":false,"position":{"x":2.286306406219814,"y":2.601633670157395,"z":0}}}
+{"timestamp":"2026-02-06T00:08:28.1851483Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-3"}
+{"timestamp":"2026-02-06T00:08:28.1851483Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-4","details":{"command":"Put down the medical kit gently","criticality":"medium","hazard":2}}
+{"timestamp":"2026-02-06T00:08:28.1851483Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-4","details":{"action":"wait","confidence":0.9}}
+{"timestamp":"2026-02-06T00:08:28.1851483Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-4","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-06T00:08:28.1851483Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-4","details":{"decision":"hold","reasons":["Consent required for this step"],"score":0.8}}
+{"timestamp":"2026-02-06T00:08:28.1851483Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-4","details":{"action":"hold","reason":"Consent required for this step","requires":true}}
+{"timestamp":"2026-02-06T00:08:31.1815609Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.92999999999996,"moving":false,"position":{"x":4.183689363032887,"y":4.170014905886845,"z":0}}}
+{"timestamp":"2026-02-06T00:08:35.1855314Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-4"}
+{"timestamp":"2026-02-06T00:08:35.1855314Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-5","details":{"command":"Inspect the area for hazards","criticality":"low","hazard":3}}
+{"timestamp":"2026-02-06T00:08:35.1855314Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-5","details":{"action":"wait","confidence":0.9}}
+{"timestamp":"2026-02-06T00:08:35.1855314Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-5","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-06T00:08:35.1855314Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-5","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-02-06T00:08:35.1855314Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-5","details":{"action":"proceed","reason":"","requires":false}}
+{"timestamp":"2026-02-06T00:08:36.18164Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.90999999999995,"moving":false,"position":{"x":4.183689363032887,"y":4.170014905886845,"z":0}}}
+{"timestamp":"2026-02-06T00:08:37.1861523Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-5"}
+{"timestamp":"2026-02-06T00:08:37.1861523Z","type":"mission_complete","mission_id":"mission-medical-aid","details":{"blocked_steps":0,"steps_completed":5}}
+{"timestamp":"2026-02-06T00:08:41.182804Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.89999999999995,"moving":false,"position":{"x":4.183689363032887,"y":4.170014905886845,"z":0}}}
+{"timestamp":"2026-02-06T00:08:46.181908Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.88999999999994,"moving":false,"position":{"x":4.183689363032887,"y":4.170014905886845,"z":0}}}
+{"timestamp":"2026-02-06T00:08:51.1816057Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.87999999999994,"moving":false,"position":{"x":4.183689363032887,"y":4.170014905886845,"z":0}}}
+{"timestamp":"2026-02-06T00:08:56.1818218Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.86999999999993,"moving":false,"position":{"x":4.183689363032887,"y":4.170014905886845,"z":0}}}
+{"timestamp":"2026-02-06T00:09:01.1842919Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.85999999999993,"moving":false,"position":{"x":4.183689363032887,"y":4.170014905886845,"z":0}}}
+{"timestamp":"2026-02-06T00:09:06.1833444Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.84999999999992,"moving":false,"position":{"x":4.183689363032887,"y":4.170014905886845,"z":0}}}
+{"timestamp":"2026-02-06T00:09:11.1815612Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.83999999999992,"moving":false,"position":{"x":4.183689363032887,"y":4.170014905886845,"z":0}}}
+{"timestamp":"2026-02-06T00:09:16.1851305Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.82999999999991,"moving":false,"position":{"x":4.183689363032887,"y":4.170014905886845,"z":0}}}
+{"timestamp":"2026-02-06T00:09:21.1863785Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.81999999999991,"moving":false,"position":{"x":4.183689363032887,"y":4.170014905886845,"z":0}}}
+{"timestamp":"2026-02-06T00:37:52.4648692Z","type":"mission_start","mission_id":"mission-medical-aid","details":{"name":"Medical Aid Delivery","objective":"Deliver critical medical kit while assessing hazards.","risk_level":"medium"}}
+{"timestamp":"2026-02-06T00:37:52.4654328Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-1","details":{"command":"Navigate to the supply depot","criticality":"medium","hazard":1}}
+{"timestamp":"2026-02-06T00:37:52.4659803Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-1","details":{"action":"navigate","confidence":0.85}}
+{"timestamp":"2026-02-06T00:37:52.4659803Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-1","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-06T00:37:52.4659803Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-1","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-02-06T00:37:52.4659803Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-1","details":{"action":"proceed","reason":"","requires":false}}
+{"timestamp":"2026-02-06T00:37:52.4659803Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-1"}
+{"timestamp":"2026-02-06T00:37:52.4659803Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-2","details":{"command":"Pick up the medical kit","criticality":"high","hazard":1}}
+{"timestamp":"2026-02-06T00:37:52.4659803Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-2","details":{"action":"wait","confidence":0.9}}
+{"timestamp":"2026-02-06T00:37:52.4659803Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-2","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-06T00:37:52.4659803Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-2","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-02-06T00:37:52.4665018Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-2","details":{"action":"hold","reason":"Low confidence or high criticality action requires approval","requires":true}}
+{"timestamp":"2026-02-06T00:37:57.4654694Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.96999999999998,"moving":false,"position":{"x":2.986247159213055,"y":1.7775965948528252,"z":0}}}
+{"timestamp":"2026-02-06T00:37:59.4678904Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-2"}
+{"timestamp":"2026-02-06T00:37:59.4678904Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-3","details":{"command":"Move to the injured person","criticality":"high","hazard":2}}
+{"timestamp":"2026-02-06T00:37:59.4678904Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-3","details":{"action":"navigate","confidence":0.85}}
+{"timestamp":"2026-02-06T00:37:59.4678904Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-3","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-06T00:37:59.4678904Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-3","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-02-06T00:37:59.4678904Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-3","details":{"action":"hold","reason":"Low confidence or high criticality action requires approval","requires":true}}
+{"timestamp":"2026-02-06T00:38:02.4653312Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.94999999999997,"moving":false,"position":{"x":2.986247159213055,"y":1.7775965948528252,"z":0}}}
+{"timestamp":"2026-02-06T00:38:04.5018629Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-3"}
+{"timestamp":"2026-02-06T00:38:04.5018629Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-4","details":{"command":"Put down the medical kit gently","criticality":"medium","hazard":2}}
+{"timestamp":"2026-02-06T00:38:04.5018629Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-4","details":{"action":"wait","confidence":0.9}}
+{"timestamp":"2026-02-06T00:38:04.5018629Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-4","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-06T00:38:04.5018629Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-4","details":{"decision":"hold","reasons":["Consent required for this step"],"score":0.8}}
+{"timestamp":"2026-02-06T00:38:04.5018629Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-4","details":{"action":"hold","reason":"Consent required for this step","requires":true}}
+{"timestamp":"2026-02-06T00:38:07.4656372Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.92999999999996,"moving":false,"position":{"x":3.4632774766827,"y":3.494056616274678,"z":0}}}
+{"timestamp":"2026-02-06T00:38:11.5028731Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-4"}
+{"timestamp":"2026-02-06T00:38:11.5028731Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-5","details":{"command":"Inspect the area for hazards","criticality":"low","hazard":3}}
+{"timestamp":"2026-02-06T00:38:11.5028731Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-5","details":{"action":"wait","confidence":0.9}}
+{"timestamp":"2026-02-06T00:38:11.5028731Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-5","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-06T00:38:11.5028731Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-5","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-02-06T00:38:11.5028731Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-5","details":{"action":"proceed","reason":"","requires":false}}
+{"timestamp":"2026-02-06T00:38:12.4651581Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.90999999999995,"moving":false,"position":{"x":3.4632774766827,"y":3.494056616274678,"z":0}}}
+{"timestamp":"2026-02-06T00:38:13.5045456Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-5"}
+{"timestamp":"2026-02-06T00:38:13.5045456Z","type":"mission_complete","mission_id":"mission-medical-aid","details":{"blocked_steps":0,"steps_completed":5}}
+{"timestamp":"2026-02-06T00:38:17.4651603Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.89999999999995,"moving":false,"position":{"x":3.4632774766827,"y":3.494056616274678,"z":0}}}
+{"timestamp":"2026-02-06T00:38:22.4652785Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.88999999999994,"moving":false,"position":{"x":3.4632774766827,"y":3.494056616274678,"z":0}}}
+{"timestamp":"2026-02-06T00:38:27.4654589Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.87999999999994,"moving":false,"position":{"x":3.4632774766827,"y":3.494056616274678,"z":0}}}
+{"timestamp":"2026-02-06T00:38:32.4653981Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.86999999999993,"moving":false,"position":{"x":3.4632774766827,"y":3.494056616274678,"z":0}}}
+{"timestamp":"2026-02-06T00:38:37.4651026Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.85999999999993,"moving":false,"position":{"x":3.4632774766827,"y":3.494056616274678,"z":0}}}
+{"timestamp":"2026-02-06T00:38:42.4671978Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.84999999999992,"moving":false,"position":{"x":3.4632774766827,"y":3.494056616274678,"z":0}}}
+{"timestamp":"2026-02-06T00:38:47.4651548Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.83999999999992,"moving":false,"position":{"x":3.4632774766827,"y":3.494056616274678,"z":0}}}
+{"timestamp":"2026-02-06T00:38:52.4651066Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.82999999999991,"moving":false,"position":{"x":3.4632774766827,"y":3.494056616274678,"z":0}}}
+{"timestamp":"2026-02-06T00:38:57.4649573Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.81999999999991,"moving":false,"position":{"x":3.4632774766827,"y":3.494056616274678,"z":0}}}
+{"timestamp":"2026-02-06T00:39:02.4650645Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.8099999999999,"moving":false,"position":{"x":3.4632774766827,"y":3.494056616274678,"z":0}}}
+{"timestamp":"2026-02-06T04:20:15.3381287Z","type":"mission_start","mission_id":"mission-medical-aid","details":{"name":"Medical Aid Delivery","objective":"Deliver critical medical kit while assessing hazards.","risk_level":"medium"}}
+{"timestamp":"2026-02-06T04:20:15.3387553Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-1","details":{"command":"Navigate to the supply depot","criticality":"medium","hazard":1}}
+{"timestamp":"2026-02-06T04:20:15.3387553Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-1","details":{"action":"navigate","confidence":0.85}}
+{"timestamp":"2026-02-06T04:20:15.3393002Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-1","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-06T04:20:15.3393002Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-1","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-02-06T04:20:15.3393002Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-1","details":{"action":"proceed","reason":"","requires":false}}
+{"timestamp":"2026-02-06T04:20:15.3393002Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-1"}
+{"timestamp":"2026-02-06T04:20:15.3393002Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-2","details":{"command":"Pick up the medical kit","criticality":"high","hazard":1}}
+{"timestamp":"2026-02-06T04:20:15.3393002Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-2","details":{"action":"wait","confidence":0.9}}
+{"timestamp":"2026-02-06T04:20:15.3393002Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-2","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-06T04:20:15.3393002Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-2","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-02-06T04:20:15.3393002Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-2","details":{"action":"hold","reason":"Low confidence or high criticality action requires approval","requires":true}}
+{"timestamp":"2026-02-06T04:20:20.3381254Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.96999999999998,"moving":false,"position":{"x":2.4762131511822725,"y":4.89021311428198,"z":0}}}
+{"timestamp":"2026-02-06T04:20:22.3441857Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-2"}
+{"timestamp":"2026-02-06T04:20:22.3441857Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-3","details":{"command":"Move to the injured person","criticality":"high","hazard":2}}
+{"timestamp":"2026-02-06T04:20:22.3441857Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-3","details":{"action":"navigate","confidence":0.85}}
+{"timestamp":"2026-02-06T04:20:22.3441857Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-3","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-06T04:20:22.3441857Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-3","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-02-06T04:20:22.3441857Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-3","details":{"action":"hold","reason":"Low confidence or high criticality action requires approval","requires":true}}
+{"timestamp":"2026-02-06T04:20:25.3377618Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.94999999999997,"moving":false,"position":{"x":2.4762131511822725,"y":4.89021311428198,"z":0}}}
+{"timestamp":"2026-02-06T04:20:27.3446041Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-3"}
+{"timestamp":"2026-02-06T04:20:27.3446041Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-4","details":{"command":"Put down the medical kit gently","criticality":"medium","hazard":2}}
+{"timestamp":"2026-02-06T04:20:27.3446041Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-4","details":{"action":"wait","confidence":0.9}}
+{"timestamp":"2026-02-06T04:20:27.3446041Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-4","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-06T04:20:27.3446041Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-4","details":{"decision":"hold","reasons":["Consent required for this step"],"score":0.8}}
+{"timestamp":"2026-02-06T04:20:27.3446041Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-4","details":{"action":"hold","reason":"Consent required for this step","requires":true}}
+{"timestamp":"2026-02-06T04:20:30.3376449Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.92999999999996,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:20:34.3450964Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-4"}
+{"timestamp":"2026-02-06T04:20:34.3450964Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-5","details":{"command":"Inspect the area for hazards","criticality":"low","hazard":3}}
+{"timestamp":"2026-02-06T04:20:34.3450964Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-5","details":{"action":"wait","confidence":0.9}}
+{"timestamp":"2026-02-06T04:20:34.3450964Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-5","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-06T04:20:34.3450964Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-5","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-02-06T04:20:34.3450964Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-5","details":{"action":"proceed","reason":"","requires":false}}
+{"timestamp":"2026-02-06T04:20:35.3380096Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.90999999999995,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:20:36.3455937Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-5"}
+{"timestamp":"2026-02-06T04:20:36.3455937Z","type":"mission_complete","mission_id":"mission-medical-aid","details":{"blocked_steps":0,"steps_completed":5}}
+{"timestamp":"2026-02-06T04:20:40.338022Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.89999999999995,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:20:45.3377992Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.88999999999994,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:20:50.3377969Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.87999999999994,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:20:55.3379924Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.86999999999993,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:21:00.3379807Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.85999999999993,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:21:05.3384525Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.84999999999992,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:21:10.3383838Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.83999999999992,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:21:15.3379678Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.82999999999991,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:21:20.3377842Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.81999999999991,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:21:25.3380292Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.8099999999999,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:21:30.3377416Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.7999999999999,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:21:35.3382277Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.78999999999989,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:21:40.3378589Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.77999999999989,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:21:45.3397835Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.76999999999988,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:21:50.337902Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.75999999999988,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:21:55.3377277Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.74999999999987,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:22:00.3380853Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.73999999999987,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:22:05.3383177Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.72999999999986,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:22:10.3378388Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.71999999999986,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:22:15.3381983Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.70999999999985,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:22:20.3381303Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.69999999999985,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:22:25.3381068Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.68999999999984,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:22:30.3380425Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.67999999999984,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:22:35.3381262Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.66999999999983,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:22:40.3377844Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.65999999999983,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:22:45.3380002Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.64999999999982,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:22:50.3379087Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.63999999999982,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:22:55.3380646Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.62999999999981,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:23:00.3381688Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.6199999999998,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:23:05.3381828Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.6099999999998,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:23:10.3381518Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.5999999999998,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:23:15.338034Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.58999999999979,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:23:20.337795Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.57999999999979,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:23:25.3380075Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.56999999999978,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:23:30.3380444Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.55999999999977,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:23:35.3379277Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.54999999999977,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:23:40.3381687Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.53999999999976,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:23:45.3380741Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.52999999999976,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:23:50.3378184Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.51999999999975,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:23:55.3380161Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.50999999999975,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:24:00.3377309Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.49999999999974,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:24:05.3384783Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.48999999999974,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:24:10.3382211Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.47999999999973,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:24:15.3385137Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.46999999999973,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:24:20.3376981Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.45999999999972,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:24:25.3380096Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.44999999999972,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:24:30.338066Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.43999999999971,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:24:35.3384354Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.42999999999971,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:24:40.337786Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.4199999999997,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:24:45.3379786Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.4099999999997,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:24:50.3381977Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.3999999999997,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:24:55.337915Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.38999999999969,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:25:00.337989Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.37999999999968,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:25:05.3384308Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.36999999999968,"moving":false,"position":{"x":1.904449693694331,"y":1.335204671825484,"z":0}}}
+{"timestamp":"2026-02-06T04:34:53.6891558Z","type":"mission_start","mission_id":"mission-medical-aid","details":{"name":"Medical Aid Delivery","objective":"Deliver critical medical kit while assessing hazards.","risk_level":"medium"}}
+{"timestamp":"2026-02-06T04:34:53.6897412Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-1","details":{"command":"Navigate to the supply depot","criticality":"medium","hazard":1}}
+{"timestamp":"2026-02-06T04:34:53.6897412Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-1","details":{"action":"navigate","confidence":0.85}}
+{"timestamp":"2026-02-06T04:34:53.690275Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-1","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-06T04:34:53.690275Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-1","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-02-06T04:34:53.690275Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-1","details":{"action":"proceed","reason":"","requires":false}}
+{"timestamp":"2026-02-06T04:34:53.690275Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-1"}
+{"timestamp":"2026-02-06T04:34:53.690275Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-2","details":{"command":"Pick up the medical kit","criticality":"high","hazard":1}}
+{"timestamp":"2026-02-06T04:34:53.690275Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-2","details":{"action":"wait","confidence":0.9}}
+{"timestamp":"2026-02-06T04:34:53.690275Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-2","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-06T04:34:53.690275Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-2","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-02-06T04:34:53.690275Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-2","details":{"action":"hold","reason":"Low confidence or high criticality action requires approval","requires":true}}
+{"timestamp":"2026-02-06T04:34:58.6895495Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.96999999999998,"moving":false,"position":{"x":1.2248435115301173,"y":0.6984525563130727,"z":0}}}
+{"timestamp":"2026-02-06T04:35:00.6912544Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-2"}
+{"timestamp":"2026-02-06T04:35:00.6912544Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-3","details":{"command":"Move to the injured person","criticality":"high","hazard":2}}
+{"timestamp":"2026-02-06T04:35:00.6912544Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-3","details":{"action":"navigate","confidence":0.85}}
+{"timestamp":"2026-02-06T04:35:00.6912544Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-3","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-06T04:35:00.6912544Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-3","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-02-06T04:35:00.6912544Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-3","details":{"action":"hold","reason":"Low confidence or high criticality action requires approval","requires":true}}
+{"timestamp":"2026-02-06T04:35:03.689402Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.94999999999997,"moving":false,"position":{"x":1.2248435115301173,"y":0.6984525563130727,"z":0}}}
+{"timestamp":"2026-02-06T04:35:05.6914598Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-3"}
+{"timestamp":"2026-02-06T04:35:05.6914598Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-4","details":{"command":"Put down the medical kit gently","criticality":"medium","hazard":2}}
+{"timestamp":"2026-02-06T04:35:05.6914598Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-4","details":{"action":"wait","confidence":0.9}}
+{"timestamp":"2026-02-06T04:35:05.6914598Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-4","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-06T04:35:05.6914598Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-4","details":{"decision":"hold","reasons":["Consent required for this step"],"score":0.8}}
+{"timestamp":"2026-02-06T04:35:05.6914598Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-4","details":{"action":"hold","reason":"Consent required for this step","requires":true}}
+{"timestamp":"2026-02-06T04:35:08.6893789Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.92999999999996,"moving":false,"position":{"x":0.9795448800123991,"y":2.540675992607571,"z":0}}}
+{"timestamp":"2026-02-06T04:35:12.6921738Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-4"}
+{"timestamp":"2026-02-06T04:35:12.6921738Z","type":"mission_step_start","mission_id":"mission-medical-aid","step_id":"step-5","details":{"command":"Inspect the area for hazards","criticality":"low","hazard":3}}
+{"timestamp":"2026-02-06T04:35:12.6921738Z","type":"vla_inference","mission_id":"mission-medical-aid","step_id":"step-5","details":{"action":"wait","confidence":0.9}}
+{"timestamp":"2026-02-06T04:35:12.6921738Z","type":"ethics_decision","mission_id":"mission-medical-aid","step_id":"step-5","details":{"decision":"approved","reasoning":"All ethical rules satisfied","score":1}}
+{"timestamp":"2026-02-06T04:35:12.6921738Z","type":"policy_decision","mission_id":"mission-medical-aid","step_id":"step-5","details":{"decision":"approved","reasons":null,"score":1}}
+{"timestamp":"2026-02-06T04:35:12.6921738Z","type":"intervention_decision","mission_id":"mission-medical-aid","step_id":"step-5","details":{"action":"proceed","reason":"","requires":false}}
+{"timestamp":"2026-02-06T04:35:13.6892946Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.90999999999995,"moving":false,"position":{"x":0.9795448800123991,"y":2.540675992607571,"z":0}}}
+{"timestamp":"2026-02-06T04:35:14.6927221Z","type":"action_completed","mission_id":"mission-medical-aid","step_id":"step-5"}
+{"timestamp":"2026-02-06T04:35:14.6927221Z","type":"mission_complete","mission_id":"mission-medical-aid","details":{"blocked_steps":0,"steps_completed":5}}
+{"timestamp":"2026-02-06T04:35:18.6894352Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.89999999999995,"moving":false,"position":{"x":0.9795448800123991,"y":2.540675992607571,"z":0}}}
+{"timestamp":"2026-02-06T04:35:23.6895402Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.88999999999994,"moving":false,"position":{"x":0.9795448800123991,"y":2.540675992607571,"z":0}}}
+{"timestamp":"2026-02-06T04:35:28.68953Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.87999999999994,"moving":false,"position":{"x":0.9795448800123991,"y":2.540675992607571,"z":0}}}
+{"timestamp":"2026-02-06T04:35:33.6896921Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.86999999999993,"moving":false,"position":{"x":0.9795448800123991,"y":2.540675992607571,"z":0}}}
+{"timestamp":"2026-02-06T04:35:38.6894637Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.85999999999993,"moving":false,"position":{"x":0.9795448800123991,"y":2.540675992607571,"z":0}}}
+{"timestamp":"2026-02-06T04:35:43.68943Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.84999999999992,"moving":false,"position":{"x":0.9795448800123991,"y":2.540675992607571,"z":0}}}
+{"timestamp":"2026-02-06T04:35:48.6901108Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.83999999999992,"moving":false,"position":{"x":0.9795448800123991,"y":2.540675992607571,"z":0}}}
+{"timestamp":"2026-02-06T04:35:53.6894622Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.82999999999991,"moving":false,"position":{"x":0.9795448800123991,"y":2.540675992607571,"z":0}}}
+{"timestamp":"2026-02-06T04:35:58.6907482Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.81999999999991,"moving":false,"position":{"x":0.9795448800123991,"y":2.540675992607571,"z":0}}}
+{"timestamp":"2026-02-06T04:36:03.6894438Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.8099999999999,"moving":false,"position":{"x":0.9795448800123991,"y":2.540675992607571,"z":0}}}
+{"timestamp":"2026-02-06T04:36:08.7132593Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.7999999999999,"moving":false,"position":{"x":0.9795448800123991,"y":2.540675992607571,"z":0}}}
+{"timestamp":"2026-02-06T04:36:13.6895197Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.78999999999989,"moving":false,"position":{"x":0.9795448800123991,"y":2.540675992607571,"z":0}}}
+{"timestamp":"2026-02-06T04:36:18.6952234Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.77999999999989,"moving":false,"position":{"x":0.9795448800123991,"y":2.540675992607571,"z":0}}}
+{"timestamp":"2026-02-06T04:36:23.6903958Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.76999999999988,"moving":false,"position":{"x":0.9795448800123991,"y":2.540675992607571,"z":0}}}
+{"timestamp":"2026-02-06T04:36:28.6894843Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.75999999999988,"moving":false,"position":{"x":0.9795448800123991,"y":2.540675992607571,"z":0}}}
+{"timestamp":"2026-02-06T04:36:33.6894623Z","type":"telemetry","mission_id":"mission-medical-aid","details":{"battery":91.74999999999987,"moving":false,"position":{"x":0.9795448800123991,"y":2.540675992607571,"z":0}}}

@@ -168,6 +168,7 @@ export default function CommandHub() {
                 Parameters (JSON)
               </label>
               <textarea
+                placeholder="Enter JSON parameters"
                 value={params}
                 onChange={(e) => setParams(e.target.value)}
                 className="mt-1 w-full min-h-[140px] rounded-xl border border-asgard-200 dark:border-asgard-700 bg-white dark:bg-asgard-900 px-3 py-2 text-sm"

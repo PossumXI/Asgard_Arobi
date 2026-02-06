@@ -1,0 +1,163 @@
+# ASGARD Civilian Package Configuration
+# Version: 1.0.0
+# Copyright 2026 Arobi. All Rights Reserved.
+
+package:
+  name: "asgard-civilian"
+  version: "1.0.0"
+  type: "civilian"
+  description: "Public-facing civilian package with limited functionality"
+
+# Enabled Services
+services:
+  websites:
+    enabled: true
+    port: 3000
+    public: true
+    features:
+      - marketing
+      - civilian_dashboard
+      - account_management
+      - support
+
+  hubs:
+    enabled: true
+    port: 3001
+    public: true
+    features:
+      - video_streaming_tiered
+      - weather_display
+      - status_overview
+    access_tiers:
+      free:
+        - low_quality_stream
+        - basic_status
+      premium:
+        - high_quality_stream
+        - detailed_status
+        - historical_data
+
+  giru_jarvis:
+    enabled: true
+    port: 7777
+    websocket_port: 7778
+    public: false
+    features:
+      - voice_assistant
+      - basic_queries
+    restricted_commands:
+      - mission_control
+      - valkyrie_commands
+      - hunoid_commands
+      - military_operations
+
+  pricilla:
+    enabled: true
+    port: 8089
+    public: false
+    features:
+      - trajectory_display
+      - basic_predictions
+    restricted_features:
+      - intercept_calculation
+      - military_guidance
+      - weapons_targeting
+
+# Disabled Services (Government Only)
+disabled_services:
+  - valkyrie
+  - hunoid
+  - giru_security
+  - nysus
+  - silenus
+  - gov_client
+
+# Security Configuration
+security:
+  authentication:
+    type: "oauth2"
+    providers:
+      - google
+      - microsoft
+      - email_password
+
+  authorization:
+    default_role: "civilian_user"
+    roles:
+      civilian_user:
+        - read_public_status
+        - access_streaming
+        - basic_voice_commands
+      premium_user:
+        - civilian_user
+        - high_quality_streaming
+        - detailed_telemetry
+
+  rate_limiting:
+    enabled: true
+    requests_per_minute: 60
+    burst_size: 10
+
+  cors:
+    allowed_origins:
+      - "https://aura-genesis.org"
+      - "https://www.aura-genesis.org"
+      - "http://localhost:3000"
+
+# API Access
+api:
+  endpoints:
+    public:
+      - "/api/status"
+      - "/api/weather"
+      - "/api/news"
+      - "/api/support"
+
+    authenticated:
+      - "/api/telemetry/basic"
+      - "/api/account"
+      - "/api/streaming/access"
+
+    restricted:
+      - "/api/missions/*"
+      - "/api/valkyrie/*"
+      - "/api/hunoid/*"
+      - "/api/military/*"
+      - "/api/satellite/*"
+
+# Telemetry (Limited)
+telemetry:
+  enabled: true
+  update_rate_hz: 1  # Reduced rate for civilians
+  data_retention_days: 7
+  exposed_metrics:
+    - system_status
+    - weather_conditions
+    - basic_location
+  hidden_metrics:
+    - military_positions
+    - mission_details
+    - sensitive_telemetry
+
+# Logging
+logging:
+  level: "info"
+  format: "json"
+  output:
+    - stdout
+    - file
+  file_path: "/var/log/asgard/civilian.log"
+  max_size_mb: 100
+  max_backups: 5
+
+# Deployment
+deployment:
+  type: "web"
+  platform:
+    - vercel
+    - cloudflare
+    - aws
+  cdn: true
+  auto_scaling: true
+  min_instances: 2
+  max_instances: 20

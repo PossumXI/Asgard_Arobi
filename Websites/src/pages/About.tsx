@@ -80,9 +80,9 @@ const timeline = [
 
 const leadership = [
   {
-    name: 'Dr. Helena Vance',
+    name: 'Gaetano Comparcola',
     role: 'Chief Executive Officer',
-    bio: 'Former NASA Mission Director with 20 years in autonomous systems.',
+    bio: 'System Engineer and Lead Architect responsible for the creating and maintaining the ASGARD fleet.',
   },
   {
     name: 'Marcus Chen',
@@ -95,9 +95,9 @@ const leadership = [
     bio: 'Leading researcher in AI ethics and autonomous decision-making frameworks.',
   },
   {
-    name: 'Gen. James Reeves (Ret.)',
+    name: 'James Reeves',
     role: 'Chief Security Officer',
-    bio: 'Former CYBERCOM commander, expert in defensive cyber operations.',
+    bio: 'Expert in defensive cyber operations.',
   },
 ];
 

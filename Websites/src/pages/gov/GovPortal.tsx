@@ -1,18 +1,22 @@
-import { useState } from 'react';
+import { useState, lazy, Suspense } from 'react';
 import { Routes, Route, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { 
-  Shield, 
-  Building2, 
-  Lock, 
-  Key, 
-  FileText, 
+import {
+  Shield,
+  Building2,
+  Lock,
+  Key,
+  FileText,
   Users,
   AlertTriangle,
   CheckCircle,
   ArrowRight,
-  Fingerprint
+  Fingerprint,
+  Download
 } from 'lucide-react';
+
+// Lazy-load download page
+const GovDownload = lazy(() => import('@/pages/GovDownload'));
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -88,14 +92,20 @@ function GovLanding() {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 onClick={() => setShowLogin(true)}
                 className="group"
               >
                 <Key className="w-5 h-5 mr-2" />
                 Authenticate with FIDO2
               </Button>
+              <Link to="/gov/download">
+                <Button size="lg" variant="outline" className="border-amber-500/50 text-amber-400 hover:bg-amber-500/10">
+                  <Download className="w-5 h-5 mr-2" />
+                  Download Client
+                </Button>
+              </Link>
               <Link to="/gov/request">
                 <Button size="lg" variant="outline" className="border-white/20 text-white hover:bg-white/10">
                   Request Access
@@ -375,9 +385,12 @@ function GovRequest() {
 
 export default function GovPortal() {
   return (
-    <Routes>
-      <Route index element={<GovLanding />} />
-      <Route path="request" element={<GovRequest />} />
-    </Routes>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <Routes>
+        <Route index element={<GovLanding />} />
+        <Route path="request" element={<GovRequest />} />
+        <Route path="download" element={<GovDownload />} />
+      </Routes>
+    </Suspense>
   );
 }

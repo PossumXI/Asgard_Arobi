@@ -128,11 +128,11 @@ export default function Layout() {
           </div>
           
           <div className="flex items-center gap-3">
-            <button className="relative p-2 rounded-lg hover:bg-hub-surface transition-colors">
+            <button type="button" aria-label="Notifications" className="relative p-2 rounded-lg hover:bg-hub-surface transition-colors">
               <Bell className="w-5 h-5 text-gray-400" />
               <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-red-500" />
             </button>
-            <button className="p-2 rounded-lg hover:bg-hub-surface transition-colors">
+            <button type="button" aria-label="User profile" className="p-2 rounded-lg hover:bg-hub-surface transition-colors">
               <User className="w-5 h-5 text-gray-400" />
             </button>
           </div>

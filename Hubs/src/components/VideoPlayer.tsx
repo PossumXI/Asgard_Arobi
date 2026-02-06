@@ -368,6 +368,8 @@ export default function VideoPlayer({
                         setVolume(parseFloat(e.target.value));
                       }}
                       className="w-full accent-hub-accent"
+                      title="Volume control"
+                      aria-label="Volume"
                     />
                   </div>
                 </div>

@@ -141,7 +141,7 @@ export default function Header() {
           {/* Company Tagline - Desktop only */}
           <div className="hidden lg:flex items-center">
             <span className="text-xs text-asgard-500 dark:text-asgard-400 italic">
-              Aerospace Intelligence & Defense Systems
+              Software, Robotics, Aerospace Intelligence & Defense Systems
             </span>
           </div>
 
@@ -297,8 +297,10 @@ export default function Header() {
             {isAuthenticated ? (
               <div className="relative">
                 <button
+                  type="button"
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                   className="flex items-center gap-2 p-2 rounded-xl hover:bg-asgard-100 dark:hover:bg-asgard-800 transition-colors"
+                  aria-label="Toggle user menu"
                 >
                   <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
                     <User className="w-4 h-4 text-primary" />

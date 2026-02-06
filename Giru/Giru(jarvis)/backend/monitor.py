@@ -6,6 +6,7 @@ Real-time activity tracking and monitoring with WebSocket broadcasts.
 
 import asyncio
 import json
+import logging
 import time
 from datetime import datetime
 from dataclasses import dataclass, field, asdict
@@ -13,8 +14,15 @@ from enum import Enum
 from typing import Optional, Callable, Any
 from contextlib import asynccontextmanager
 import websockets
+import websockets.exceptions
 
 from database import get_database, ActivityType, ActivityStatus
+
+# Suppress expected WebSocket handshake errors from health checks/probes
+# These occur when clients connect without completing the WebSocket handshake
+logging.getLogger("websockets").setLevel(logging.CRITICAL)
+logging.getLogger("websockets.server").setLevel(logging.CRITICAL)
+logging.getLogger("websockets.protocol").setLevel(logging.CRITICAL)
 
 
 # =============================================================================
@@ -332,9 +340,9 @@ class MonitoringServer:
         )
     
     async def _handle_client(self, websocket):
-        """Handle a monitoring client connection."""
+        """Handle a monitoring client connection with proper error handling."""
         self.clients.add(websocket)
-        
+
         try:
             # Send initial dashboard data
             dashboard = await self.monitor.get_dashboard_data()
@@ -343,10 +351,10 @@ class MonitoringServer:
                 'data': dashboard,
                 'timestamp': datetime.now().isoformat(),
             }))
-            
+
             # Subscribe to activity updates
             await self.monitor.subscribe(self._broadcast_to_clients)
-            
+
             # Handle incoming messages
             async for message in websocket:
                 try:
@@ -354,7 +362,17 @@ class MonitoringServer:
                     await self._handle_message(websocket, data)
                 except json.JSONDecodeError:
                     pass
-        
+
+        except websockets.exceptions.ConnectionClosedError:
+            # Client disconnected - expected behavior
+            pass
+        except websockets.exceptions.ConnectionClosedOK:
+            # Client closed connection gracefully
+            pass
+        except Exception as e:
+            # Log unexpected errors but don't crash
+            print(f"Monitor WebSocket error: {type(e).__name__}: {e}")
+
         finally:
             self.clients.discard(websocket)
     
@@ -392,11 +410,11 @@ class MonitoringServer:
         """Start the monitoring server."""
         import os
         self._running = True
-        
+
         # Bind to 0.0.0.0 to accept connections from outside Docker container
         bind_host = "0.0.0.0" if os.getenv("GIRU_DOCKER") else "127.0.0.1"
         async with websockets.serve(self._handle_client, bind_host, self.port):
-            print(f"📊 Monitoring server started on ws://{bind_host}:{self.port}")
+            print(f"Monitoring server started on ws://{bind_host}:{self.port}")
             
             # Periodically send dashboard updates
             while self._running:

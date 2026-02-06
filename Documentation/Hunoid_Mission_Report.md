@@ -3,8 +3,8 @@
 - Mission ID: mission-medical-aid
 - Mission name: Medical Aid Delivery
 - Objective: Deliver critical medical kit while assessing hazards.
-- Started: 2026-01-30T21:38:31Z
-- Completed: 2026-01-30T21:38:52Z
+- Started: 2026-02-06T04:34:53Z
+- Completed: 2026-02-06T04:35:14Z
 - Steps completed: 5
 - Steps blocked: 0
 - Auto approvals: 3
@@ -12,11 +12,11 @@
 
 ## Step Outcomes
 
-- step-1: Navigate to the supply depot -> completed (8.2745ms)
-- step-2: Pick up the medical kit -> completed (7.001767s)
-- step-3: Move to the injured person -> completed (5.0018095s)
-- step-4: Put down the medical kit gently -> completed (7.0019757s)
-- step-5: Inspect the area for hazards -> completed (2.0013354s)
+- step-1: Navigate to the supply depot -> completed (533.8µs)
+- step-2: Pick up the medical kit -> completed (7.0009794s)
+- step-3: Move to the injured person -> completed (5.0002054s)
+- step-4: Put down the medical kit gently -> completed (7.000714s)
+- step-5: Inspect the area for hazards -> completed (2.0005483s)
 
 ## Intervention Decisions
 

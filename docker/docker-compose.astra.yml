@@ -1,0 +1,95 @@
+# ASGARD Astra - Moltbook Social Agent
+# Docker Compose configuration for automated community building
+#
+# Start: docker-compose -f docker/docker-compose.astra.yml up -d
+# Logs: docker-compose -f docker/docker-compose.astra.yml logs -f astra
+# Stop: docker-compose -f docker/docker-compose.astra.yml down
+#
+# Copyright 2026 Arobi. All Rights Reserved.
+
+version: '3.8'
+
+services:
+  astra:
+    build:
+      context: ..
+      dockerfile: cmd/astra/Dockerfile
+    container_name: asgard-astra
+    restart: unless-stopped
+    environment:
+      - MOLTBOOK_API_KEY=${MOLTBOOK_API_KEY}
+      - TZ=America/New_York
+      # Agent behavior settings
+      - ASTRA_POST_INTERVAL=45m
+      - ASTRA_ENGAGE_INTERVAL=20m
+      - ASTRA_MAX_POSTS_DAY=10
+      - ASTRA_MAX_COMMENTS_DAY=30
+    volumes:
+      # Persist state and logs
+      - astra-data:/app/data
+      - astra-logs:/app/logs
+    networks:
+      - asgard-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "pgrep", "astra"]
+      interval: 5m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    labels:
+      - "com.asgard.service=astra"
+      - "com.asgard.description=Moltbook Social Agent"
+      - "com.arobi.project=asgard"
+
+  # Optional: Cron scheduler for specific posting times
+  astra-scheduler:
+    image: alpine:3.19
+    container_name: asgard-astra-scheduler
+    restart: unless-stopped
+    depends_on:
+      - astra
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    entrypoint: /bin/sh
+    command: |
+      -c '
+      # Install docker CLI
+      apk add --no-cache docker-cli
+
+      # Create cron jobs
+      echo "# Astra Moltbook Schedule" > /etc/crontabs/root
+
+      # Morning post (9 AM EST)
+      echo "0 9 * * * docker exec asgard-astra /usr/local/bin/astra --post" >> /etc/crontabs/root
+
+      # Afternoon engagement (2 PM EST)
+      echo "0 14 * * * docker exec asgard-astra /usr/local/bin/astra --feed" >> /etc/crontabs/root
+
+      # Evening post (7 PM EST)
+      echo "0 19 * * * docker exec asgard-astra /usr/local/bin/astra --post" >> /etc/crontabs/root
+
+      # Midnight engagement check
+      echo "0 0 * * * docker exec asgard-astra /usr/local/bin/astra --feed" >> /etc/crontabs/root
+
+      # Start crond in foreground
+      crond -f -l 2
+      '
+    networks:
+      - asgard-network
+    labels:
+      - "com.asgard.service=astra-scheduler"
+
+volumes:
+  astra-data:
+    driver: local
+  astra-logs:
+    driver: local
+
+networks:
+  asgard-network:
+    driver: bridge

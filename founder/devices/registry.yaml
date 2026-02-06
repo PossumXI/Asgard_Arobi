@@ -1,0 +1,68 @@
+# ASGARD Founder Device Registry
+# Classification: MAXIMUM SECURITY
+# Access: Tier 7+ or Founder Authorization
+
+registry_version: "1.0.0"
+last_updated: "2026-02-05"
+
+# Device registration placeholder
+# Add devices using the format specified in README.md
+
+devices: []
+
+# Example (commented out):
+# devices:
+#   - device_id: "founder-phone-001"
+#     owner_id: "ASGARD-001"
+#     device_type: "smartphone"
+#     device_name: "Founder Primary Phone"
+#     registration_date: "2026-02-05"
+#     capabilities:
+#       - gps_location
+#       - secure_messaging
+#       - emergency_alert
+#       - biometric_auth
+#     security:
+#       encryption_enabled: true
+#       remote_wipe_capable: true
+#       fido2_registered: true
+#     status: "active"
+
+# Network monitoring configuration
+network_monitoring:
+  wifi_tracking:
+    enabled: false  # Enable when devices registered
+    secure_networks_only: true
+
+  bluetooth_proximity:
+    enabled: false
+    alert_on_separation: true
+
+  cellular_backup:
+    enabled: false
+    carrier_integration: false
+
+# Emergency beacon configuration
+emergency_beacon:
+  enabled: true
+  trigger_methods:
+    - panic_button
+    - voice_command
+    - inactivity_timeout
+  response_systems:
+    - giru_security
+    - local_authorities
+    - founder_contacts
+
+# Geofencing (optional)
+geofencing:
+  enabled: false
+  zones: []
+  # Example zone:
+  # - name: "Home"
+  #   type: "safe_zone"
+  #   coordinates: { lat: 0.0, lon: 0.0 }
+  #   radius_meters: 100
+  #   alerts:
+  #     on_exit: true
+  #     on_enter: false

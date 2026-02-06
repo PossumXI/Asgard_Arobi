@@ -237,6 +237,7 @@ export default function AdminHub() {
                         Subscription Tier
                       </label>
                       <select
+                        aria-label="Subscription Tier"
                         value={subscriptionTier}
                         onChange={(e) => handleDraftChange(user.id, 'subscriptionTier', e.target.value)}
                         className="mt-1 w-full h-10 rounded-xl border border-asgard-200 dark:border-asgard-700 bg-white dark:bg-asgard-900 px-3 text-sm"
@@ -296,6 +297,7 @@ export default function AdminHub() {
                 Subscription Tier
               </label>
               <select
+                aria-label="Subscription Tier"
                 value={createUserData.subscriptionTier}
                 onChange={(e) =>
                   setCreateUserData((prev) => ({

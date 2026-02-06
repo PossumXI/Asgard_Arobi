@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASGARD Enhanced Flight Simulation Demo</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', 'SF Pro Display', -apple-system, sans-serif;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3a 50%, #0a0a2a 100%);
+            color: #fff;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        
+        .container {
+            display: grid;
+            grid-template-columns: 300px 1fr 350px;
+            grid-template-rows: 80px 1fr 200px;
+            height: 100vh;
+            gap: 1px;
+            background: #333;
+        }
+        
+        .header {
+            grid-column: 1 / -1;
+            background: linear-gradient(90deg, #1a1a3a, #2a2a5a, #1a1a3a);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            border-bottom: 2px solid #00d4ff;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-icon { font-size: 40px; }
+        .logo-text { font-size: 28px; font-weight: 700; background: linear-gradient(90deg, #00d4ff, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .mission-id { font-size: 14px; color: #888; letter-spacing: 2px; }
+        
+        .phase-display { text-align: right; }
+        .phase-label { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+        .phase-value { font-size: 24px; font-weight: 600; color: #00ff88; }
+        
+        .sidebar {
+            background: #0f0f2a;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .sidebar-title {
+            font-size: 14px;
+            color: #00d4ff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+        
+        .system-group { margin-bottom: 20px; }
+        .group-header { font-size: 12px; color: #888; margin-bottom: 10px; text-transform: uppercase; }
+        
+        .service-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: #1a1a3a;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border-left: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .service-item:hover { background: #2a2a4a; }
+        .service-item.valkyrie { border-left-color: #00d4ff; }
+        .service-item.pricilla { border-left-color: #7c3aed; }
+        .service-item.hunoid { border-left-color: #ff6400; }
+        .service-item.giru { border-left-color: #ff0000; }
+        .service-item.silenus { border-left-color: #00ff88; }
+        .service-item.nysus { border-left-color: #ffffff; }
+        .service-item.satnet { border-left-color: #800080; }
+        
+        .service-status { width: 12px; height: 12px; border-radius: 50%; }
+        .service-status.online { background: #00ff88; box-shadow: 0 0 10px #00ff88; animation: pulse 2s infinite; }
+        .service-status.offline { background: #ff4444; }
+        
+        .service-name { flex: 1; font-size: 13px; font-weight: 600; }
+        .service-port { font-size: 11px; color: #666; }
+        .service-metrics { font-size: 11px; color: #00d4ff; }
+        
+        .main-display {
+            background: #0a0a1a;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .flight-viz {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+        
+        .map-bg {
+            position: absolute; inset: 0;
+            background: radial-gradient(ellipse at center, #1a2a4a 0%, #0a0a1a 100%);
+        }
+        
+        .grid-overlay {
+            position: absolute; inset: 0;
+            background-image: linear-gradient(rgba(0,212,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,212,255,0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+        
+        .flight-path {
+            position: absolute; top: 50%; left: 10%; right: 10%;
+            height: 4px; background: linear-gradient(90deg, #00ff88, #00d4ff, #7c3aed);
+            border-radius: 2px; transform: translateY(-50%);
+        }
+        
+        .waypoint {
+            position: absolute; top: 50%; transform: translate(-50%, -50%);
+        }
+        
+        .waypoint-dot {
+            width: 16px; height: 16px; background: #00d4ff; border-radius: 50%; border: 3px solid #fff;
+        }
+        
+        .waypoint-label {
+            position: absolute; top: 25px; left: 50%; transform: translateX(-50%);
+            font-size: 11px; white-space: nowrap; color: #888;
+        }
+        
+        .aircraft {
+            position: absolute; top: 50%; transform: translate(-50%, -50%);
+            font-size: 36px; filter: drop-shadow(0 0 20px #00ff88);
+            transition: left 0.5s ease-out;
+        }
+        
+        .aircraft-trail {
+            position: absolute; top: 50%; height: 3px;
+            background: linear-gradient(90deg, transparent, #00ff88);
+            transform: translateY(-50%); transition: width 0.5s ease-out;
+        }
+        
+        .stats-panel {
+            position: absolute; top: 20px; left: 20px;
+            background: rgba(0,0,0,0.8); border: 1px solid #00d4ff; border-radius: 12px; padding: 20px; min-width: 200px;
+        }
+        
+        .stat-row {
+            display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #222;
+        }
+        
+        .stat-row:last-child { border-bottom: none; }
+        .stat-label { color: #888; font-size: 12px; }
+        .stat-value { color: #00ff88; font-weight: 600; font-size: 14px; }
+        
+        .alert-panel {
+            position: absolute; top: 20px; right: 20px; max-width: 300px;
+        }
+        
+        .alert {
+            background: rgba(255,100,0,0.2); border: 1px solid #ff6400; border-radius: 8px; padding: 15px; margin-bottom: 10px; animation: pulse 2s infinite;
+        }
+        
+        .alert.threat { background: rgba(255,0,0,0.2); border-color: #ff0000; }
+        .alert.success { background: rgba(0,255,136,0.2); border-color: #00ff88; animation: none; }
+        
+        .alert-title { font-weight: 600; margin-bottom: 5px; }
+        .alert-text { font-size: 12px; color: #ccc; }
+        
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+        
+        .info-panel {
+            background: #0f0f2a; padding: 20px; overflow-y: auto;
+        }
+        
+        .ai-decision {
+            background: #1a1a3a; border-radius: 8px; padding: 15px; margin-bottom: 10px; border-left: 3px solid #7c3aed;
+        }
+        
+        .ai-label { font-size: 11px; color: #7c3aed; text-transform: uppercase; letter-spacing: 1px; }
+        .ai-action { font-size: 14px; margin-top: 5px; }
+        .ai-confidence { font-size: 12px; color: #00ff88; margin-top: 5px; }
+        
+        .console {
+            grid-column: 1 / -1;
+            background: #000; font-family: 'Consolas', 'Monaco', monospace; padding: 15px; overflow-y: auto; border-top: 2px solid #00d4ff;
+        }
+        
+        .console-line { font-size: 12px; line-height: 1.6; color: #0f0; }
+        .console-line.info { color: #00d4ff; }
+        .console-line.warn { color: #ffaa00; }
+        .console-line.success { color: #00ff88; }
+        .console-line.phase { color: #ff00ff; font-weight: bold; }
+        
+        .progress-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 6px; background: #222; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #00d4ff, #7c3aed); transition: width 0.3s; }
+        
+        .controls {
+            position: absolute; top: 20px; right: 380px;
+            display: flex; gap: 10px;
+        }
+        
+        .btn {
+            background: #00d4ff; color: #000; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 600; cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover { background: #00ff88; transform: translateY(-2px); }
+        .btn.secondary { background: #7c3aed; color: white; }
+        .btn.danger { background: #ff0000; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">🛡️</div>
+                <div>
+                    <div class="logo-text">ASGARD</div>
+                    <div class="mission-id">MISSION: ASGARD-DEMO-001</div>
+                </div>
+            </div>
+            <div class="phase-display">
+                <div class="phase-label">Current Phase</div>
+                <div class="phase-value" id="phase-display">INITIALIZING</div>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <div class="sidebar-title">🖥️ System Status</div>
+            
+            <div class="system-group">
+                <div class="group-header">Flight & Navigation</div>
+                <div class="service-item valkyrie">
+                    <div class="service-status online"></div>
+                    <div class="service-name">Valkyrie</div>
+                    <div class="service-metrics">ONLINE</div>
+                </div>
+                <div class="service-item pricilla">
+                    <div class="service-status online"></div>
+                    <div class="service-name">Pricilla</div>
+                    <div class="service-metrics">ONLINE</div>
+                </div>
+            </div>
+
+            <div class="system-group">
+                <div class="group-header">Robotics & Security</div>
+                <div class="service-item hunoid">
+                    <div class="service-status online"></div>
+                    <div class="service-name">Hunoid</div>
+                    <div class="service-metrics">ONLINE</div>
+                </div>
+                <div class="service-item giru">
+                    <div class="service-status online"></div>
+                    <div class="service-name">Giru</div>
+                    <div class="service-metrics">ONLINE</div>
+                </div>
+            </div>
+
+            <div class="system-group">
+                <div class="group-header">Space & Orchestration</div>
+                <div class="service-item silenus">
+                    <div class="service-status online"></div>
+                    <div class="service-name">Silenus</div>
+                    <div class="service-metrics">ONLINE</div>
+                </div>
+                <div class="service-item nysus">
+                    <div class="service-status online"></div>
+                    <div class="service-name">Nysus</div>
+                    <div class="service-metrics">ONLINE</div>
+                </div>
+                <div class="service-item satnet">
+                    <div class="service-status online"></div>
+                    <div class="service-name">Sat_Net</div>
+                    <div class="service-metrics">ONLINE</div>
+                </div>
+            </div>
+
+            <div class="system-group">
+                <div class="group-header">Real-time Metrics</div>
+                <div class="service-item">
+                    <div class="service-status online"></div>
+                    <div class="service-name">Sensor Fusion</div>
+                    <div class="service-metrics">0.574ms</div>
+                </div>
+                <div class="service-item">
+                    <div class="service-status online"></div>
+                    <div class="service-name">360° Perception</div>
+                    <div class="service-metrics">68µs</div>
+                </div>
+                <div class="service-item">
+                    <div class="service-status online"></div>
+                    <div class="service-name">Ethics Evaluation</div>
+                    <div class="service-metrics"><1ms</div>
+                </div>
+                <div class="service-item">
+                    <div class="service-status online"></div>
+                    <div class="service-name">Decision Engine</div>
+                    <div class="service-metrics"><10ms</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-display">
+            <div class="controls">
+                <button class="btn" onclick="startDemo()">Start Demo</button>
+                <button class="btn secondary" onclick="pauseDemo()">Pause</button>
+                <button class="btn danger" onclick="resetDemo()">Reset</button>
+            </div>
+            
+            <div class="flight-viz">
+                <div class="map-bg"></div>
+                <div class="grid-overlay"></div>
+                <div class="flight-path"></div>
+
+                <div class="waypoint" style="left: 10%;"><div class="waypoint-dot"></div><div class="waypoint-label">NYC</div></div>
+                <div class="waypoint" style="left: 30%;"><div class="waypoint-dot"></div><div class="waypoint-label">CHI</div></div>
+                <div class="waypoint" style="left: 50%;"><div class="waypoint-dot"></div><div class="waypoint-label">DEN</div></div>
+                <div class="waypoint" style="left: 70%;"><div class="waypoint-dot"></div><div class="waypoint-label">PHX</div></div>
+                <div class="waypoint" style="left: 90%;"><div class="waypoint-dot"></div><div class="waypoint-label">LAX</div></div>
+
+                <div class="aircraft-trail" style="left: 10%; width: 0%;"></div>
+                <div class="aircraft" style="left: 10%;">✈️</div>
+
+                <div class="stats-panel">
+                    <div class="stat-row"><span class="stat-label">Altitude</span><span class="stat-value" id="alt-display">0 m</span></div>
+                    <div class="stat-row"><span class="stat-label">Speed</span><span class="stat-value" id="speed-display">0 kts</span></div>
+                    <div class="stat-row"><span class="stat-label">Heading</span><span class="stat-value" id="heading-display">270°</span></div>
+                    <div class="stat-row"><span class="stat-label">Fuel</span><span class="stat-value" id="fuel-display">100%</span></div>
+                    <div class="stat-row"><span class="stat-label">Position</span><span class="stat-value" id="pos-display">40.71°N</span></div>
+                </div>
+
+                <div class="alert-panel" id="alert-panel"></div>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width: 0%;"></div></div>
+        </div>
+
+        <div class="info-panel">
+            <div class="sidebar-title">🤖 AI Decisions</div>
+            <div id="decisions-container"></div>
+        </div>
+
+        <div class="console" id="console"></div>
+    </div>
+
+    <script>
+        // Demo state
+        const state = {
+            phase: 'INITIALIZING',
+            progress: 0,
+            altitude: 0,
+            speed: 0,
+            heading: 270,
+            fuel: 100,
+            lat: 40.71,
+            running: false,
+            interval: null,
+            logs: [],
+            decisions: [],
+            alert: null,
+            alertType: '',
+            alertTitle: ''
+        };
+
+        // DOM elements
+        const elements = {
+            phase: document.getElementById('phase-display'),
+            alt: document.getElementById('alt-display'),
+            speed: document.getElementById('speed-display'),
+            heading: document.getElementById('heading-display'),
+            fuel: document.getElementById('fuel-display'),
+            pos: document.getElementById('pos-display'),
+            aircraft: document.querySelector('.aircraft'),
+            trail: document.querySelector('.aircraft-trail'),
+            progress: document.querySelector('.progress-fill'),
+            alertPanel: document.getElementById('alert-panel'),
+            console: document.getElementById('console'),
+            decisions: document.getElementById('decisions-container')
+        };
+
+        // Logging function
+        function log(msg, type = '') {
+            const time = new Date().toLocaleTimeString();
+            state.logs.push({ time, msg, type });
+            updateConsole();
+            console.log(`[${time}] ${msg}`);
+        }
+
+        // Update console display
+        function updateConsole() {
+            elements.console.innerHTML = state.logs.slice(-12).map(log => `
+                <div class="console-line ${log.type || ''}">${log.time} ${log.msg}</div>
+            `).join('');
+        }
+
+        // Update decisions display
+        function updateDecisions() {
+            elements.decisions.innerHTML = state.decisions.slice(-5).map(d => `
+                <div class="ai-decision">
+                    <div class="ai-label">${d.type}</div>
+                    <div class="ai-action">${d.action}</div>
+                    <div class="ai-confidence">Confidence: ${d.confidence}%</div>
+                </div>
+            `).join('');
+        }
+
+        // Update alert panel
+        function updateAlert() {
+            if (state.alert) {
+                elements.alertPanel.innerHTML = `
+                    <div class="alert ${state.alertType || ''}">
+                        <div class="alert-title">${state.alertTitle || 'ALERT'}</div>
+                        <div class="alert-text">${state.alert}</div>
+                    </div>
+                `;
+            } else {
+                elements.alertPanel.innerHTML = '';
+            }
+        }
+
+        // Update all displays
+        function updateDisplay() {
+            elements.phase.textContent = state.phase;
+            elements.alt.textContent = `${state.altitude} m`;
+            elements.speed.textContent = `${state.speed} kts`;
+            elements.heading.textContent = `${state.heading}°`;
+            elements.fuel.textContent = `${state.fuel}%`;
+            elements.pos.textContent = `${state.lat.toFixed(2)}°N`;
+            
+            // Update aircraft position
+            const left = 10 + (state.progress * 0.8);
+            elements.aircraft.style.left = `${left}%`;
+            elements.trail.style.width = `${state.progress}%`;
+            
+            // Update progress bar
+            elements.progress.style.width = `${state.overallProgress || 0}%`;
+            
+            updateAlert();
+        }
+
+        // Demo phases
+        const phases = [
+            { name: 'SYSTEM INIT', duration: 2000, action: () => {
+                log('═══════════════════════════════════════════════════', 'phase');
+                log('ASGARD FLIGHT SIMULATION - INITIALIZING', 'phase');
+                log('═══════════════════════════════════════════════════', 'phase');
+                log('All systems initialized', 'success');
+                state.decisions.push({ type: 'SYSTEM INIT', action: 'All ASGARD systems online', confidence: 100 });
+                state.overallProgress = 10;
+            }},
+            { name: 'MISSION PLANNING', duration: 3000, action: () => {
+                log('📋 PHASE 2: Mission Planning', 'phase');
+                log('Route: New York → Los Angeles (3,940 km)', 'info');
+                log('Waypoints: NYC → CHI → DEN → PHX → LAX', 'info');
+                log('Cruise altitude: 10,000m | Speed: 250 kts', 'info');
+                state.decisions.push({ type: 'ROUTE PLANNING', action: 'Direct route calculated', confidence: 98 });
+                state.overallProgress = 15;
+            }},
+            { name: 'TAKEOFF', duration: 3000, action: () => {
+                log('✈️ PHASE 3: Autonomous Flight', 'phase');
+                log('📍 TAKEOFF - Target: 1,000m @ 150kts', 'info');
+            }},
+            { name: 'CLIMB', duration: 3000, action: () => {
+                log('📍 CLIMB - Target: 5,000m @ 200kts', 'info');
+            }},
+            { name: 'CRUISE', duration: 8000, action: () => {
+                log('📍 CRUISE - Target: 10,000m @ 250kts', 'info');
+            }},
+            { name: 'DESCENT', duration: 3000, action: () => {
+                log('📍 DESCENT - Target: 2,000m @ 180kts', 'info');
+            }},
+            { name: 'APPROACH', duration: 2000, action: () => {
+                log('📍 APPROACH - Target: 500m @ 120kts', 'info');
+            }},
+            { name: 'LANDING', duration: 2000, action: () => {
+                log('📍 LANDING - Target: 0m @ 0kts', 'info');
+            }},
+            { name: 'WEATHER ALERT', duration: 4000, action: () => {
+                log('🌧️ PHASE 4: Weather Event', 'phase');
+                log('⚠️ SEVERE THUNDERSTORM DETECTED', 'warn');
+                state.alert = 'Severe thunderstorm detected ahead. Visibility 2000m, turbulence SEVERE.';
+                state.alertTitle = '⚠️ WEATHER ALERT';
+                state.alertType = '';
+                log('🤖 GIRU analyzing weather data...', 'info');
+                state.decisions.push({ type: 'WEATHER ANALYSIS', action: 'Visibility below minimums - REPLAN REQUIRED', confidence: 94 });
+                log('Decision: REPLAN ROUTE - Avoid weather zone', 'info');
+                state.alert = 'Route replanned successfully. +180km, +12 minutes.';
+                state.alertTitle = '✓ ROUTE UPDATED';
+                state.alertType = 'success';
+                state.decisions.push({ type: 'ROUTE REPLAN', action: 'Northern diversion calculated', confidence: 97 });
+                log('✓ New route applied - Weather avoidance 100%', 'success');
+                state.overallProgress = 70;
+            }},
+            { name: 'DEFENSE ENGAGEMENT', duration: 6000, action: () => {
+                log('🎯 PHASE 5: Defense Target Engagement', 'phase');
+                log('🎯 HOSTILE TARGET DETECTED - ENGAGEMENT REQUIRED', 'warn');
+                state.alert = 'Hostile target detected. Coordinates: 41.5°N, -102.0°W. Threat level: HIGH';
+                state.alertTitle = '🎯 DEFENSE MISSION';
+                state.alertType = 'threat';
+                log('🤖 Pricilla calculating optimal engagement trajectory...', 'info');
+                
+                // Physics calculation
+                const targetDistance = 12000; // meters
+                const munitionsSpeed = 850; // m/s
+                const blastRadius = 25; // meters
+                const timeToTarget = targetDistance / munitionsSpeed;
+                
+                log(`Physics Calculation: Distance ${targetDistance}m, Speed ${munitionsSpeed}m/s`, 'info');
+                log(`Time to target: ${timeToTarget.toFixed(2)}s, Blast radius: ${blastRadius}m`, 'info');
+                
+                state.decisions.push({ type: 'TRAJECTORY CALCULATION', action: `Optimal intercept calculated - ${timeToTarget.toFixed(2)}s flight time`, confidence: 98 });
+                log('Decision: ENGAGE - Optimal intercept trajectory locked', 'info');
+                log('🛡️ Ethics Kernel validation for target engagement...', 'info');
+                log('✓ Target classified as hostile military asset', 'success');
+                log('✓ No civilian structures in blast radius', 'success');
+                log('✓ Rules of engagement compliance verified', 'success');
+                state.decisions.push({ type: 'ETHICS VALIDATION', action: 'All constraints PASSED - Engagement authorized', confidence: 100 });
+                log('🎯 Munitions deployment in progress...', 'info');
+                log('Impact in 3... 2... 1...', 'info');
+                state.alert = 'Target neutralized successfully. Blast radius: 25m. No collateral damage.';
+                state.alertTitle = '🎯 TARGET NEUTRALIZED';
+                state.alertType = 'success';
+                state.decisions.push({ type: 'ENGAGEMENT RESULT', action: 'Mission objective achieved', confidence: 100 });
+                log('🎯 TARGET NEUTRALIZED - Mission success', 'success');
+                state.overallProgress = 85;
+            }},
+            { name: 'WIFI IMAGING', duration: 5000, action: () => {
+                log('📡 PHASE 6: WiFi Through-Wall Imaging', 'phase');
+                log('📡 CSI FRAME ANALYSIS - STRUCTURAL IMAGING', 'info');
+                state.alert = 'Structural imaging required. WiFi CSI analysis initiated.';
+                state.alertTitle = '📡 WIFI IMAGING';
+                state.alertType = '';
+                log('🤖 Giru processing WiFi Channel State Information...', 'info');
+                
+                // WiFi CSI processing
+                const csiFrames = 1000;
+                const processingTime = 45; // milliseconds
+                const materialsDetected = ['Drywall', 'Concrete', 'Metal'];
+                const structuralIntegrity = '94%';
+                
+                log(`CSI Processing: ${csiFrames} frames analyzed in ${processingTime}ms`, 'info');
+                log(`Materials detected: ${materialsDetected.join(', ')}`, 'info');
+                log(`Structural integrity: ${structuralIntegrity}`, 'info');
+                
+                state.decisions.push({ type: 'CSI ANALYSIS', action: `Structural imaging complete - ${materialsDetected.length} materials identified`, confidence: 96 });
+                log('Decision: STRUCTURAL MAPPING COMPLETE - Safe entry points identified', 'info');
+                log('📡 Triangulation with multiple WiFi routers...', 'info');
+                log('📍 Target coordinates locked: 41.8°N, -103.5°W', 'info');
+                state.alert = 'Structural analysis complete. Safe entry points identified. No structural hazards detected.';
+                state.alertTitle = '📡 IMAGING COMPLETE';
+                state.alertType = 'success';
+                state.decisions.push({ type: 'TRIANGULATION', action: 'Entry points mapped with 94% accuracy', confidence: 95 });
+                log('📡 STRUCTURAL IMAGING COMPLETE - Ready for rescue operations', 'success');
+                state.overallProgress = 90;
+            }},
+            { name: 'RESCUE OPERATIONS', duration: 6000, action: () => {
+                log('🆘 PHASE 7: Hunoid Rescue Operations', 'phase');
+                log('🆘 ETHICS KERNEL - RESCUE PRIORITIZATION', 'info');
+                state.alert = 'Rescue scenario initiated. Two groups in danger - ethics kernel activated.';
+                state.alertTitle = '🆘 RESCUE MISSION';
+                state.alertType = '';
+                log('🤖 Hunoid performing 360° perception analysis...', 'info');
+                
+                // 360-degree perception
+                const perceptionTime = 68; // microseconds
+                const objectsDetected = 15;
+                const velocitiesCalculated = true;
+                const distancesMeasured = true;
+                const riskAssessment = 'Group A: 85% survival chance, Group B: 62% survival chance';
+                
+                log(`360° Perception: ${perceptionTime}µs processing time`, 'info');
+                log(`Objects detected: ${objectsDetected}, Velocities: ${velocitiesCalculated}`, 'info');
+                log(`Risk assessment: ${riskAssessment}`, 'info');
+                
+                state.decisions.push({ type: '360° PERCEPTION', action: `Complete analysis in ${perceptionTime}µs - All objects tracked`, confidence: 99 });
+                log('Decision: RESCUE GROUP A - Higher survival probability (85%)', 'info');
+                log('🛡️ Ethics Kernel validation per Agent_guide_manifest_2.md...', 'info');
+                log('✓ Decision maximizes overall survival probability', 'success');
+                log('✓ No bias detected in rescue prioritization', 'success');
+                log('✓ All ethical constraints satisfied', 'success');
+                state.decisions.push({ type: 'ETHICS KERNEL', action: 'Rescue prioritization validated - Group A selected', confidence: 100 });
+                log('🤖 Hunoid executing rescue maneuver...', 'info');
+                log('Rescue in progress...', 'info');
+                state.alert = 'Rescue operation successful. Group A extracted with 92% safety margin.';
+                state.alertTitle = '🆘 RESCUE COMPLETE';
+                state.alertType = 'success';
+                state.decisions.push({ type: 'RESCUE RESULT', action: 'Mission accomplished - All ethical guidelines followed', confidence: 100 });
+                log('🆘 RESCUE MISSION ACCOMPLISHED - Ethics compliance verified', 'success');
+                state.overallProgress = 95;
+            }},
+            { name: 'MISSION COMPLETE', duration: 5000, action: () => {
+                log('═══════════════════════════════════════════════════', 'phase');
+                log('✅ MISSION COMPLETE - ALL OBJECTIVES ACHIEVED', 'success');
+                log('═══════════════════════════════════════════════════', 'phase');
+                log('Total Distance: 3,940 km', 'info');
+                log('Flight Time: 3h 42m', 'info');
+                log('Fuel Consumed: 47.2%', 'info');
+                log('AI Decisions: 847 | Route Replans: 2', 'info');
+                log('Ethics Violations: 0 | Safety Score: 100%', 'success');
+                state.decisions.push({ type: 'MISSION STATUS', action: 'ALL OBJECTIVES ACHIEVED', confidence: 100 });
+                state.overallProgress = 100;
+                log('DO-178C DAL-B Compliance: VERIFIED', 'success');
+                log('Ethics Kernel: ALL CONSTRAINTS SATISFIED', 'success');
+            }}
+        ];
+
+        // Flight simulation logic
+        function simulateFlight() {
+            let phaseIndex = 0;
+            let phaseElapsed = 0;
+            let totalElapsed = 0;
+            const totalDuration = phases.reduce((sum, p) => sum + p.duration, 0);
+
+            state.interval = setInterval(() => {
+                if (!state.running) return;
+
+                const currentPhase = phases[phaseIndex];
+                phaseElapsed += 100;
+                totalElapsed += 100;
+
+                // Execute phase action once
+                if (phaseElapsed === 100) {
+                    state.phase = currentPhase.name;
+                    currentPhase.action();
+                    updateDisplay();
+                    updateDecisions();
+                }
+
+                // Update flight parameters based on phase
+                if (currentPhase.name === 'TAKEOFF') {
+                    state.altitude = Math.min(1000, state.altitude + 10);
+                    state.speed = Math.min(150, state.speed + 5);
+                    state.fuel -= 0.1;
+                } else if (currentPhase.name === 'CLIMB') {
+                    state.altitude = Math.min(5000, state.altitude + 20);
+                    state.speed = Math.min(200, state.speed + 5);
+                    state.fuel -= 0.1;
+                } else if (currentPhase.name === 'CRUISE') {
+                    state.altitude = Math.min(10000, state.altitude + 10);
+                    state.speed = Math.min(250, state.speed + 2);
+                    state.fuel -= 0.2;
+                    state.lat = 40.71 - (totalElapsed / totalDuration) * 6.66;
+                } else if (currentPhase.name === 'DESCENT') {
+                    state.altitude = Math.max(2000, state.altitude - 20);
+                    state.speed = Math.max(180, state.speed - 2);
+                    state.fuel -= 0.1;
+                } else if (currentPhase.name === 'APPROACH') {
+                    state.altitude = Math.max(500, state.altitude - 10);
+                    state.speed = Math.max(120, state.speed - 5);
+                    state.fuel -= 0.1;
+                } else if (currentPhase.name === 'LANDING') {
+                    state.altitude = Math.max(0, state.altitude - 5);
+                    state.speed = Math.max(0, state.speed - 5);
+                    state.fuel -= 0.05;
+                }
+
+                // Update progress
+                state.progress = Math.min(100, (totalElapsed / totalDuration) * 100);
+                state.overallProgress = Math.min(100, state.overallProgress + (100 / phases.length) * (100 / currentPhase.duration));
+
+                updateDisplay();
+
+                // Move to next phase
+                if (phaseElapsed >= currentPhase.duration) {
+                    phaseIndex++;
+                    phaseElapsed = 0;
+                    
+                    if (phaseIndex >= phases.length) {
+                        stopDemo();
+                    }
+                }
+            }, 100);
+        }
+
+        // Control functions
+        function startDemo() {
+            if (state.running) return;
+            state.running = true;
+            log('🎬 Starting Flight Simulation Demo...', 'phase');
+            simulateFlight();
+        }
+
+        function pauseDemo() {
+            state.running = false;
+            if (state.interval) {
+                clearInterval(state.interval);
+                state.interval = null;
+            }
+            log('⏸️ Demo paused', 'warn');
+        }
+
+        function resetDemo() {
+            pauseDemo();
+            state.phase = 'INITIALIZING';
+            state.progress = 0;
+            state.altitude = 0;
+            state.speed = 0;
+            state.heading = 270;
+            state.fuel = 100;
+            state.lat = 40.71;
+            state.overallProgress = 0;
+            state.logs = [];
+            state.decisions = [];
+            state.alert = null;
+            state.alertType = '';
+            state.alertTitle = '';
+            
+            updateDisplay();
+            updateDecisions();
+            log('🔄 Demo reset to initial state', 'info');
+        }
+
+        function stopDemo() {
+            state.running = false;
+            if (state.interval) {
+                clearInterval(state.interval);
+                state.interval = null;
+            }
+            log('✅ Demo completed successfully!', 'success');
+            state.phase = 'DEMO COMPLETE';
+            updateDisplay();
+        }
+
+        // Initialize
+        log('🛡️ ASGARD Flight Simulation Demo Ready', 'phase');
+        log('Click "Start Demo" to begin the 5-minute simulation', 'info');
+        updateDisplay();
+    </script>
+</body>
+</html>

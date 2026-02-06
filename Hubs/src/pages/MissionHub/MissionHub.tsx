@@ -261,10 +261,19 @@ const LiveFeedViewer: React.FC<{
             {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
           </button>
           <div className="control-spacer" />
-          <button onClick={() => setIsFullscreen(!isFullscreen)}>
+          <button 
+            onClick={() => setIsFullscreen(!isFullscreen)} 
+            title="Toggle fullscreen"
+            aria-label="Toggle fullscreen"
+          >
             <Maximize2 size={20} />
+            <span className="sr-only">Toggle fullscreen</span>
           </button>
-          <button>
+          <button 
+            type="button"
+            title="Open settings"
+            aria-label="Open settings"
+          >
             <Settings size={20} />
           </button>
         </div>
@@ -505,7 +514,13 @@ export const MissionHub: React.FC = () => {
           )}
         </div>
         <div className="header-right">
-          <button className="refresh-btn" onClick={refreshMissions}>
+          <button 
+            type="button"
+            className="refresh-btn" 
+            onClick={refreshMissions}
+            title="Refresh missions"
+            aria-label="Refresh missions"
+          >
             <RefreshCw size={18} />
           </button>
           <button className="logout-btn" onClick={() => setIsAuthenticated(false)}>
