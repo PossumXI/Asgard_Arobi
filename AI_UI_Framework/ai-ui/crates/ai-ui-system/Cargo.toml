@@ -1,0 +1,48 @@
+[package]
+name = "ai-ui-system"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+anyhow = { workspace = true }
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+
+# Fuzzy search (used by Helix editor, 6x faster than skim)
+nucleo-matcher = "0.3"
+
+# System info (CPU, RAM, disk)
+sysinfo = "0.38"
+
+# Date/time
+chrono = "0.4"
+
+# Global hotkeys (Tauri team)
+global-hotkey = "0.6"
+
+# Config directories
+dirs = "6"
+
+# Platform-specific
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.62", features = [
+    "Win32_Foundation",
+    "Win32_UI_WindowsAndMessaging",
+    "Win32_UI_Shell",
+    "Win32_Graphics_Gdi",
+    "Win32_System_Threading",
+    "Win32_System_Power",
+] }
+winreg = "0.55"
+
+[target.'cfg(target_os = "linux")'.dependencies]
+zbus = { version = "5", default-features = false, features = ["tokio"] }
+freedesktop-desktop-entry = "0.8"
+x11rb = "0.13"
+
+[target.'cfg(target_os = "macos")'.dependencies]
+objc2 = "0.6"
+objc2-app-kit = "0.3"
+objc2-foundation = "0.3"

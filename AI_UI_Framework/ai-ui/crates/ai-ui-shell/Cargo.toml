@@ -1,0 +1,78 @@
+[package]
+name = "ai-ui-shell"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+iced = { workspace = true }
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+anyhow = { workspace = true }
+
+ai-ui-ai = { path = "../ai-ui-ai" }
+ai-ui-system = { path = "../ai-ui-system" }
+
+# Layout engine (CSS Flexbox + Grid)
+taffy = "0.7"
+
+# System tray (by Tauri team)
+tray-icon = "0.19"
+muda = "0.16"
+
+# Date/time
+chrono = "0.4"
+
+# Config
+dirs = "6"
+toml = "0.8"
+
+# Global hotkeys
+global-hotkey = "0.6"
+
+# Platform-specific
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.62", features = [
+    "Win32_Foundation",
+    "Win32_UI_WindowsAndMessaging",
+    "Win32_UI_Shell",
+    "Win32_Graphics_Gdi",
+    "Win32_System_Threading",
+] }
+winreg = "0.55"
+
+[target.'cfg(target_os = "linux")'.dependencies]
+zbus = { version = "5", default-features = false, features = ["tokio"] }
+freedesktop-desktop-entry = "0.8"
+x11rb = "0.13"
+
+[target.'cfg(target_os = "macos")'.dependencies]
+objc2 = "0.6"
+objc2-app-kit = "0.3"
+objc2-foundation = "0.3"
+
+[package.metadata.deb]
+maintainer = "ASGARD Team <dev@asgard.dev>"
+depends = "$auto, libvulkan1, libwayland-client0"
+section = "x11"
+assets = [
+    ["target/release/ai-ui-shell", "usr/bin/", "755"],
+    ["assets/ai-ui.desktop", "usr/share/applications/", "644"],
+    ["assets/ai-ui.desktop", "usr/share/wayland-sessions/", "644"],
+    ["assets/icons/256x256.png", "usr/share/icons/hicolor/256x256/apps/ai-ui.png", "644"],
+]
+
+[package.metadata.wix]
+upgrade-guid = "A1B2C3D4-E5F6-7890-ABCD-EF1234567890"
+path-guid = "B2C3D4E5-F6A7-8901-BCDE-F12345678901"
+license = false
+eula = false
+
+[package.metadata.bundle]
+name = "AI-UI"
+identifier = "com.ai-ui.shell"
+icon = ["assets/icons/icon.icns"]
+osx_minimum_system_version = "10.15"
+category = "public.app-category.utilities"

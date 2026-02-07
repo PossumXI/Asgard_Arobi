@@ -1,0 +1,45 @@
+# AI-UI Configuration
+# Place this at ~/.config/ai-ui/config.toml
+
+[api]
+# Anthropic API key (or set ANTHROPIC_API_KEY env var, or use OS keyring)
+# anthropic_key = "sk-ant-..."
+
+# Default model
+model = "claude-sonnet-4-5-20250929"
+
+[ai]
+# System prompt for the AI assistant
+system_prompt = "You are an AI assistant integrated into a desktop shell. Help users launch apps, manage files, answer questions, and control their system. Be concise and actionable."
+
+# Enable Ollama fallback when Claude is unavailable
+ollama_fallback = true
+ollama_model = "llama3.2:latest"
+
+[appearance]
+# Theme: "dark" or "light"
+theme = "dark"
+
+# Taskbar height in pixels
+taskbar_height = 40
+
+# Command bar width in pixels
+command_bar_width = 700
+
+[hotkeys]
+# Toggle AI command bar
+command_bar = "Ctrl+Space"
+
+# Open app launcher
+launcher = "Ctrl+Shift+A"
+
+# Open settings
+settings = "Ctrl+Shift+S"
+
+[mcp]
+# MCP server configurations
+# [[mcp.servers]]
+# name = "filesystem"
+# command = "npx"
+# args = ["-y", "@modelcontextprotocol/server-filesystem", "/home/user"]
+# enabled = true

@@ -1,0 +1,103 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*.*.*"]
+
+permissions:
+  contents: write
+
+env:
+  CARGO_TERM_COLOR: always
+  APP_NAME: ai-ui-shell
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install system deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwayland-dev libxkbcommon-dev \
+            libvulkan-dev libx11-dev libxrandr-dev libxi-dev libdbus-1-dev
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with: { key: linux }
+      - run: cargo build --release -p ai-ui-shell
+      - name: Package .deb
+        run: |
+          cargo install cargo-deb
+          cargo deb -p ai-ui-shell --no-build
+      - name: Package AppImage
+        run: |
+          wget -q https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+          chmod +x linuxdeploy-x86_64.AppImage
+          ./linuxdeploy-x86_64.AppImage \
+            --appdir AppDir \
+            --executable target/release/ai-ui-shell \
+            --desktop-file assets/ai-ui.desktop \
+            --icon-file assets/icons/256x256.png \
+            --output appimage
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux
+          path: |
+            target/debian/*.deb
+            *.AppImage
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with: { key: windows }
+      - run: cargo build --release -p ai-ui-shell
+        env: { RUSTFLAGS: "-C target-feature=+crt-static" }
+      - name: Package .msi
+        run: |
+          cargo install cargo-wix
+          cargo wix -p ai-ui-shell --no-build --nocapture
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: target/wix/*.msi
+
+  build-macos:
+    strategy:
+      matrix:
+        include:
+          - { target: x86_64-apple-darwin, os: macos-13 }
+          - { target: aarch64-apple-darwin, os: macos-14 }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with: { targets: "${{ matrix.target }}" }
+      - uses: Swatinem/rust-cache@v2
+        with: { key: "macos-${{ matrix.target }}" }
+      - run: cargo build --release -p ai-ui-shell --target ${{ matrix.target }}
+        env: { MACOSX_DEPLOYMENT_TARGET: "10.15" }
+      - name: Package .dmg
+        run: |
+          cargo install cargo-bundle
+          cargo bundle --release -p ai-ui-shell --target ${{ matrix.target }} --format osx
+          APP=$(find target/${{ matrix.target }}/release/bundle/osx -name "*.app" -maxdepth 1)
+          hdiutil create -volname "AI-UI" -srcfolder "$APP" -ov -format UDZO \
+            "AI-UI-${{ matrix.target }}.dmg"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos-${{ matrix.target }}
+          path: "*.dmg"
+
+  release:
+    needs: [build-linux, build-windows, build-macos]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { path: artifacts }
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/**/*
+          generate_release_notes: true

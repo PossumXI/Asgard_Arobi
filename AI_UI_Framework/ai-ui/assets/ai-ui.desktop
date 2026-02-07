@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=AI-UI Desktop
+Comment=AI-powered desktop environment
+Exec=/usr/bin/ai-ui-shell --session
+Type=Application
+DesktopNames=AI-UI
